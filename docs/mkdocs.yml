@@ -1,0 +1,38 @@
+site_name: screenlamp
+site_url: http://rasbt.github.io/screenlamp
+site_author: Sebastian Raschka
+site_description: A toolkit for ligand-based screening
+
+repo_url: https://github.com/rasbt/screenlamp
+
+#include_search: true # not necessary for this theme
+docs_dir: sources
+site_dir: html
+theme: simplex
+
+use_directory_urls: false
+site_favicon: favicon.ico
+
+markdown_extensions:
+  - extra
+  - tables
+  - fenced_code
+  - mathjax
+extra_javascript:
+  - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
+  - mathjaxhelper.js
+extra_css:
+  - extra.css
+
+copyright: Copyright &copy; 2017 Michigan State University. Developed in the <a href="http://www.kuhnlab.bmb.msu.edu">PSA Lab</a>. <em>Sebastian Raschka et al. 2017</em>.
+
+pages:
+- Home: index.md
+- Installation: installation.md
+- User Guide:
+  - placeholder.md
+- About:
+  - Contact: contact.md
+  - Release Notes: changelog.md
+  - License: license.md
+  - Citing screenlamp: cite.md
