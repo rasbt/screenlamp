@@ -8,16 +8,16 @@ repo_url: https://github.com/rasbt/screenlamp
 #include_search: true # not necessary for this theme
 docs_dir: sources
 site_dir: html
-theme: simplex
+theme: united
 
 use_directory_urls: false
 site_favicon: favicon.ico
 
 markdown_extensions:
+  - mdx_math
   - extra
   - tables
   - fenced_code
-  - mathjax
 extra_javascript:
   - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
   - mathjaxhelper.js

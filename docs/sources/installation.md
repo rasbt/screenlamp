@@ -10,13 +10,13 @@ You can install the latest stable release of screenlamp from the Python Packagin
 pip install screenlamp  
 ```
 
-Alternatively, you can download the latest `screenlamp` release from the GitHub repository at https://github.com/psa-lab/screenlamp/releases, unzip it, and install it by executing
+Alternatively, you can download the latest `screenlamp` release from the GitHub repository at [https://github.com/psa-lab/screenlamp/releases](https://github.com/psa-lab/screenlamp/releases), unzip it, and install it by executing
 
 ```bash
 python setup.py install
 ```
 
-##### Upgrading via `pip`
+### Upgrading via `pip`
 
 To upgrade an existing version of screenlamp from PyPI, execute
 
@@ -38,12 +38,4 @@ Or, you can fork the GitHub repository from https://github.com/rasbt/screenlamp 
 
 ```bash
 python setup.py install
-```
-
-### Anaconda/Conda
-
-Conda packages are now available for Mac, Windows, and Linux. You can install screenlamp using conda by executing
-
-```bash
-conda install -c rasbt screenlamp
 ```
