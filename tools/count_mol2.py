@@ -94,8 +94,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
             description='A command line tool for counting MOL2 structures',
-            epilog='Examples\n---------\n1) python count_mol2.py -i mol2_dir\n'
-                   '2) python count_mol2.py -i file.mol2.gz',
+            epilog='Example: python count_mol2.py -i mol2_dir\n',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

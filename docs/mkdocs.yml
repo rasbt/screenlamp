@@ -14,7 +14,7 @@ use_directory_urls: false
 site_favicon: favicon.ico
 
 markdown_extensions:
-  - mdx_math
+  - mathjax
   - extra
   - tables
   - fenced_code
@@ -31,6 +31,7 @@ pages:
 - Installation: installation.md
 - User Guide:
   - placeholder.md
+  - API.md
 - About:
   - Contact: contact.md
   - Release Notes: changelog.md
