@@ -28,6 +28,46 @@ python count_mol2.py -i mol2_dir
 ```
 
 
+# id_to_mol2.py
+
+
+
+**Usage:**
+
+    id_to_mol2.py [-h] -i INPUT --id_file ID_FILE -o OUTPUT [-w WHITELIST]
+
+
+    - [-v VERBOSE] [--version]
+
+Write a file with molecule IDs from MOL2 files.
+
+
+**Optional Arguments:**
+
+
+- `-h, --help            show this help message and exit`
+- `-i INPUT, --input INPUT`
+    - Input .mol2 or .mol2.gz file,or a directory of MOL2 files
+
+- `--id_file ID_FILE     Input ID file that contains moleculeIDs (one ID per line)`
+- `-o OUTPUT, --output OUTPUT`
+    - Output directory path for the filtered MOL2 files
+
+- `-w WHITELIST, --whitelist WHITELIST`
+    - Uses ID file as whitelist if True (default). Uses ID file as blacklist if False.
+
+- `-v VERBOSE, --verbose VERBOSE`
+    - Verbosity level. If 0, does not print any output. If 1 (default), prints the file currently processing.
+
+- `--version             show program's version number and exit`
+
+**Example:**
+
+```
+python mol2_to_id.py -i mol2_dir -o ids.txt
+```
+
+
 # mol2_to_id.py
 
 
