@@ -2,40 +2,24 @@
 
 ---
 
-### PyPI
+## Obtaining screenlamp
 
-You can install the latest stable release of screenlamp from the Python Packaging Index directly using `pip`:
+You can download the latest version of screenlamp either from [Python's Package Index (PyPI)](https://pypi.python.org/pypi/screenlamp) or select the latest version bundle from the [GitHub repository](https://github.com/psa-lab/screenlamp/releases).
 
-```bash
-pip install screenlamp  
-```
+Python package dependencies of screenlamp are listed in the `requirements.txt` file located in the screenlamp directory. To install all of these dependencies most conveniently, you can execute the following command:
 
-Alternatively, you can download the latest `screenlamp` release from the GitHub repository at [https://github.com/psa-lab/screenlamp/releases](https://github.com/psa-lab/screenlamp/releases), unzip it, and install it by executing
+    pip install -r requirements.txt
 
-```bash
-python setup.py install
-```
+The the main modules of screenlamp are located in the `tools/` subdirectory, and after satisfying the Python package requirements (see `requirements.txt`), they are ready to use. If you haven't used screenlamp before, we recommend you to read the screenlamp [Tutorial](tutorial.md).
 
-### Upgrading via `pip`
+### Obtaining older versions of screenlamp
 
-To upgrade an existing version of screenlamp from PyPI, execute
+To obtain one of the previous versions of screenlamp, please see the [Release Notes](changelog), which contains the respective download links.
 
-```bash
-pip install screenlamp --upgrade --no-deps
-```
+### Development version
 
-Please note that the dependencies (NumPy and SciPy) will also be upgraded if you omit the `--no-deps` flag; use the `--no-deps` ("no dependencies") flag if you don't want this.
+You can download the latest development version of screenlamp [as ZIP](https://github.com/rasbt/screenlamp/archive/master.zip) file directly from GitHub.
 
-### Dev Version
+Alternatively, you can clone the screenlamp development version to your local machine by executing the following command:
 
-The screenlamp version on PyPI may always one step behind; you can install the latest development version from the GitHub repository by executing
-
-```bash
-pip install git+git://github.com/psa-lab/screenlamp.git
-```
-
-Or, you can fork the GitHub repository from https://github.com/rasbt/screenlamp and install screenlamp from your local drive via
-
-```bash
-python setup.py install
-```
+    git clone https://github.com/rasbt/screenlamp.git
