@@ -17,6 +17,7 @@
 
 import argparse
 import os
+import sys
 
 from biopandas.mol2.mol2_io import split_multimol2
 
@@ -42,11 +43,13 @@ def mol2_to_idfile(mol2_files, id_file_path, verbose=0):
     with open(id_file_path, 'w') as f:
         for mol2_file in mol2_files:
             if verbose:
-                print('Processing %s' % mol2_file)
+                sys.stdout.write('Processing %s\n' % mol2_file)
+                sys.stdout.flush()
             for mol2 in split_multimol2(mol2_file):
                 f.write(mol2[0] + '\n')
     if verbose:
-        print('Finished')
+        sys.stdout.write('Finished\n')
+        sys.stdout.flush()
 
 
 def main(input_dir, output_file, verbose):

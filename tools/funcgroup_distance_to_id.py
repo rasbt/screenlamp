@@ -17,10 +17,16 @@
 
 import os
 import argparse
+import sys
 import pandas as pd
 from mputil import lazy_imap
 from biopandas.mol2 import split_multimol2
 from biopandas.mol2 import PandasMol2
+
+
+def parse_distance_string(s):
+    dist = [int(p.strip()) for p in s.split('-')]
+    return dist
 
 
 def get_mol2_files(dir_path):
@@ -59,13 +65,21 @@ def data_processor(mol2):
     pdmol = PandasMol2().read_mol2_from_list(mol2_lines=mol2[1],
                                              mol2_code=mol2[0])
 
-    match = mol2[0]
-    for sub_sele in SELECTION:
-        if not pd.eval(sub_sele).any():
-            match = ''
-            break
+    coordinates = pdmol.df.loc[pd.eval(SELECTION[0]), ['x', 'y', 'z']].values
 
-    return match
+    pdmol._df = pdmol._df[pd.eval(SELECTION[1])]
+
+    for xyz in coordinates:
+
+        distances = pdmol.distance(xyz)
+
+        match = ((distances.values >= DISTANCE[0]).any() and
+                 (distances.values <= DISTANCE[1]).any())
+
+        if match:
+            return mol2[0]
+
+    return ''
 
 
 def read_and_write(mol2_files, id_file_path, verbose):
@@ -74,7 +88,8 @@ def read_and_write(mol2_files, id_file_path, verbose):
 
         for mol2_file in mol2_files:
             if verbose:
-                print('Processing %s' % mol2_file)
+                sys.stdout.write('Processing %s\n' % mol2_file)
+                sys.stdout.flush()
 
             for chunk in lazy_imap(data_processor=data_processor,
                                    data_generator=split_multimol2(mol2_file),
@@ -112,6 +127,9 @@ if __name__ == '__main__':
                              ' output.'
                              ' If 1 (default), prints the file currently'
                              ' processing.')
+    parser.add_argument('-d', '--distance',
+                        type=str,
+                        help='Distance as "lowerbound-upperbound"')
     parser.add_argument('--processes',
                         type=int,
                         default=1,
@@ -126,6 +144,17 @@ if __name__ == '__main__':
     parser.add_argument('--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()
+    DISTANCE = parse_distance_string(args.distance)
+    if len(DISTANCE) != 2:
+        raise ValueError("Make sure you only have an lower and upper bound"
+                         " for --distance"
+                         "\nFor example '13-20'")
+
     SELECTION = parse_selection_string(args.selection)
+    if len(SELECTION) != 2:
+        raise ValueError("Make sure you only have 2 --selection criteria"
+                         " separated via '-->', for example,"
+                         "\n\"((atom_type == 'S.3') |"
+                         " (atom_type == 'S.o2'))\"")
 
     main(args.input, args.output, args.verbose)

@@ -25,8 +25,9 @@ def read_and_write(source, target, selection, columns, id_column, sep, verbose):
 
     if verbose:
         counter = 0
-        print('Using columns: %s' % columns)
-        print('Using selection: %s' % selection)
+        sys.stdout.write('Using columns: %s\n' % columns)
+        sys.stdout.write('Using selection: %s\n' % selection)
+        sys.stdout.flush()
 
     reader = pd.read_table(source, chunksize=100000, usecols=columns, sep=sep)
 

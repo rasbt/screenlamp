@@ -17,6 +17,7 @@
 
 import argparse
 import os
+import sys
 
 from biopandas.mol2.mol2_io import split_multimol2
 
@@ -55,7 +56,8 @@ def read_idfile(id_file_path):
 def filter_and_write(mol2_files, ids, output_dir, whitelist_filter, verbose):
     for mol2_file in mol2_files:
         if verbose:
-            print('Processing %s' % mol2_file)
+            sys.stdout.write('Processing %s\n' % mol2_file)
+            sys.stdout.flush()
 
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
