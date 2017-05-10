@@ -18,6 +18,7 @@
 import os
 import argparse
 import pandas as pd
+from mputil import lazy_imap
 from biopandas.mol2 import split_multimol2
 from biopandas.mol2 import PandasMol2
 
@@ -53,44 +54,38 @@ def parse_selection_string(s, df_name='pdmol.df'):
     return parsed
 
 
-def read_and_write(mol2_files, id_file_path, selection, verbose):
+def data_processor(mol2):
 
-    total_count = 0
+    pdmol = PandasMol2().read_mol2_from_list(mol2_lines=mol2[1],
+                                             mol2_code=mol2[0])
+
+    match = mol2[0]
+    for sub_sele in SELECTION:
+        if not pd.eval(sub_sele).any():
+            match = ''
+            break
+
+    return match
+
+
+def read_and_write(mol2_files, id_file_path, verbose):
+
     with open(id_file_path, 'w') as f:
 
         for mol2_file in mol2_files:
-            count = 0
             if verbose:
                 print('Processing %s' % mol2_file)
 
-            pdmol = PandasMol2()
-            for mol2 in split_multimol2(mol2_file):
-                pdmol.read_mol2_from_list(mol2_lines=mol2[1],
-                                          mol2_code=mol2[0])
-
-                match = True
-                for sub_sele in selection:
-                    if not pd.eval(sub_sele).any():
-                        match = False
-                        break
-
-                if match:
-                    f.write('%s\n' % mol2[0])
-                    count += 1
-
-            if verbose:
-                print('  Selected: %d' % count)
-                total_count += count
-    if verbose:
-        print('Total Selected: %d' % total_count)
+            for chunk in lazy_imap(data_processor=data_processor,
+                                   data_generator=split_multimol2(mol2_file),
+                                   n_cpus=0):
+                _ = [f.write('%s\n' % mol2_id)for mol2_id in chunk if mol2_id]
 
 
-def main(input_dir, output_file, selection, verbose):
+def main(input_dir, output_file, verbose):
     mol2_files = get_mol2_files(dir_path=input_dir)
-    parsed_sele = parse_selection_string(selection)
     read_and_write(mol2_files=mol2_files,
                    id_file_path=output_file,
-                   selection=parsed_sele,
                    verbose=verbose)
 
 
@@ -110,11 +105,6 @@ if __name__ == '__main__':
                         type=str,
                         required=True,
                         help='Selection string For example, ...')
-    parser.add_argument('-p', '--processes',
-                        type=int,
-                        default=1,
-                        help='Number of processes to run in parallel.'
-                             ' Uses all CPUs if 0')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
@@ -122,9 +112,20 @@ if __name__ == '__main__':
                              ' output.'
                              ' If 1 (default), prints the file currently'
                              ' processing.')
+    parser.add_argument('--processes',
+                        type=int,
+                        default=1,
+                        help='Number of processes to run in parallel.'
+                             ' If processes>0, the specified number of CPUs'
+                             ' will be used.'
+                             ' If processes=0, all available CPUs will'
+                             ' be used.'
+                             ' If processes=-1, all available CPUs'
+                             ' minus `processes` will be used.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()
+    SELECTION = parse_selection_string(args.selection)
 
-    main(args.input, args.output, args.selection, args.verbose)
+    main(args.input, args.output, args.verbose)
