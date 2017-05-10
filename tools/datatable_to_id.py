@@ -20,21 +20,19 @@ import sys
 import pandas as pd
 
 
-def read_and_write(source, target, selection, id_column, sep, verbose):
+def read_and_write(source, target, selection, columns, id_column, sep, verbose):
 
-    parsed_sele = parse_selection_string(selection, df_name='chunk')
-    columns = [id_column] + columns_from_selection(selection)
 
     if verbose:
         counter = 0
         print('Using columns: %s' % columns)
-        print('Using selection: %s' % parsed_sele)
+        print('Using selection: %s' % selection)
 
     reader = pd.read_table(source, chunksize=100000, usecols=columns, sep=sep)
 
     with open(target, 'w') as f:
         for chunk in reader:
-            mask = pd.eval(parsed_sele)
+            mask = pd.eval(selection)
             chunk.loc[mask, [id_column]].to_csv(f,
                                                 header=None,
                                                 index=None)
@@ -57,11 +55,15 @@ def columns_from_selection(s):
     return [c.replace('(', '') for c in s.split() if '(' in c]
 
 
-def main(input_dir, output_file, verbose):
+def main(input_dir, output_file, verbose, selection, id_column):
+
+    parsed_sele = parse_selection_string(selection, df_name='chunk')
+    columns = [id_column] + columns_from_selection(selection)
     read_and_write(source=args.input,
                    target=args.output,
-                   selection=args.selection,
-                   id_column=args.id_column,
+                   selection=parsed_sele,
+                   columns=columns,
+                   id_column=id_column,
                    sep=args.seperator,
                    verbose=args.verbose)
 
@@ -107,4 +109,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.input, args.output, args.verbose)
+    main(args.input, args.output, args.verbose, args.selection, args.id_column)
