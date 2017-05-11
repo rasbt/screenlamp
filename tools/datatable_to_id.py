@@ -17,11 +17,13 @@
 
 import argparse
 import sys
+import os
 import pandas as pd
+import time
 
 
-def read_and_write(source, target, selection, columns, id_column, sep, verbose):
-
+def read_and_write(source, target, selection,
+                   columns, id_column, sep, verbose):
 
     if verbose:
         counter = 0
@@ -32,14 +34,20 @@ def read_and_write(source, target, selection, columns, id_column, sep, verbose):
     reader = pd.read_table(source, chunksize=100000, usecols=columns, sep=sep)
 
     with open(target, 'w') as f:
+        if verbose:
+            start = time.time()
         for chunk in reader:
+
             mask = pd.eval(selection)
             chunk.loc[mask, [id_column]].to_csv(f,
                                                 header=None,
                                                 index=None)
             if verbose:
                 counter += 100000
-                sys.stderr.write('\rProcessed: %d' % counter)
+
+                elapsed = time.time() - start
+                sys.stdout.write('\rProcessed %d rows | %d rows/sec' %
+                                 (counter, counter / elapsed))
                 sys.stderr.flush()
 
     if verbose:
@@ -59,6 +67,9 @@ def columns_from_selection(s):
 def main(input_dir, output_file, verbose, selection, id_column):
 
     parsed_sele = parse_selection_string(selection, df_name='chunk')
+    dirpath = os.path.dirname(output_file)
+    if not os.path.exists(dirpath):
+        os.mkdir(dirpath)
     columns = [id_column] + columns_from_selection(selection)
     read_and_write(source=args.input,
                    target=args.output,

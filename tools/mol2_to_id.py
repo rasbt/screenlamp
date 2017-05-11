@@ -18,6 +18,7 @@
 import argparse
 import os
 import sys
+import time
 
 from biopandas.mol2.mol2_io import split_multimol2
 
@@ -42,14 +43,21 @@ def get_mol2_files(dir_path):
 def mol2_to_idfile(mol2_files, id_file_path, verbose=0):
     with open(id_file_path, 'w') as f:
         for mol2_file in mol2_files:
+
             if verbose:
-                sys.stdout.write('Processing %s\n' % mol2_file)
+                sys.stdout.write('Processing %s' % os.path.basename(mol2_file))
                 sys.stdout.flush()
-            for mol2 in split_multimol2(mol2_file):
+                start = time.time()
+
+            for idx, mol2 in enumerate(split_multimol2(mol2_file)):
                 f.write(mol2[0] + '\n')
-    if verbose:
-        sys.stdout.write('Finished\n')
-        sys.stdout.flush()
+
+            if verbose:
+                elapsed = time.time() - start
+                n_molecules = idx + 1
+                sys.stdout.write(' | scanned %d molecules | %d mol/sec\n' %
+                                 (n_molecules, n_molecules / elapsed))
+                sys.stdout.flush()
 
 
 def main(input_dir, output_file, verbose):

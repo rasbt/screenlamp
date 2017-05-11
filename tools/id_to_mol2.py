@@ -18,6 +18,7 @@
 import argparse
 import os
 import sys
+import time
 
 from biopandas.mol2.mol2_io import split_multimol2
 
@@ -56,7 +57,7 @@ def read_idfile(id_file_path):
 def filter_and_write(mol2_files, ids, output_dir, whitelist_filter, verbose):
     for mol2_file in mol2_files:
         if verbose:
-            sys.stdout.write('Processing %s\n' % mol2_file)
+            sys.stdout.write('Processing %s' % os.path.basename(mol2_file))
             sys.stdout.flush()
 
         if not os.path.exists(output_dir):
@@ -66,15 +67,25 @@ def filter_and_write(mol2_files, ids, output_dir, whitelist_filter, verbose):
 
         with open(mol2_outpath, 'w') as f:
 
+            if verbose:
+                start = time.time()
+
             if whitelist_filter:
-                for mol2 in split_multimol2(mol2_file):
+                for idx, mol2 in enumerate(split_multimol2(mol2_file)):
                     if mol2[0] in ids:
                         f.write(''.join(mol2[1]))
 
             else:
-                for mol2 in split_multimol2(mol2_file):
+                for idx, mol2 in enumerate(split_multimol2(mol2_file)):
                     if mol2[0] not in ids:
                         f.write(''.join(mol2[1]))
+            if verbose:
+                elapsed = time.time() - start
+                n_molecules = idx + 1
+                sys.stdout.write(' | scanned %d molecules | %d mol/sec\n' %
+                                 (n_molecules, n_molecules / elapsed))
+                sys.stdout.flush()
+
 
 
 def main(input_dir, id_file_path, output_dir, whitelist_filter, verbose):

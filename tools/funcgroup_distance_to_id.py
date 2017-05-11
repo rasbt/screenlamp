@@ -19,6 +19,7 @@ import os
 import argparse
 import sys
 import pandas as pd
+import time
 from mputil import lazy_imap
 from biopandas.mol2 import split_multimol2
 from biopandas.mol2 import PandasMol2
@@ -88,16 +89,27 @@ def read_and_write(mol2_files, id_file_path, verbose):
 
         for mol2_file in mol2_files:
             if verbose:
-                sys.stdout.write('Processing %s\n' % mol2_file)
+                start = time.time()
+                sys.stdout.write('Processing %s' % os.path.basename(mol2_file))
                 sys.stdout.flush()
 
+            cnt = 0
             for chunk in lazy_imap(data_processor=data_processor,
                                    data_generator=split_multimol2(mol2_file),
                                    n_cpus=0):
                 _ = [f.write('%s\n' % mol2_id)for mol2_id in chunk if mol2_id]
+                cnt += len(chunk)
+
+            if verbose:
+                elapsed = time.time() - start
+                sys.stdout.write(' | %d mol/sec\n' % (cnt / elapsed))
+                sys.stdout.flush()
 
 
 def main(input_dir, output_file, verbose):
+    dirpath = os.path.dirname(output_file)
+    if not os.path.exists(dirpath):
+        os.mkdir(dirpath)
     mol2_files = get_mol2_files(dir_path=input_dir)
     read_and_write(mol2_files=mol2_files,
                    id_file_path=output_file,
