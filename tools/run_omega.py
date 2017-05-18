@@ -31,45 +31,38 @@ def get_mol2_files(dir_path):
     return files
 
 
-def run_omega(source_file, target_file):
+def run_omega(source_file, target_file, n_processes, settings):
 
     prefix = ''.join(target_file.split('.mol2')[:-1])
-
-    sys.stdout.write('Processing %s\n' % source_file)
-    sys.stdout.flush()
 
     cmd = [EXECUTABLE,
            '-in', source_file,
            '-out', target_file,
            '-prefix', prefix,
-           '-maxconfs', '200',
-           '-warts', 'false']
-    
+           '-mpi_np', str(n_processes)]
+    if settings:
+        for s in settings.split():
+            s = s.strip()
+            if s:
+                cmd.append(s)
+
     subprocess.call(cmd, stdout=subprocess.PIPE, bufsize=1)
 
 
-def subprocess_runner(source_files, target_files, n_processes, func):
-
-    pool = Pool(processes=n_processes)
-
-    arguments = [(x, y) for x, y in zip(source_files, target_files)]
-
-    _ = [pool.apply_async(func, args=(x, y)) for x, y in arguments]
-    pool.close()
-    pool.join()
-
-
-def main(input_dir, output_dir, n_processes):
+def main(input_dir, output_dir, n_processes, settings):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
     mol2_in_files = get_mol2_files(input_dir)
     mol2_out_files = [os.path.join(output_dir, os.path.basename(mol2))
                       for mol2 in mol2_in_files]
+
     n_processes = get_num_cpus(n_processes)
-    subprocess_runner(source_files=mol2_in_files,
-                      target_files=mol2_out_files,
-                      n_processes=n_processes,
-                      func=run_omega)
+
+    for i, j in zip(mol2_in_files, mol2_out_files):
+        run_omega(source_file=i,
+                  target_file=j,
+                  n_processes=n_processes,
+                  settings=settings)
 
 
 if __name__ == '__main__':
@@ -88,7 +81,11 @@ if __name__ == '__main__':
                         help='Directory for writing the output files')
     parser.add_argument('--executable',
                         type=str,
-                        help='Omega2 executable')
+                        help='OMEGA2 executable')
+    parser.add_argument('--settings',
+                        type=str,
+                        default='-maxconfs 200 -warts false -progress percent',
+                        help='Additional OMEGA2 settings')
     parser.add_argument('-p', '--processes',
                         type=int,
                         default=1,
@@ -102,4 +99,5 @@ if __name__ == '__main__':
 
     main(input_dir=args.input,
          output_dir=args.output,
-         n_processes=args.processes)
+         n_processes=args.processes,
+         settings=args.settings)

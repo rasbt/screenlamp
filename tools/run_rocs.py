@@ -2,8 +2,22 @@ import os
 import subprocess
 import sys
 import argparse
-from multiprocessing import Pool
 from multiprocessing import cpu_count
+from biopandas.mol2.mol2_io import split_multimol2
+
+
+def check_query(query_path):
+    ids = [mol2[0] for mol2 in split_multimol2(query_path)]
+    n_ids = len(ids)
+    if n_ids > 1:
+        n_unique_ids = len(set(ids))
+        if n_unique_ids > 1:
+            raise ValueError('Please Make sure that you only submit one'
+                             ' molecule or, if you submit a multi-conformer'
+                             ' query, that conformers of the molecule'
+                             ' have all the same molecule ID labels.'
+                             ' Found %d molecules and %d unique labels'
+                             % (n_ids, n_unique_ids))
 
 
 def get_num_cpus(n_cpus):
@@ -31,7 +45,7 @@ def get_mol2_files(dir_path):
     return files
 
 
-def run_rocs(source_file, target_file):
+def run_rocs(source_file, target_file, n_processes, settings):
 
     prefix = ''.join(target_file.split('.mol2')[:-1])
 
@@ -41,39 +55,37 @@ def run_rocs(source_file, target_file):
     cmd = [EXECUTABLE,
            '-ref', QUERY_FILE,
            '-dbase', source_file,
-           'mcquery', 'true',
            '-outputquery', 'false',
-           '-maxhits', '0',
-           '-besthits', '0',
            '-prefix', prefix,
-           '-rankby', 'TanimotoCombo',
+           '-mcquery', 'true',
+           '-mpi_np', str(n_processes),
            '-oformat', 'mol2']
+
+    if settings:
+        for s in settings.split():
+            s = s.strip()
+            if s:
+                cmd.append(s)
 
     subprocess.call(cmd, stdout=subprocess.PIPE, bufsize=1)
 
 
-def subprocess_runner(source_files, target_files, n_processes, func):
-
-    pool = Pool(processes=n_processes)
-
-    arguments = [(x, y) for x, y in zip(source_files, target_files)]
-
-    _ = [pool.apply_async(func, args=(x, y)) for x, y in arguments]
-    pool.close()
-    pool.join()
-
-
-def main(input_dir, output_dir, n_processes):
+def main(input_dir, output_dir, n_processes, settings):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
+
+    check_query(QUERY_FILE)
     mol2_in_files = get_mol2_files(input_dir)
     mol2_out_files = [os.path.join(output_dir, os.path.basename(mol2))
                       for mol2 in mol2_in_files]
+
     n_processes = get_num_cpus(n_processes)
-    subprocess_runner(source_files=mol2_in_files,
-                      target_files=mol2_out_files,
-                      n_processes=n_processes,
-                      func=run_rocs)
+
+    for i, j in zip(mol2_in_files, mol2_out_files):
+        run_rocs(source_file=i,
+                 target_file=j,
+                 n_processes=n_processes,
+                 settings=settings)
 
 
 if __name__ == '__main__':
@@ -96,6 +108,10 @@ if __name__ == '__main__':
     parser.add_argument('--executable',
                         type=str,
                         help='ROCS executable')
+    parser.add_argument('--settings',
+                        type=str,
+                        default='-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent',
+                        help='Additional ROCS settings')
     parser.add_argument('-p', '--processes',
                         type=int,
                         default=1,
@@ -110,4 +126,5 @@ if __name__ == '__main__':
 
     main(input_dir=args.input,
          output_dir=args.output,
-         n_processes=args.processes)
+         n_processes=args.processes,
+         settings=args.settings)
