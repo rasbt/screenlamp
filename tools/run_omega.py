@@ -35,6 +35,9 @@ def run_omega(source_file, target_file, n_processes, settings):
 
     prefix = ''.join(target_file.split('.mol2')[:-1])
 
+    sys.stdout.write('Processing %s\n' % source_file)
+    sys.stdout.flush()
+
     cmd = [EXECUTABLE,
            '-in', source_file,
            '-out', target_file,
