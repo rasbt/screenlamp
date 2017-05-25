@@ -18,7 +18,7 @@ import sys
 def get_pyfiles(path):
     files = []
     for file in os.listdir(path):
-        if file.endswith('.py'):
+        if file.endswith('.py') and not file.startswith('_'):
             files.append(os.path.join(os.path.abspath(path), file))
     return files
 

@@ -31,7 +31,7 @@ pages:
 - Installation: installation.md
 - Tools Overview: tools.md
 #- Tutorial: tutorial.md
-- Tutorial: workflow/80698_mol2.md
+- Tutorial: workflow/example_1/example_1.md
 - About:
   - Contact: contact.md
   - Release Notes: changelog.md
