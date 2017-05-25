@@ -85,6 +85,10 @@ def data_processor(mol2):
 
 def read_and_write(mol2_files, id_file_path, verbose):
 
+    if verbose:
+        sys.stdout.write('Using selection: %s\n' % SELECTION)
+        sys.stdout.flush()
+
     with open(id_file_path, 'w') as f:
 
         for mol2_file in mol2_files:

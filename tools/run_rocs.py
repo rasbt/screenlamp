@@ -104,6 +104,7 @@ if __name__ == '__main__':
                         help='Directory for writing the output files')
     parser.add_argument('--query',
                         type=str,
+                        required=True,
                         help='Query molecule')
     parser.add_argument('--executable',
                         type=str,

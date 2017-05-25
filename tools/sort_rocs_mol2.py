@@ -57,9 +57,10 @@ def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         for id_, cont in split_multimol2(inp_mol2_path):
-            tmp_path = os.path.join(tmpdirname, id_)
-            with open(tmp_path, 'wb') as f:
-                pickle.dump(''.join(cont), f)
+            if id_:
+                tmp_path = os.path.join(tmpdirname, id_)
+                with open(tmp_path, 'wb') as f:
+                    pickle.dump(''.join(cont), f)
 
         with open(out_path_d, 'w') as dof,\
                 open(out_path_q, 'w') as qof:
@@ -83,7 +84,6 @@ def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
         sys.stdout.flush()
 
 
-
 def main(input_dir, output_dir, query_path,
          sortby, column_seperator, verbose):
     if not os.path.exists(output_dir):
@@ -91,11 +91,9 @@ def main(input_dir, output_dir, query_path,
     inp_mol2_paths = get_mol2_files(input_dir)
 
     for mol2_path in inp_mol2_paths:
-        report_path = os.path.basename(mol2_path).split('_')
-        report_path = (report_path[0] + '_' + report_path[-1])
-        report_path = report_path.replace('.mol2', '.rpt')
+        base = os.path.basename(mol2_path)
+        report_path = base.replace('.mol2', '.rpt').replace('_hits_', '_')
         report_path = os.path.join(os.path.dirname(mol2_path), report_path)
-
         read_and_write(mol2_path, report_path, output_dir, query_path,
                        sortby, column_seperator, verbose)
 
