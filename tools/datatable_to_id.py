@@ -43,7 +43,7 @@ def read_and_write(source, target, selection,
                                                 header=None,
                                                 index=None)
             if verbose:
-                counter += 100000
+                counter += chunk.shape[0]
 
                 elapsed = time.time() - start
                 sys.stdout.write('\rProcessed %d rows | %d rows/sec' %
