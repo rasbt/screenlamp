@@ -2,7 +2,6 @@ import os
 import subprocess
 import sys
 import argparse
-from multiprocessing import Pool
 from multiprocessing import cpu_count
 
 

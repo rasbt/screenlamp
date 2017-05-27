@@ -2,6 +2,7 @@ import os
 import argparse
 import sys
 import time
+from multiprocessing import cpu_count
 from numpy import nan as np_nan
 from mputil import lazy_imap
 from biopandas.mol2 import PandasMol2
@@ -71,7 +72,8 @@ def data_processor(mol2s):
     return mol2s[0][0], mol2s[1][0], atoms, charges
 
 
-def read_and_write(q_path, d_path, verbose, cache, output_file):
+def read_and_write(q_path, d_path, verbose,
+                   cache, output_file, n_cpus):
 
     dct_results = {'dbase': [], 'query': [], 'atoms': [], 'charges': []}
 
@@ -84,10 +86,11 @@ def read_and_write(q_path, d_path, verbose, cache, output_file):
         sys.stdout.flush()
 
     cnt = 0
+
     for chunk in lazy_imap(data_processor=data_processor,
                            data_generator=zip(split_multimol2(d_path),
                                               split_multimol2(q_path)),
-                           n_cpus=0):
+                           n_cpus=n_cpus):
 
         for dbase_id, query_id, atoms, charges in chunk:
             dct_results['dbase'].append(dbase_id)
@@ -151,7 +154,18 @@ def read_and_write(q_path, d_path, verbose, cache, output_file):
         sys.stdout.flush()
 
 
-def main(input_dir, output_dir, verbose):
+def get_num_cpus(n_cpus):
+    if not n_cpus:
+        n_cpus = cpu_count()
+    elif n_cpus < 0:
+        n_cpus = cpu_count() - n_cpus
+    return n_cpus
+
+
+def main(input_dir, output_dir, verbose, n_cpus):
+
+    n_cpus = get_num_cpus(n_cpus)
+
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
@@ -171,7 +185,8 @@ def main(input_dir, output_dir, verbose):
                        d_path=d,
                        verbose=verbose,
                        cache=cache,
-                       output_file=c)
+                       output_file=c,
+                       n_cpus=n_cpus)
 
 
 if __name__ == '__main__':
@@ -192,6 +207,11 @@ if __name__ == '__main__':
                         type=float,
                         default=1.3,
                         help='Distance')
+    parser.add_argument('-p', '--processes',
+                        type=int,
+                        default=1,
+                        help='Number of processes to run in parallel.'
+                             ' Uses all CPUs if 0')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
@@ -207,4 +227,5 @@ if __name__ == '__main__':
 
     main(input_dir=args.input,
          output_dir=args.output,
-         verbose=args.verbose)
+         verbose=args.verbose,
+         n_cpus=args.processes)

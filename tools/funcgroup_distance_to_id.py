@@ -21,6 +21,7 @@ import sys
 import pandas as pd
 import time
 from mputil import lazy_imap
+from multiprocessing import cpu_count
 from biopandas.mol2 import split_multimol2
 from biopandas.mol2 import PandasMol2
 
@@ -83,7 +84,7 @@ def data_processor(mol2):
     return ''
 
 
-def read_and_write(mol2_files, id_file_path, verbose):
+def read_and_write(mol2_files, id_file_path, verbose, n_cpus):
 
     if verbose:
         sys.stdout.write('Using selection: %s\n' % SELECTION)
@@ -100,7 +101,7 @@ def read_and_write(mol2_files, id_file_path, verbose):
             cnt = 0
             for chunk in lazy_imap(data_processor=data_processor,
                                    data_generator=split_multimol2(mol2_file),
-                                   n_cpus=0):
+                                   n_cpus=n_cpus):
                 _ = [f.write('%s\n' % mol2_id)for mol2_id in chunk if mol2_id]
                 cnt += len(chunk)
 
@@ -110,14 +111,25 @@ def read_and_write(mol2_files, id_file_path, verbose):
                 sys.stdout.flush()
 
 
-def main(input_dir, output_file, verbose):
+def get_num_cpus(n_cpus):
+    if not n_cpus:
+        n_cpus = cpu_count()
+    elif n_cpus < 0:
+        n_cpus = cpu_count() - n_cpus
+    return n_cpus
+
+
+def main(input_dir, output_file, verbose, n_cpus):
+
+    n_cpus = get_num_cpus(n_cpus)
     dirpath = os.path.dirname(output_file)
     if not os.path.exists(dirpath):
         os.mkdir(dirpath)
     mol2_files = get_mol2_files(dir_path=input_dir)
     read_and_write(mol2_files=mol2_files,
                    id_file_path=output_file,
-                   verbose=verbose)
+                   verbose=verbose,
+                   n_cpus=n_cpus)
 
 
 if __name__ == '__main__':
@@ -173,4 +185,7 @@ if __name__ == '__main__':
                          "\n\"((atom_type == 'S.3') |"
                          " (atom_type == 'S.o2'))\"")
 
-    main(args.input, args.output, args.verbose)
+    main(input_dir=args.input,
+         output_file=args.output,
+         verbose=args.verbose,
+         n_cpus=args.processes)
