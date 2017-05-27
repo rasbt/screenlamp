@@ -2,6 +2,7 @@ import os
 import argparse
 import sys
 import time
+from mputil import lazy_imap
 from biopandas.mol2 import PandasMol2
 from biopandas.mol2 import split_multimol2
 
@@ -40,6 +41,8 @@ def get_dbase_query_pairs(all_mol2s):
 def get_atom_matches(q_pdmol, d_pdmol):
     atoms, charges = [], []
     for xyz in q_pdmol.df[['x', 'y', 'z']].iterrows():
+        #distances = d_pdmol.distance(xyz=xyz[1].values)
+
         nearest_idx = d_pdmol.distance(xyz=xyz[1].values).argmin()
         columns = ['atom_type', 'charge']
         atom, charge = d_pdmol.df[columns].iloc[nearest_idx].values
@@ -48,9 +51,26 @@ def get_atom_matches(q_pdmol, d_pdmol):
     return atoms, charges
 
 
+def data_processor(mol2s):
+
+    q_pdmol = PandasMol2()
+    d_pdmol = PandasMol2()
+
+    d_pdmol.read_mol2_from_list(mol2_code=mol2s[0][0],
+                                mol2_lines=mol2s[0][1])
+    d_pdmol._df = d_pdmol.df[(d_pdmol.df['atom_type'] != 'H')]
+
+    q_pdmol.read_mol2_from_list(mol2_code=mol2s[1][0],
+                                mol2_lines=mol2s[1][1])
+    q_pdmol._df = q_pdmol.df[(q_pdmol.df['atom_type'] != 'H')]
+
+    atoms, charges = get_atom_matches(q_pdmol, d_pdmol)
+    return mol2s[0][0], mol2s[1][0], atoms, charges
+
+
 def read_and_write(q_path, d_path, verbose, cache, output_file):
 
-    dct_results = {'MoleculeID': [], 'Atoms': [], 'Charges': []}
+    dct_results = {'dbase': [], 'query': [], 'atoms': [], 'charges': []}
 
     d_base = os.path.basename(d_path)
     q_base = os.path.basename(q_path)
@@ -60,10 +80,24 @@ def read_and_write(q_path, d_path, verbose, cache, output_file):
         sys.stdout.write('Processing %s/%s' % (d_base, q_base))
         sys.stdout.flush()
 
+    cnt = 0
+    for chunk in lazy_imap(data_processor=data_processor,
+                           data_generator=zip(split_multimol2(d_path),
+                                              split_multimol2(q_path)),
+                           n_cpus=0):
+
+        for dbase_id, query_id, atoms, charges in chunk:
+            dct_results['dbase'].append(dbase_id)
+            dct_results['query'].append(query_id)
+            dct_results['atoms'].append(atoms)
+            dct_results['charges'].append(charges)
+
+        cnt += len(chunk)
+    """
+
     q_pdmol = PandasMol2()
     d_pdmol = PandasMol2()
 
-    cnt = 0
     for q_mol2, d_mol2 in zip(split_multimol2(q_path),
                               split_multimol2(d_path)):
         cnt += 1
@@ -81,23 +115,29 @@ def read_and_write(q_path, d_path, verbose, cache, output_file):
             cache[q_mol2[0]] = q_pdmol
 
         atoms, charges = get_atom_matches(q_pdmol, d_pdmol)
-        dct_results['MoleculeID'].append(d_mol2[0])
-        dct_results['Atoms'].append(atoms)
-        dct_results['Charges'].append(charges)
+
+        dct_results['query'].append(q_mol2[0])
+        dct_results['dbase'].append(d_mol2[0])
+        dct_results['atoms'].append(atoms)
+        dct_results['charges'].append(charges)
+    """
 
     with open(output_file + '_charge.csv', 'w') as f1,\
             open(output_file + '_atomtype.csv', 'w') as f2:
-        columns = q_pdmol.df['atom_name'].values
-        f1.write('MoleculeID,%s\n' % ','.join(columns))
-        f2.write('MoleculeID,%s\n' % ','.join(columns))
-        for i in range(len(dct_results['MoleculeID'])):
-            s1 = '%s,%s\n' % (dct_results['MoleculeID'][i],
-                              ','.join(format(x, "10.2f")
-                                       for x in dct_results['Charges'][i]))
+
+        columns = PandasMol2().read_mol2(q_path).df['atom_name'].values
+        f1.write('dbase,query,%s\n' % ','.join(columns))
+        f2.write('dbase,query,%s\n' % ','.join(columns))
+        for i in range(len(dct_results['dbase'])):
+            s1 = '%s,%s,%s\n' % (dct_results['dbase'][i],
+                                 dct_results['query'][i],
+                                 ','.join(format(x, "10.2f")
+                                          for x in dct_results['charges'][i]))
 
             f1.write(s1)
-            s2 = '%s,%s\n' % (dct_results['MoleculeID'][i],
-                              ','.join(dct_results['Atoms'][i]))
+            s2 = '%s,%s,%s\n' % (dct_results['dbase'][i],
+                                 dct_results['query'][i],
+                                 ','.join(dct_results['atoms'][i]))
             f2.write(s2)
 
     if verbose:
@@ -160,5 +200,5 @@ if __name__ == '__main__':
     parser.add_argument('--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()
-
+    DISTANCE = args.distance
     main(input_dir=args.input, output_dir=args.output, verbose=args.verbose)
