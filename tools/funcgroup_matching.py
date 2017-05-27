@@ -2,7 +2,6 @@ import os
 import argparse
 import sys
 import time
-import pandas as pd
 from biopandas.mol2 import PandasMol2
 from biopandas.mol2 import split_multimol2
 
@@ -38,24 +37,39 @@ def get_dbase_query_pairs(all_mol2s):
     return q_list, d_list
 
 
-def read_and_write(q_path, d_path, verbose, cache):
+def get_atom_matches(q_pdmol, d_pdmol):
+    atoms, charges = [], []
+    for xyz in q_pdmol.df[['x', 'y', 'z']].iterrows():
+        nearest_idx = d_pdmol.distance(xyz=xyz[1].values).argmin()
+        columns = ['atom_type', 'charge']
+        atom, charge = d_pdmol.df[columns].iloc[nearest_idx].values
+        atoms.append(atom)
+        charges.append(charge)
+    return atoms, charges
+
+
+def read_and_write(q_path, d_path, verbose, cache, output_file):
+
+    dct_results = {'MoleculeID': [], 'Atoms': [], 'Charges': []}
 
     d_base = os.path.basename(d_path)
     q_base = os.path.basename(q_path)
 
     if verbose:
+        start = time.time()
         sys.stdout.write('Processing %s/%s' % (d_base, q_base))
         sys.stdout.flush()
 
     q_pdmol = PandasMol2()
     d_pdmol = PandasMol2()
 
+    cnt = 0
     for q_mol2, d_mol2 in zip(split_multimol2(q_path),
                               split_multimol2(d_path)):
-
+        cnt += 1
         d_pdmol.read_mol2_from_list(mol2_code=d_mol2[0],
                                     mol2_lines=d_mol2[1])
-        d_pdmol.df[(d_pdmol.df['atom_type'] != 'H')]
+        d_pdmol._df = d_pdmol.df[(d_pdmol.df['atom_type'] != 'H')]
 
         if q_mol2[0] in cache:
             q_pdmol = cache[q_mol2[0]]
@@ -63,33 +77,58 @@ def read_and_write(q_path, d_path, verbose, cache):
         else:
             q_pdmol.read_mol2_from_list(mol2_code=q_mol2[0],
                                         mol2_lines=q_mol2[1])
-            q_pdmol.df[(q_pdmol.df['atom_type'] != 'H')]
+            q_pdmol._df = q_pdmol.df[(q_pdmol.df['atom_type'] != 'H')]
             cache[q_mol2[0]] = q_pdmol
 
-    """
+        atoms, charges = get_atom_matches(q_pdmol, d_pdmol)
+        dct_results['MoleculeID'].append(d_mol2[0])
+        dct_results['Atoms'].append(atoms)
+        dct_results['Charges'].append(charges)
+
+    with open(output_file + '_charge.csv', 'w') as f1,\
+            open(output_file + '_atomtype.csv', 'w') as f2:
+        columns = q_pdmol.df['atom_name'].values
+        f1.write('MoleculeID,%s\n' % ','.join(columns))
+        f2.write('MoleculeID,%s\n' % ','.join(columns))
+        for i in range(len(dct_results['MoleculeID'])):
+            s1 = '%s,%s\n' % (dct_results['MoleculeID'][i],
+                              ','.join(format(x, "10.2f")
+                                       for x in dct_results['Charges'][i]))
+
+            f1.write(s1)
+            s2 = '%s,%s\n' % (dct_results['MoleculeID'][i],
+                              ','.join(dct_results['Atoms'][i]))
+            f2.write(s2)
+
     if verbose:
         elapsed = time.time() - start
         n_molecules = cnt + 1
         sys.stdout.write(' | scanned %d molecules | %d mol/sec\n' %
                          (n_molecules, n_molecules / elapsed))
         sys.stdout.flush()
-    """
-
-
-
-
 
 
 def main(input_dir, output_dir, verbose):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
-    inp_mol2_paths = get_mol2_files(input_dir)
-    q_list, d_list = get_dbase_query_pairs(inp_mol2_paths)
 
+    mol2_in_files = get_mol2_files(input_dir)
+
+    q_list, d_list = get_dbase_query_pairs(mol2_in_files)
+
+    csv_out_bases = [os.path.join(output_dir,
+                                  os.path.basename(mol2).replace(
+                                    '_dbase.mol2.gz', '').replace(
+                                    '_dbase.mol2', ''))
+                     for mol2 in d_list]
 
     cache = {}
-    for q, d in zip(q_list, d_list):
-        read_and_write(q, d, verbose, cache)
+    for q, d, c in zip(q_list, d_list, csv_out_bases):
+        read_and_write(q_path=q,
+                       d_path=d,
+                       verbose=verbose,
+                       cache=cache,
+                       output_file=c)
 
 
 if __name__ == '__main__':
@@ -106,6 +145,10 @@ if __name__ == '__main__':
                         type=str,
                         required=True,
                         help='Directory for writing the output files')
+    parser.add_argument('-d', '--distance',
+                        type=float,
+                        default=1.3,
+                        help='Distance')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,

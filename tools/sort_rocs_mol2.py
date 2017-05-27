@@ -27,7 +27,7 @@ def get_mol2_files(dir_path):
 
 
 def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
-                   sortby, column_seperator, verbose):
+                   sortby, column_seperator, verbose, id_suffix):
 
     if verbose:
         sys.stdout.write('Processing %s' % os.path.basename(inp_mol2_path))
@@ -48,6 +48,8 @@ def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
         cnt += 1
         mol_idx = '%s_%d' % (id_, cnt)
         if mol_idx in query_names:
+            if id_suffix:
+                cont[1] = mol_idx + '\n'
             query_mol2s[mol_idx] = ''.join(cont)
 
     out_path_base = os.path.join(output_dir, os.path.basename(inp_mol2_path)
@@ -85,7 +87,7 @@ def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
 
 
 def main(input_dir, output_dir, query_path,
-         sortby, column_seperator, verbose):
+         sortby, column_seperator, verbose, id_suffix):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
     inp_mol2_paths = get_mol2_files(input_dir)
@@ -95,7 +97,7 @@ def main(input_dir, output_dir, query_path,
         report_path = base.replace('.mol2', '.rpt').replace('_hits_', '_')
         report_path = os.path.join(os.path.dirname(mol2_path), report_path)
         read_and_write(mol2_path, report_path, output_dir, query_path,
-                       sortby, column_seperator, verbose)
+                       sortby, column_seperator, verbose, id_suffix)
 
 
 if __name__ == '__main__':
@@ -124,6 +126,10 @@ if __name__ == '__main__':
                         type=str,
                         default='\t',
                         help='')
+    parser.add_argument('--id_suffix',
+                        type=str,
+                        default='False',
+                        help='')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
@@ -136,6 +142,15 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.id_suffix.lower() in {'false', 'f', 'no', 'n'}:
+        id_suffix = False
+    elif args.id_suffix.lower() in {'true', 't', 'yes', 'y'}:
+        id_suffix = True
+    else:
+        raise ValueError('--id_suffix must be true or false. Got %s' %
+                         args.id_suffix)
+
     main(input_dir=args.input, output_dir=args.output, query_path=args.query,
          sortby=args.sortby, verbose=args.verbose,
-         column_seperator=args.column_seperator)
+         column_seperator=args.column_seperator,
+         id_suffix=id_suffix)
