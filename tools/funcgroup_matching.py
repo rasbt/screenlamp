@@ -2,6 +2,7 @@ import os
 import argparse
 import sys
 import time
+from numpy import nan as np_nan
 from mputil import lazy_imap
 from biopandas.mol2 import PandasMol2
 from biopandas.mol2 import split_multimol2
@@ -41,11 +42,13 @@ def get_dbase_query_pairs(all_mol2s):
 def get_atom_matches(q_pdmol, d_pdmol):
     atoms, charges = [], []
     for xyz in q_pdmol.df[['x', 'y', 'z']].iterrows():
-        #distances = d_pdmol.distance(xyz=xyz[1].values)
-
-        nearest_idx = d_pdmol.distance(xyz=xyz[1].values).argmin()
+        distances = d_pdmol.distance(xyz=xyz[1].values)
+        nearest_idx = distances.argmin()
         columns = ['atom_type', 'charge']
-        atom, charge = d_pdmol.df[columns].iloc[nearest_idx].values
+        if distances.iloc[nearest_idx] > THRESHOLD:
+            atom, charge = '', np_nan
+        else:
+            atom, charge = d_pdmol.df[columns].iloc[nearest_idx].values
         atoms.append(atom)
         charges.append(charge)
     return atoms, charges
@@ -185,7 +188,7 @@ if __name__ == '__main__':
                         type=str,
                         required=True,
                         help='Directory for writing the output files')
-    parser.add_argument('-d', '--distance',
+    parser.add_argument('-d', '--max_distance',
                         type=float,
                         default=1.3,
                         help='Distance')
@@ -200,5 +203,8 @@ if __name__ == '__main__':
     parser.add_argument('--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()
-    DISTANCE = args.distance
-    main(input_dir=args.input, output_dir=args.output, verbose=args.verbose)
+    THRESHOLD = args.max_distance
+
+    main(input_dir=args.input,
+         output_dir=args.output,
+         verbose=args.verbose)
