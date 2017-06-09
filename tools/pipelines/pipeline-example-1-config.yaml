@@ -1,0 +1,23 @@
+general settings:
+  screenlamp tools directory: /Users/sebastian/code/screenlamp/tools
+  project output directory: /Users/sebastian/Desktop/screenlamp_pipe
+  input mol2 directory: /Users/sebastian/code/screenlamp/docs/sources/workflow/example_1/dataset/mol2
+
+molecule property filter settings:
+  datatable path: /Users/sebastian/code/screenlamp/docs/sources/workflow/example_1/dataset/tables/3_prop.xls
+  column filter: (NRB <= 7) & (MWT >= 200)
+
+functional group presence filter settings:
+  selection key: ((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')
+
+functional group distance filter settings:
+  selection key: ((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')
+  distance: 13-20
+
+OMEGA settings:
+  OMEGA executable: /Applications/OMEGA 2.5.1.4.app/Contents/MacOS/omega2-2.5.1.4
+  
+ROCS settings:
+  ROCS executable: /Applications/ROCS 3.2.1.4.app/Contents/MacOS/rocs-3.2.1.4
+  ROCS sort by: TanimotoCombo
+  query molecule path: /Users/sebastian/code/screenlamp/docs/sources/workflow/example_1/dataset/query/3kpzs_conf_subset_nowarts.mol2

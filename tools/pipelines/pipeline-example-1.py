@@ -17,40 +17,67 @@
 import subprocess
 import os
 import argparse
+import yaml
 
-PROJECT_PATH = '/Users/sebastian/Desktop/screenlamp_pipe'
-SCREENLAMP_TOOLS_DIR = '/Users/sebastian/code/screenlamp/tools'
-INPUT_MOL2_PATH = ('/Users/sebastian/code/screenlamp/docs/sources/workflow/'
-                   'example_1/dataset/mol2')
-DATATABLE_PATH = ('/Users/sebastian/code/screenlamp/docs/sources/workflow/'
-                  'example_1/dataset/tables/3_prop.xls')
-DATATABLE_FILTER = "(NRB <= 7) & (MWT >= 200)"
-FUNCTIONAL_GROUP_PRESENCE = "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')"
-FUNCTIONAL_GROUP_DISTANCE_SELECTION = "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')"
-FUNCTIONAL_GROUP_DISTANCE = "13-20"
-OMEGA_EXECUTABLE = '/Applications/OMEGA 2.5.1.4.app/Contents/MacOS/omega2-2.5.1.4'
-ROCS_EXECUTABLE = '/Applications/ROCS 3.2.1.4.app/Contents/MacOS/rocs-3.2.1.4'
-ROCS_SORTBY = 'TanimotoCombo'
-QUERY_PATH = ('/Users/sebastian/code/screenlamp/docs/sources/workflow/'
-              'example_1/dataset/query/3kpzs_conf_subset_nowarts.mol2')
-
-if not os.path.exists(PROJECT_PATH):
-    os.mkdir(PROJECT_PATH)
 
 ###############################################################################
 
 parser = argparse.ArgumentParser(
-        description='A command line tool for filtering mol2 files.',
+        description='An example screenlamp pipeline ... [placeholder].',
         formatter_class=argparse.RawTextHelpFormatter)
+
+parser.add_argument('-c', '--config_file',
+                    type=str,
+                    required=True,
+                    default=0,
+                    help='Path to the pipeline configuration file')
 
 parser.add_argument('-s', '--start_at_step',
                     type=int,
-                    required=True,
+                    required=False,
                     default=0,
-                    help='Input directory with .mol2 and .mol2.gz files')
+                    help='Placeholder')
+
+parser.add_argument('-i', '--interactive',
+                    type=str,
+                    required=False,
+                    default='false',
+                    help='Interactive mode. If enabled, stops before each step'
+                    ' to ask the user to continue')
 
 args = parser.parse_args()
 start_at = args.start_at_step
+config_path = args.config_file
+
+print(args.interactive)
+if args.interactive.lower() not in {'true', 'false'}:
+    raise AttributeError('interactive must be true or false')
+if args.interactive == 'true':
+    interactive = True
+else:
+    interactive = False
+
+with open(config_path, 'r') as stream:
+    ymldct = yaml.load(stream)
+
+PROJECT_PATH = ymldct['general settings']['project output directory']
+SCREENLAMP_TOOLS_DIR = ymldct['general settings']['screenlamp tools directory']
+INPUT_MOL2_PATH = ymldct['general settings']['input mol2 directory']
+DATATABLE_PATH = ymldct['molecule property filter settings']['datatable path']
+DATATABLE_FILTER = ymldct['molecule property filter settings']['column filter']
+FUNCTIONAL_GROUP_PRESENCE = ymldct[
+    'functional group presence filter settings']['selection key']
+FUNCTIONAL_GROUP_DISTANCE_SELECTION = ymldct[
+    'functional group distance filter settings']['selection key']
+FUNCTIONAL_GROUP_DISTANCE = ymldct[
+    'functional group distance filter settings']['distance']
+OMEGA_EXECUTABLE = ymldct['OMEGA settings']['OMEGA executable']
+ROCS_EXECUTABLE = ymldct['ROCS settings']['ROCS executable']
+ROCS_SORTBY = ymldct['ROCS settings']['ROCS sort by']
+QUERY_PATH = ymldct['ROCS settings']['query molecule path']
+
+if not os.path.exists(PROJECT_PATH):
+    os.makedirs(PROJECT_PATH)
 
 ###############################################################################
 
@@ -67,6 +94,9 @@ COUNT MOLECULES IN DATATABLE_PATH
            '--input', INPUT_MOL2_PATH]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -87,6 +117,8 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
            '--selection', DATATABLE_FILTER]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
     print('\n\n')
 
@@ -97,6 +129,8 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
            '--whitelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
 
@@ -104,6 +138,8 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
            '--input', os.path.join(PROJECT_PATH, '01_selected-mol2s')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -125,6 +161,8 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
            '--processes', '0']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
     print('\n\n')
 
@@ -136,6 +174,8 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
            '--whitelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
 
@@ -143,6 +183,8 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
            '--input', os.path.join(PROJECT_PATH, '02_3keto-and-sulfur-mol2s')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -165,6 +207,8 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
            '--distance', FUNCTIONAL_GROUP_DISTANCE,
            '--processes', '0']
 
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
     print('\n\n')
 
@@ -177,6 +221,8 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
            '--whitelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
 
@@ -185,15 +231,18 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
                                    '03_3keto-and-sulfur-13-20A_mol2s')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
 
- ###############################################################################
+###############################################################################
 
 if start_at <= 4:
     s = """
 
 ################################################
-Step 04: OMEGA conformERS
+Step 04: OMEGA conformers
 ################################################
     """
     print(s)
@@ -206,6 +255,8 @@ Step 04: OMEGA conformERS
            '--processes', '0']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
 
@@ -213,6 +264,9 @@ Step 04: OMEGA conformERS
            '--input', os.path.join(PROJECT_PATH, '04_omega_conformers')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -238,12 +292,16 @@ Step 05: ROCS OVERLAYS
            '--processes', '0']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
 
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'count_mol2.py'),
            '--input', os.path.join(PROJECT_PATH, '05_rocs_overlays')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)
 
     cmd = ['python',  os.path.join(SCREENLAMP_TOOLS_DIR, 'sort_rocs_mol2.py'),
@@ -253,4 +311,6 @@ Step 05: ROCS OVERLAYS
            '--sortby', ROCS_SORTBY]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed')
     subprocess.call(cmd)

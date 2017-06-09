@@ -29,9 +29,11 @@ copyright: Copyright &copy; 2017 Michigan State University. Developed in the <a 
 pages:
 - Home: index.md
 - Installation: installation.md
-- Tools Overview: tools.md
-#- Tutorial: tutorial.md
-- Tutorial: workflow/example_1/example_1.md
+- User Documentation: 
+  - Overview: doc-overview.md
+  - Tools API: tools.md
+  - Tools Tutorial: workflow/example_1/example_1.md
+  - Pipeline Tutorial: pipeline-tutorial-1.md
 - About:
   - Contact: contact.md
   - Release Notes: changelog.md
