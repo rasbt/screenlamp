@@ -30,10 +30,10 @@ pages:
 - Home: index.md
 - Installation: installation.md
 - User Documentation: 
-  - Overview: doc-overview.md
-  - Tools API: tools.md
-  - Tools Tutorial: workflow/example_1/example_1.md
-  - Pipeline Tutorial: pipeline-tutorial-1.md
+  - Overview: user_guide/doc-overview.md
+  - Tools API: user_guide/tools.md
+  - Tools Tutorial: user_guide/example_1.md
+  - Pipeline Tutorial: user_guide/pipeline-tutorial-1.md
 - About:
   - Contact: contact.md
   - Release Notes: changelog.md

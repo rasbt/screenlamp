@@ -1,16 +1,27 @@
 general settings:
   screenlamp tools directory: /Users/sebastian/code/screenlamp/tools
   project output directory: /Users/sebastian/Desktop/screenlamp_pipe
-  input mol2 directory: /Users/sebastian/code/screenlamp/docs/sources/workflow/example_1/dataset/mol2
+  input mol2 directory: /Users/sebastian/code/screenlamp/docs/workflow/example_1/dataset/mol2
+  number of cpus: 0 # 0 means all avaible CPUs (recommended)
 
 molecule property filter settings:
-  datatable path: /Users/sebastian/code/screenlamp/docs/sources/workflow/example_1/dataset/tables/3_prop.xls
-  column filter: (NRB <= 7) & (MWT >= 200)
+  datatable path: /Users/sebastian/code/screenlamp/docs/workflow/example_1/dataset/tables/3_prop.xls
+  # the following filter key selects all molecules with 
+  # fewer than 8 rotatable bonds and a molecular weight 
+  # greater than 200 g/mol
+  column filter: (NRB <= 7) & (MWT > 200)
 
 functional group presence filter settings:
+  # the following selection key selects all molecules that
+  # have an sp2-hybridized sulfur atom (MOL2 atom type S.3 or S.o2)
+  # and a keto group (MOL2 atom type O.2)
   selection key: ((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')
 
 functional group distance filter settings:
+  # the following selection criteria select all molecules that
+  # have an sp2-hybridized sulfur atom (MOL2 atom type S.3 or S.o2)
+  # and a keto group (MOL2 atom type O.2), and where the distance between
+  # the sulfur and oxygen atoms is between 13 and 20 angstrom
   selection key: ((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')
   distance: 13-20
 

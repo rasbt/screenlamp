@@ -36,7 +36,7 @@ parser.add_argument('-s', '--start_at_step',
                     type=int,
                     required=False,
                     default=0,
-                    help='Placeholder')
+                    help='Start the pipeline at a particular step')
 
 parser.add_argument('-i', '--interactive',
                     type=str,
@@ -63,6 +63,7 @@ with open(config_path, 'r') as stream:
 PROJECT_PATH = ymldct['general settings']['project output directory']
 SCREENLAMP_TOOLS_DIR = ymldct['general settings']['screenlamp tools directory']
 INPUT_MOL2_PATH = ymldct['general settings']['input mol2 directory']
+N_CPUS = str(ymldct['general settings']['number of cpus'])
 DATATABLE_PATH = ymldct['molecule property filter settings']['datatable path']
 DATATABLE_FILTER = ymldct['molecule property filter settings']['column filter']
 FUNCTIONAL_GROUP_PRESENCE = ymldct[
@@ -96,7 +97,7 @@ COUNT MOLECULES IN DATATABLE_PATH
     print('Running command:\n%s\n' % ' '.join(cmd))
 
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -118,7 +119,7 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\n')
 
@@ -130,7 +131,7 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
 
@@ -139,7 +140,7 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -158,11 +159,11 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
            '--output', os.path.join(PROJECT_PATH,
                                     '02_3keto-and-sulfur-mol2ids.txt'),
            '--selection', FUNCTIONAL_GROUP_PRESENCE,
-           '--processes', '0']
+           '--processes', N_CPUS]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\n')
 
@@ -175,7 +176,7 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
 
@@ -184,7 +185,7 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -205,10 +206,10 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
                                     '03_3keto-and-sulfur-13-20A_mol2ids.txt'),
            '--selection', FUNCTIONAL_GROUP_DISTANCE_SELECTION,
            '--distance', FUNCTIONAL_GROUP_DISTANCE,
-           '--processes', '0']
+           '--processes', N_CPUS]
 
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\n')
 
@@ -222,7 +223,7 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
 
@@ -233,7 +234,7 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
     print('Running command:\n%s\n' % ' '.join(cmd))
 
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -252,11 +253,11 @@ Step 04: OMEGA conformers
                                    '03_3keto-and-sulfur-13-20A_mol2s'),
            '--output', os.path.join(PROJECT_PATH, '04_omega_conformers'),
            '--executable', OMEGA_EXECUTABLE,
-           '--processes', '0']
+           '--processes', N_CPUS]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
 
@@ -266,7 +267,7 @@ Step 04: OMEGA conformers
     print('Running command:\n%s\n' % ' '.join(cmd))
 
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
 ###############################################################################
@@ -289,11 +290,11 @@ Step 05: ROCS OVERLAYS
            '--settings', ('-rankby %s -maxhits 0'
                           ' -besthits 0 -progress percent' %
                           ROCS_SORTBY),
-           '--processes', '0']
+           '--processes', N_CPUS]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'count_mol2.py'),
@@ -301,7 +302,7 @@ Step 05: ROCS OVERLAYS
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
     cmd = ['python',  os.path.join(SCREENLAMP_TOOLS_DIR, 'sort_rocs_mol2.py'),
@@ -312,5 +313,31 @@ Step 05: ROCS OVERLAYS
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if interactive:
-        input('Press Enter to proceed')
+        input('Press Enter to proceed or CTRL+C to quit')
+    subprocess.call(cmd)
+
+
+###############################################################################
+
+if start_at <= 6:
+
+    s = """
+
+################################################
+Step 06: MATCHING FUNCTIONAL GROUPS
+################################################
+    """
+    print(s)
+
+    cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR,
+                                  'funcgroup_matching.py'),
+           '--input', os.path.join(PROJECT_PATH, '05_rocs_overlays_sorted'),
+           '--output', os.path.join(PROJECT_PATH, '06_funcgroup_matching'),
+           '--executable', ROCS_EXECUTABLE,
+           '--max_distance', "1.3",
+           '--processes', N_CPUS]
+
+    print('Running command:\n%s\n' % ' '.join(cmd))
+    if interactive:
+        input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
