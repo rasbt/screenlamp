@@ -26,16 +26,27 @@ def get_mol2_files(dir_path):
     return files
 
 
+def parse_selection_string(s, df_name='df'):
+    return s.replace('(', '(%s.' % df_name)
+
+
 def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
-                   sortby, column_seperator, verbose, id_suffix):
+                   sortby, column_seperator, verbose, id_suffix, selection):
 
     if verbose:
         sys.stdout.write('Processing %s' % os.path.basename(inp_mol2_path))
         sys.stdout.flush()
 
-    df = pd.read_table(report_path, usecols=['Name', 'ShapeQuery', sortby],
+    df = pd.read_table(report_path, usecols=['Name', 'ShapeQuery'] + sortby,
                        sep=column_seperator)
-    df.sort_values(sortby, inplace=True, ascending=False)
+
+    if sortby:
+        df.sort_values(sortby, inplace=True, ascending=False)
+
+    if selection:
+        selection_str = parse_selection_string(selection, df_name='df')
+        mask = pd.eval(selection_str)
+        df = df[mask]
 
     dbase_query_pairs = [(d, q) for d, q in
                          zip(df['Name'].values, df['ShapeQuery'].values)]
@@ -87,7 +98,7 @@ def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
 
 
 def main(input_dir, output_dir, query_path,
-         sortby, column_seperator, verbose, id_suffix):
+         sortby, column_seperator, verbose, id_suffix, selection):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
     inp_mol2_paths = get_mol2_files(input_dir)
@@ -97,7 +108,7 @@ def main(input_dir, output_dir, query_path,
         report_path = base.replace('.mol2', '.rpt').replace('_hits_', '_')
         report_path = os.path.join(os.path.dirname(mol2_path), report_path)
         read_and_write(mol2_path, report_path, output_dir, query_path,
-                       sortby, column_seperator, verbose, id_suffix)
+                       sortby, column_seperator, verbose, id_suffix, selection)
 
 
 if __name__ == '__main__':
@@ -120,7 +131,12 @@ if __name__ == '__main__':
                         help='Query molecule file')
     parser.add_argument('-s', '--sortby',
                         type=str,
-                        default='TanimotoCombo',
+                        default='TanimotoCombo,ColorTanimoto',
+                        help='')
+    parser.add_argument('--selection',
+                        type=str,
+                        default='(TanimotoCombo >= 1.0)'
+                                ' & (ColorTanimoto >= 0.25)',
                         help='')
     parser.add_argument('--column_seperator',
                         type=str,
@@ -150,7 +166,10 @@ if __name__ == '__main__':
         raise ValueError('--id_suffix must be true or false. Got %s' %
                          args.id_suffix)
 
+    sortby = [s.strip() for s in args.sortby.split(',')]
     main(input_dir=args.input, output_dir=args.output, query_path=args.query,
-         sortby=args.sortby, verbose=args.verbose,
+         sortby=sortby, 
+         verbose=args.verbose,
          column_seperator=args.column_seperator,
-         id_suffix=id_suffix)
+         id_suffix=id_suffix,
+         selection=args.selection)

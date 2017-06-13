@@ -38,24 +38,24 @@ parser.add_argument('-s', '--start_at_step',
                     default=0,
                     help='Start the pipeline at a particular step')
 
-parser.add_argument('-i', '--interactive',
+parser.add_argument('-i', '--incremental',
                     type=str,
                     required=False,
                     default='false',
-                    help='Interactive mode. If enabled, stops before each step'
+                    help='incremental mode. If enabled, stops before each step'
                     ' to ask the user to continue')
 
 args = parser.parse_args()
 start_at = args.start_at_step
 config_path = args.config_file
 
-print(args.interactive)
-if args.interactive.lower() not in {'true', 'false'}:
-    raise AttributeError('interactive must be true or false')
-if args.interactive == 'true':
-    interactive = True
+print(args.incremental)
+if args.incremental.lower() not in {'true', 'false'}:
+    raise AttributeError('incremental must be true or false')
+if args.incremental == 'true':
+    incremental = True
 else:
-    interactive = False
+    incremental = False
 
 with open(config_path, 'r') as stream:
     ymldct = yaml.load(stream)
@@ -74,8 +74,23 @@ FUNCTIONAL_GROUP_DISTANCE = ymldct[
     'functional group distance filter settings']['distance']
 OMEGA_EXECUTABLE = ymldct['OMEGA settings']['OMEGA executable']
 ROCS_EXECUTABLE = ymldct['ROCS settings']['ROCS executable']
-ROCS_SORTBY = ymldct['ROCS settings']['ROCS sort by']
+ROCS_RANKBY = ymldct['ROCS settings']['ROCS run rankby']
+ROCS_SORTBY = ymldct['ROCS settings']['ROCS results sort by']
+ROCS_THRESHOLD = ymldct['ROCS settings']['ROCS score threshold']
 QUERY_PATH = ymldct['ROCS settings']['query molecule path']
+
+FGROUP_MATCH_DISTANCE = str(ymldct['functional group matching '
+                                   'selection settings'][
+                                   'maximum pairwise atom distance'])
+
+WRITE_MATCH_OVERLAYS = False
+if ymldct['functional group match selection settings']['write mol2 files'] in (
+      'true', True):
+    WRITE_MATCH_OVERLAYS = True
+FGROUP_ATOMTYPE = ymldct['functional group match selection settings'][
+                         'atomtype selection keys']
+FGROUP_CHARGE = ymldct['functional group match selection settings'][
+                       'charge selection keys']
 
 if not os.path.exists(PROJECT_PATH):
     os.makedirs(PROJECT_PATH)
@@ -96,7 +111,7 @@ COUNT MOLECULES IN DATATABLE_PATH
 
     print('Running command:\n%s\n' % ' '.join(cmd))
 
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
@@ -118,7 +133,7 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
            '--selection', DATATABLE_FILTER]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\n')
@@ -130,7 +145,7 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
            '--whitelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
@@ -139,7 +154,7 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
            '--input', os.path.join(PROJECT_PATH, '01_selected-mol2s')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
@@ -162,7 +177,7 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
            '--processes', N_CPUS]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\n')
@@ -175,7 +190,7 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
            '--whitelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
@@ -184,7 +199,7 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
            '--input', os.path.join(PROJECT_PATH, '02_3keto-and-sulfur-mol2s')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
@@ -208,7 +223,7 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
            '--distance', FUNCTIONAL_GROUP_DISTANCE,
            '--processes', N_CPUS]
 
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\n')
@@ -222,7 +237,7 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
            '--whitelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
@@ -233,7 +248,7 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
 
     print('Running command:\n%s\n' % ' '.join(cmd))
 
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
@@ -256,7 +271,7 @@ Step 04: OMEGA conformers
            '--processes', N_CPUS]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
     print('\n\nSELECTED MOL2s:')
@@ -266,7 +281,7 @@ Step 04: OMEGA conformers
 
     print('Running command:\n%s\n' % ' '.join(cmd))
 
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
@@ -289,11 +304,11 @@ Step 05: ROCS OVERLAYS
            '--query', QUERY_PATH,
            '--settings', ('-rankby %s -maxhits 0'
                           ' -besthits 0 -progress percent' %
-                          ROCS_SORTBY),
+                          ROCS_RANKBY),
            '--processes', N_CPUS]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
@@ -301,18 +316,7 @@ Step 05: ROCS OVERLAYS
            '--input', os.path.join(PROJECT_PATH, '05_rocs_overlays')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
-        input('Press Enter to proceed or CTRL+C to quit')
-    subprocess.call(cmd)
-
-    cmd = ['python',  os.path.join(SCREENLAMP_TOOLS_DIR, 'sort_rocs_mol2.py'),
-           '--input', os.path.join(PROJECT_PATH, '05_rocs_overlays'),
-           '--output', os.path.join(PROJECT_PATH, '05_rocs_overlays_sorted'),
-           '--query', QUERY_PATH,
-           '--sortby', ROCS_SORTBY]
-
-    print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)
 
@@ -324,20 +328,73 @@ if start_at <= 6:
     s = """
 
 ################################################
-Step 06: MATCHING FUNCTIONAL GROUPS
+Step 06: SORT ROCS OVERLAYS
+################################################
+    """
+    print(s)
+
+    cmd = ['python',  os.path.join(SCREENLAMP_TOOLS_DIR, 'sort_rocs_mol2.py'),
+           '--input', os.path.join(PROJECT_PATH, '05_rocs_overlays'),
+           '--output', os.path.join(PROJECT_PATH, '06_rocs_overlays_sorted'),
+           '--query', QUERY_PATH,
+           '--sortby', ROCS_SORTBY,
+           '--selection', ROCS_THRESHOLD]
+
+    print('Running command:\n%s\n' % ' '.join(cmd))
+    if incremental:
+        input('Press Enter to proceed or CTRL+C to quit')
+    subprocess.call(cmd)
+
+###############################################################################
+
+if start_at <= 7:
+
+    s = """
+
+################################################
+Step 07: MATCHING FUNCTIONAL GROUPS
 ################################################
     """
     print(s)
 
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR,
                                   'funcgroup_matching.py'),
-           '--input', os.path.join(PROJECT_PATH, '05_rocs_overlays_sorted'),
-           '--output', os.path.join(PROJECT_PATH, '06_funcgroup_matching'),
-           '--executable', ROCS_EXECUTABLE,
-           '--max_distance', "1.3",
+           '--input', os.path.join(PROJECT_PATH, '06_rocs_overlays_sorted'),
+           '--output', os.path.join(PROJECT_PATH, '07_funcgroup_matching'),
+           '--max_distance', FGROUP_MATCH_DISTANCE,
            '--processes', N_CPUS]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
-    if interactive:
+    if incremental:
+        input('Press Enter to proceed or CTRL+C to quit')
+    subprocess.call(cmd)
+
+###############################################################################
+
+if start_at <= 8:
+
+    s = """
+
+################################################
+Step 08: SELECTING FUNCTIONAL GROUP MATCHES
+################################################
+    """
+    print(s)
+
+    if WRITE_MATCH_OVERLAYS:
+        in_path = os.path.join(PROJECT_PATH, '06_rocs_overlays_sorted')
+    else:
+        in_path = ''
+
+    cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR,
+                                  'funcgroup_selection.py'),
+           '--input', os.path.join(PROJECT_PATH, '07_funcgroup_matching'),
+           '--output', os.path.join(PROJECT_PATH, '08_funcgroup_selection'),
+           '--atomtype_selection', FGROUP_ATOMTYPE,
+           '--charge_selection', FGROUP_CHARGE,
+           '--input_mol2', in_path]
+
+    print('Running command:\n%s\n' % ' '.join(cmd))
+    if incremental:
         input('Press Enter to proceed or CTRL+C to quit')
     subprocess.call(cmd)

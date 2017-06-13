@@ -4,6 +4,9 @@ general settings:
   input mol2 directory: /Users/sebastian/code/screenlamp/docs/workflow/example_1/dataset/mol2
   number of cpus: 0 # 0 means all avaible CPUs (recommended)
 
+################################################
+### Step 01: SELECT MOLECULES FROM DATA TABLE
+################################################
 molecule property filter settings:
   datatable path: /Users/sebastian/code/screenlamp/docs/workflow/example_1/dataset/tables/3_prop.xls
   # the following filter key selects all molecules with 
@@ -11,12 +14,18 @@ molecule property filter settings:
   # greater than 200 g/mol
   column filter: (NRB <= 7) & (MWT > 200)
 
+###################################################
+### Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
+###################################################
 functional group presence filter settings:
   # the following selection key selects all molecules that
   # have an sp2-hybridized sulfur atom (MOL2 atom type S.3 or S.o2)
   # and a keto group (MOL2 atom type O.2)
   selection key: ((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')
 
+###################################################
+### Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
+###################################################
 functional group distance filter settings:
   # the following selection criteria select all molecules that
   # have an sp2-hybridized sulfur atom (MOL2 atom type S.3 or S.o2)
@@ -25,10 +34,44 @@ functional group distance filter settings:
   selection key: ((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')
   distance: 13-20
 
+################################################
+### Step 04: OMEGA conformers
+################################################
 OMEGA settings:
   OMEGA executable: /Applications/OMEGA 2.5.1.4.app/Contents/MacOS/omega2-2.5.1.4
-  
+
+#########################################################
+### Step 05: ROCS OVERLAYS & Step 06: SORT ROCS OVERLAYS
+#########################################################
 ROCS settings:
   ROCS executable: /Applications/ROCS 3.2.1.4.app/Contents/MacOS/rocs-3.2.1.4
-  ROCS sort by: TanimotoCombo
-  query molecule path: /Users/sebastian/code/screenlamp/docs/sources/workflow/example_1/dataset/query/3kpzs_conf_subset_nowarts.mol2
+  ROCS run rankby: TanimotoCombo
+  ROCS results sort by: TanimotoCombo,ColorTanimoto
+  ROCS score threshold: (TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)
+  query molecule path: /Users/sebastian/code/screenlamp/docs/workflow/example_1/dataset/query/3kpzs_conf_subset_nowarts.mol2
+
+################################################
+### Step 07: MATCHING FUNCTIONAL GROUPS
+################################################
+
+functional group matching selection settings:
+  maximum pairwise atom distance: 1.3 # in angstrom
+
+################################################
+### Step 08: SELECTING FUNCTIONAL GROUP MATCHES
+################################################
+
+functional group match selection settings:
+  # the following selection key selects all database molecules
+  # that meet the two following criteria
+  #   a) an overlay with the S1 atom in the query molecules
+  #   b) an overlay with the O2 atom in the query molecule 
+  # To satisfy a), the matching atom must be of atom type S.3 or S.o2
+  #   and its charge must be at least +1 or more positive.
+  # To satisfy b), the matching atom must be of atom type O.2 (sp2 oxygen)
+  #   # and its partial charge must be -0.5 or more negative
+  atomtype selection keys: ((S1 == 'S.3') | (S1 == 'S.o2')) --> (O2 == 'O.2')
+  charge selection keys: ((S1 >= 1.0)) --> (O2 <= -0.5)
+  write mol2 files: true
+
+

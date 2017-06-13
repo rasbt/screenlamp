@@ -62,11 +62,9 @@ def data_processor(mol2s):
 
     d_pdmol.read_mol2_from_list(mol2_code=mol2s[0][0],
                                 mol2_lines=mol2s[0][1])
-    d_pdmol._df = d_pdmol.df[(d_pdmol.df['atom_type'] != 'H')]
 
     q_pdmol.read_mol2_from_list(mol2_code=mol2s[1][0],
                                 mol2_lines=mol2s[1][1])
-    q_pdmol._df = q_pdmol.df[(q_pdmol.df['atom_type'] != 'H')]
 
     atoms, charges = get_atom_matches(q_pdmol, d_pdmol)
     return mol2s[0][0], mol2s[1][0], atoms, charges
@@ -128,22 +126,22 @@ def read_and_write(q_path, d_path, verbose,
         dct_results['charges'].append(charges)
     """
 
-    with open(output_file + '_charge.csv', 'w') as f1,\
-            open(output_file + '_atomtype.csv', 'w') as f2:
+    with open(output_file + '_charge.tsv', 'w') as f1,\
+            open(output_file + '_atomtype.tsv', 'w') as f2:
 
         columns = PandasMol2().read_mol2(q_path).df['atom_name'].values
-        f1.write('dbase,query,%s\n' % ','.join(columns))
-        f2.write('dbase,query,%s\n' % ','.join(columns))
+        f1.write('dbase\tquery\t%s\n' % '\t'.join(columns))
+        f2.write('dbase\tquery\t%s\n' % '\t'.join(columns))
         for i in range(len(dct_results['dbase'])):
-            s1 = '%s,%s,%s\n' % (dct_results['dbase'][i],
+            s1 = '%s\t%s\t%s\n' % (dct_results['dbase'][i],
                                  dct_results['query'][i],
-                                 ','.join(format(x, "10.2f")
+                                 '\t'.join(format(x, "1.2f")
                                           for x in dct_results['charges'][i]))
 
             f1.write(s1)
-            s2 = '%s,%s,%s\n' % (dct_results['dbase'][i],
+            s2 = '%s\t%s\t%s\n' % (dct_results['dbase'][i],
                                  dct_results['query'][i],
-                                 ','.join(dct_results['atoms'][i]))
+                                 '\t'.join(dct_results['atoms'][i]))
             f2.write(s2)
 
     if verbose:
