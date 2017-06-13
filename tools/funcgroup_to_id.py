@@ -162,5 +162,3 @@ if __name__ == '__main__':
          output_file=args.output,
          verbose=args.verbose,
          n_cpus=args.processes)
-
-    main(args.input, args.output, args.verbose)

@@ -172,7 +172,7 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'funcgroup_to_id.py'),
            '--input', os.path.join(PROJECT_PATH, '01_selected-mol2s'),
            '--output', os.path.join(PROJECT_PATH,
-                                    '02_3keto-and-sulfur-mol2ids.txt'),
+                                    '02_fgroup-presence_mol2ids.txt'),
            '--selection', FUNCTIONAL_GROUP_PRESENCE,
            '--processes', N_CPUS]
 
@@ -185,8 +185,8 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'id_to_mol2.py'),
            '--input', os.path.join(PROJECT_PATH, '01_selected-mol2s'),
            '--id_file', os.path.join(PROJECT_PATH,
-                                     '02_3keto-and-sulfur-mol2ids.txt'),
-           '--output', os.path.join(PROJECT_PATH, '02_3keto-and-sulfur-mol2s'),
+                                     '02_fgroup-presence_mol2ids.txt'),
+           '--output', os.path.join(PROJECT_PATH, '02_fgroup-presence_mol2s'),
            '--whitelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
@@ -196,7 +196,7 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
     print('\n\nSELECTED MOL2s:')
 
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'count_mol2.py'),
-           '--input', os.path.join(PROJECT_PATH, '02_3keto-and-sulfur-mol2s')]
+           '--input', os.path.join(PROJECT_PATH, '02_fgroup-presence_mol2s')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if incremental:
@@ -216,9 +216,9 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
 
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR,
                                   'funcgroup_distance_to_id.py'),
-           '--input', os.path.join(PROJECT_PATH, '02_3keto-and-sulfur-mol2s'),
+           '--input', os.path.join(PROJECT_PATH, '02_fgroup-presence_mol2s'),
            '--output', os.path.join(PROJECT_PATH,
-                                    '03_3keto-and-sulfur-13-20A_mol2ids.txt'),
+                                    '03_fgroup_distance_mol2ids.txt'),
            '--selection', FUNCTIONAL_GROUP_DISTANCE_SELECTION,
            '--distance', FUNCTIONAL_GROUP_DISTANCE,
            '--processes', N_CPUS]
@@ -229,11 +229,11 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
     print('\n\n')
 
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'id_to_mol2.py'),
-           '--input', os.path.join(PROJECT_PATH, '02_3keto-and-sulfur-mol2s'),
+           '--input', os.path.join(PROJECT_PATH, '02_fgroup-presence_mol2s'),
            '--id_file', os.path.join(PROJECT_PATH,
-                                     '03_3keto-and-sulfur-13-20A_mol2ids.txt'),
+                                     '03_fgroup_distance_mol2ids.txt'),
            '--output', os.path.join(PROJECT_PATH,
-                                    '03_3keto-and-sulfur-13-20A_mol2s'),
+                                    '03_fgroup_distance_mol2s'),
            '--whitelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
@@ -244,7 +244,7 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
 
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'count_mol2.py'),
            '--input', os.path.join(PROJECT_PATH,
-                                   '03_3keto-and-sulfur-13-20A_mol2s')]
+                                   '03_fgroup_distance_mol2s')]
 
     print('Running command:\n%s\n' % ' '.join(cmd))
 
@@ -265,7 +265,7 @@ Step 04: OMEGA conformers
 
     cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'run_omega.py'),
            '--input', os.path.join(PROJECT_PATH,
-                                   '03_3keto-and-sulfur-13-20A_mol2s'),
+                                   '03_fgroup_distance_mol2s'),
            '--output', os.path.join(PROJECT_PATH, '04_omega_conformers'),
            '--executable', OMEGA_EXECUTABLE,
            '--processes', N_CPUS]

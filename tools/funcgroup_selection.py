@@ -65,9 +65,7 @@ def main(input_dir, output_dir, atomtype_selection, charge_selection,
                                                df_name='df_atom')
 
             for sele in atom_sele:
-                df_s = pd.eval(sele)
-                if df_s.shape[0]:
-                    df_atom = df_s
+                df_atom = pd.eval(sele)
 
         if charge_selection:
             charge_sele = parse_selection_string(s=charge_selection,
@@ -75,16 +73,14 @@ def main(input_dir, output_dir, atomtype_selection, charge_selection,
                                                  df_name='df_charge')
 
             for sele in charge_sele:
-                df_s = pd.eval(sele)
-                if df_s.shape[0]:
-                    df_charge = df_s
+                df_charge = pd.eval(sele)
 
         selection_indices = set(df_charge.index).intersection(
                             set(df_atom.index))
         selection_indices = sorted(list(selection_indices))
 
-        df_atom.ix[selection_indices].to_csv(a_out, header=None, sep='\t')
-        df_charge.ix[selection_indices].to_csv(c_out, header=None, sep='\t')
+        df_atom.ix[selection_indices].to_csv(a_out, sep='\t')
+        df_charge.ix[selection_indices].to_csv(c_out, sep='\t')
 
         if input_mol2:
             input_mol2_path_query = os.path.join(input_mol2, os.path.basename(
