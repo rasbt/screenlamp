@@ -6,6 +6,12 @@ This tutorial explains how to use a pre-built screenlamp pipeline to perform an 
 
 In this particular screening pipeline, we are searching for mimics of a query molecule that contain a keto- group and sulfur atom in a specified distance to each other (13-20 angstroms) and have a high overall chemical and volumetric similarity towards the query. 
 
+(../images/automated-pipeline-flowchart.png)
+
+![](../images/automated-pipeline-flowchart.jpg)
+
+(A higher-resolution PDF version is available [here]().)
+
 ### Requirements
 
 Before you continue with tutorial, please see the [setup instructions](../installation/index.html#other-software-requirements) for screenlamp if this is your first screening run.
@@ -37,7 +43,7 @@ Once you obtained the database molecules (mol2 partitions), the datatable of mol
 
 As your configuration file template, you can use the following YAML file the [`screenlamp/tools/pipelines/pipeline-example-1-config.yaml`](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1-config.yaml), create a local copy of it, and modify the file paths according to your system's configuration.
 
-## Running the Autmated Screening Pipeline
+## Running the Automated Screening Pipeline
 
 After you customized your configuration file, you start the screening pipeline as shown in the example command snippet below:
 
@@ -47,7 +53,7 @@ python path/to/screenlamp/tools/pipelines/pipeline-example-1.py --config_file /p
 
 By setting `--incremental true`, you will be prompted to confirm each step by pressing enter, which is recommended for the first time use.
 
-For your reference, a zip archive of all files being generated via the execution of the screenlamp pipeline can be obtained via the following download link: https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/pipeline-tutorial_1_outputs.zip.
+For your reference, a zip archive of all files being generated via the execution of the screenlamp pipeline can be obtained via the following download link: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/pipeline-tutorial_1_outputs.zip](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/pipeline-tutorial_1_outputs.zip).
 
 ## Canceling and Resuming a Screening Run
 
