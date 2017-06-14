@@ -1,3 +1,31 @@
+# Sebastian Raschka 2017
+#
+# screenlamp is a Python toolkit
+# for hypothesis-driven virtual screening.
+#
+# Copyright (C) 2017 Michigan State University
+# License: MIT
+#
+# Software author: Sebastian Raschka <http://sebastianraschka.com>
+# Software author email: mail@sebastianraschka.com
+#
+# Software source repository: https://github.com/rasbt/screenlamp
+# Documenatation: https://psa-lab.github.io/screenlamp
+#
+# screenlamp was developed in the
+# Protein Structural Analysis & Design Laboratory
+# (http://www.kuhnlab.bmb.msu.edu)
+#
+# If you are using screenlamp in your research, please cite
+# the following journal article:
+#
+# Sebastian Raschka, Anne M. Scott, Nan Liu,
+#   Santosh Gunturu, Mar Huertas, Weiming Li,
+#   and Leslie A. Kuhn.
+# "Screenlamp: A hypothesis-driven, ligand-based toolkit to
+#    facilitate large-scale screening,
+#    applied to discover potent GPCR inhibitors"
+
 import os
 import argparse
 import sys
@@ -7,8 +35,6 @@ from numpy import nan as np_nan
 from mputil import lazy_imap
 from biopandas.mol2 import PandasMol2
 from biopandas.mol2 import split_multimol2
-
-# make mol2.gz compatible
 
 
 def get_mol2_files(dir_path):
@@ -70,6 +96,23 @@ def data_processor(mol2s):
     return mol2s[0][0], mol2s[1][0], atoms, charges
 
 
+def data_processor_gz(mol2s_gz):
+
+    q_pdmol = PandasMol2()
+    d_pdmol = PandasMol2()
+
+    d_pdmol.read_mol2_from_list(mol2_code=mol2s_gz[0][0],
+                                mol2_lines=mol2s_gz[0][1])
+
+    q_pdmol.read_mol2_from_list(mol2_code=mol2s_gz[1][0],
+                                mol2_lines=mol2s_gz[1][1])
+
+    atoms, charges = get_atom_matches(q_pdmol, d_pdmol)
+    return (mol2s_gz[0][0].decode('utf-8'),
+            mol2s_gz[1][0].decode('utf-8'),
+            atoms, charges)
+
+
 def read_and_write(q_path, d_path, verbose,
                    cache, output_file, n_cpus):
 
@@ -85,7 +128,12 @@ def read_and_write(q_path, d_path, verbose,
 
     cnt = 0
 
-    for chunk in lazy_imap(data_processor=data_processor,
+    if q_path.endswith('.gz'):
+        data_processor_fn = data_processor_gz
+    else:
+        data_processor_fn = data_processor
+
+    for chunk in lazy_imap(data_processor=data_processor_fn,
                            data_generator=zip(split_multimol2(d_path),
                                               split_multimol2(q_path)),
                            n_cpus=n_cpus):

@@ -1,14 +1,42 @@
+# Sebastian Raschka 2017
+#
+# screenlamp is a Python toolkit
+# for hypothesis-driven virtual screening.
+#
+# Copyright (C) 2017 Michigan State University
+# License: MIT
+#
+# Software author: Sebastian Raschka <http://sebastianraschka.com>
+# Software author email: mail@sebastianraschka.com
+#
+# Software source repository: https://github.com/rasbt/screenlamp
+# Documenatation: https://psa-lab.github.io/screenlamp
+#
+# screenlamp was developed in the
+# Protein Structural Analysis & Design Laboratory
+# (http://www.kuhnlab.bmb.msu.edu)
+#
+# If you are using screenlamp in your research, please cite
+# the following journal article:
+#
+# Sebastian Raschka, Anne M. Scott, Nan Liu,
+#   Santosh Gunturu, Mar Huertas, Weiming Li,
+#   and Leslie A. Kuhn.
+# "Screenlamp: A hypothesis-driven, ligand-based toolkit to
+#    facilitate large-scale screening,
+#    applied to discover potent GPCR inhibitors"
+
 general settings:
   screenlamp tools directory: /Users/sebastian/code/screenlamp/tools
-  project output directory: /Users/sebastian/Desktop/screenlamp_pipe
-  input mol2 directory: /Users/sebastian/code/screenlamp/docs/workflow/example_1/dataset/mol2
+  project output directory: /Users/sebastian/code/screenlamp/example-files/example_1/screening-results
+  input mol2 directory: /Users/sebastian/code/screenlamp/example-files/example_1/dataset/mol2
   number of cpus: 0 # 0 means all avaible CPUs (recommended)
 
 ################################################
 ### Step 01: SELECT MOLECULES FROM DATA TABLE
 ################################################
 molecule property filter settings:
-  datatable path: /Users/sebastian/code/screenlamp/docs/workflow/example_1/dataset/tables/3_prop.xls
+  datatable path: /Users/sebastian/code/screenlamp/example-files/example_1/dataset/tables/3_prop.xls
   # the following filter key selects all molecules with 
   # fewer than 8 rotatable bonds and a molecular weight 
   # greater than 200 g/mol
@@ -48,7 +76,7 @@ ROCS settings:
   ROCS run rankby: TanimotoCombo
   ROCS results sort by: TanimotoCombo,ColorTanimoto
   ROCS score threshold: (TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)
-  query molecule path: /Users/sebastian/code/screenlamp/docs/workflow/example_1/dataset/query/3kpzs_conf_subset_nowarts.mol2
+  query molecule path: /Users/sebastian/code/screenlamp/example-files/example_1/dataset/query/3kpzs_conf_subset_nowarts.mol2
 
 ################################################
 ### Step 07: MATCHING FUNCTIONAL GROUPS

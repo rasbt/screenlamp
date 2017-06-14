@@ -1,11 +1,38 @@
+# Sebastian Raschka 2017
+#
+# screenlamp is a Python toolkit
+# for hypothesis-driven virtual screening.
+#
+# Copyright (C) 2017 Michigan State University
+# License: MIT
+#
+# Software author: Sebastian Raschka <http://sebastianraschka.com>
+# Software author email: mail@sebastianraschka.com
+#
+# Software source repository: https://github.com/rasbt/screenlamp
+# Documenatation: https://psa-lab.github.io/screenlamp
+#
+# screenlamp was developed in the
+# Protein Structural Analysis & Design Laboratory
+# (http://www.kuhnlab.bmb.msu.edu)
+#
+# If you are using screenlamp in your research, please cite
+# the following journal article:
+#
+# Sebastian Raschka, Anne M. Scott, Nan Liu,
+#   Santosh Gunturu, Mar Huertas, Weiming Li,
+#   and Leslie A. Kuhn.
+# "Screenlamp: A hypothesis-driven, ligand-based toolkit to
+#    facilitate large-scale screening,
+#    applied to discover potent GPCR inhibitors"
+
 import argparse
 import os
 import sys
 import pandas as pd
+import gzip
 import time
 from biopandas.mol2 import split_multimol2
-
-# make mol2.gz compatible
 
 
 def get_tsv_pairs(all_tsv):
@@ -89,6 +116,13 @@ def main(input_dir, output_dir, atomtype_selection, charge_selection,
             input_mol2_path_dbase = input_mol2_path_query.replace(
                                     '_query.mol2', '_dbase.mol2')
 
+            if not os.path.exists(input_mol2_path_query)\
+                    and os.path.exists(input_mol2_path_query + '.gz'):
+                input_mol2_path_query += '.gz'
+            if not os.path.exists(input_mol2_path_dbase)\
+                    and os.path.exists(input_mol2_path_dbase + '.gz'):
+                input_mol2_path_dbase += '.gz'
+
             output_mol2_path_query = os.path.join(output_dir,
                                                   os.path.basename(
                                                    c_out).replace(
@@ -97,8 +131,23 @@ def main(input_dir, output_dir, atomtype_selection, charge_selection,
             output_mol2_path_dbase = output_mol2_path_query.replace(
                                      '_query.mol2', '_dbase.mol2')
 
-            with open(output_mol2_path_query, 'w') as opq, open(
-                    output_mol2_path_dbase, 'w') as opd:
+            if input_mol2_path_query.endswith('.gz'):
+                output_mol2_path_query += '.gz'
+                query_write_mode = 'wb'
+                query_open_file = gzip.open
+            else:
+                query_write_mode = 'w'
+                query_open_file = open
+            if input_mol2_path_dbase.endswith('.gz'):
+                output_mol2_path_dbase += '.gz'
+                dbase_write_mode = 'wb'
+                dbase_open_file = gzip.open
+            else:
+                dbase_write_mode = 'w'
+                dbase_open_file = open
+
+            with query_open_file(output_mol2_path_query, query_write_mode) as opq,\
+                    dbase_open_file(output_mol2_path_dbase, dbase_write_mode) as opd:
                 for i in selection_indices:
 
                     mol2_q_cont = ('DID NOT FIND %s\n'
@@ -119,8 +168,15 @@ def main(input_dir, output_dir, atomtype_selection, charge_selection,
                             mol2_d_cont = mol2[1]
                             break
 
-                    opq.write(''.join(mol2_q_cont))
-                    opd.write(''.join(mol2_d_cont))
+                    if query_write_mode == 'wb':
+                        opq.write(b''.join(mol2_q_cont))
+                    else:
+                        opq.write(''.join(mol2_q_cont))
+
+                    if dbase_write_mode == 'wb':
+                        opd.write(b''.join(mol2_d_cont))
+                    else:
+                        opd.write(''.join(mol2_d_cont))
 
         if verbose:
             elapsed = time.time() - start

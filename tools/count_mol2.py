@@ -1,18 +1,30 @@
 # Sebastian Raschka 2017
 #
-# `screenlamp` is a Python toolkit for using
-# filters and pipelines for hypothesis-driven
-# virtual screening.
+# screenlamp is a Python toolkit
+# for hypothesis-driven virtual screening.
 #
 # Copyright (C) 2017 Michigan State University
 # License: MIT
 #
-# SiteInterlock was developed in the
+# Software author: Sebastian Raschka <http://sebastianraschka.com>
+# Software author email: mail@sebastianraschka.com
+#
+# Software source repository: https://github.com/rasbt/screenlamp
+# Documenatation: https://psa-lab.github.io/screenlamp
+#
+# screenlamp was developed in the
 # Protein Structural Analysis & Design Laboratory
 # (http://www.kuhnlab.bmb.msu.edu)
 #
-# Author: Sebastian Raschka <http://sebastianraschka.com>
-# Author email: mail@sebastianraschka.com
+# If you are using screenlamp in your research, please cite
+# the following journal article:
+#
+# Sebastian Raschka, Anne M. Scott, Nan Liu,
+#   Santosh Gunturu, Mar Huertas, Weiming Li,
+#   and Leslie A. Kuhn.
+# "Screenlamp: A hypothesis-driven, ligand-based toolkit to
+#    facilitate large-scale screening,
+#    applied to discover potent GPCR inhibitors"
 
 
 import subprocess

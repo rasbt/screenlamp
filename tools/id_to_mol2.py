@@ -1,24 +1,36 @@
 # Sebastian Raschka 2017
 #
-# `screenlamp` is a Python toolkit for using
-# filters and pipelines for hypothesis-driven
-# virtual screening.
+# screenlamp is a Python toolkit
+# for hypothesis-driven virtual screening.
 #
 # Copyright (C) 2017 Michigan State University
 # License: MIT
 #
-# SiteInterlock was developed in the
+# Software author: Sebastian Raschka <http://sebastianraschka.com>
+# Software author email: mail@sebastianraschka.com
+#
+# Software source repository: https://github.com/rasbt/screenlamp
+# Documenatation: https://psa-lab.github.io/screenlamp
+#
+# screenlamp was developed in the
 # Protein Structural Analysis & Design Laboratory
 # (http://www.kuhnlab.bmb.msu.edu)
 #
-# Author: Sebastian Raschka <http://sebastianraschka.com>
-# Author email: mail@sebastianraschka.com
-
+# If you are using screenlamp in your research, please cite
+# the following journal article:
+#
+# Sebastian Raschka, Anne M. Scott, Nan Liu,
+#   Santosh Gunturu, Mar Huertas, Weiming Li,
+#   and Leslie A. Kuhn.
+# "Screenlamp: A hypothesis-driven, ligand-based toolkit to
+#    facilitate large-scale screening,
+#    applied to discover potent GPCR inhibitors"
 
 import argparse
 import os
 import sys
 import time
+import gzip
 
 from biopandas.mol2.mol2_io import split_multimol2
 
@@ -65,20 +77,39 @@ def filter_and_write(mol2_files, ids, output_dir, whitelist_filter, verbose):
 
         mol2_outpath = os.path.join(output_dir, os.path.basename(mol2_file))
 
-        with open(mol2_outpath, 'w') as f:
+        if mol2_outpath.endswith('.gz'):
+            write_mode = 'wb'
+            open_file = gzip.open
+        else:
+            write_mode = 'w'
+            open_file = open
 
+        with open_file(mol2_outpath, write_mode) as f:
             if verbose:
                 start = time.time()
 
             if whitelist_filter:
-                for idx, mol2 in enumerate(split_multimol2(mol2_file)):
-                    if mol2[0] in ids:
-                        f.write(''.join(mol2[1]))
+
+                if write_mode == 'w':
+                    for idx, mol2 in enumerate(split_multimol2(mol2_file)):
+
+                        if mol2[0] in ids:
+                            f.write(''.join(mol2[1]))
+                else:
+                    for idx, mol2 in enumerate(split_multimol2(mol2_file)):
+
+                        if mol2[0].decode('utf-8') in ids:
+                            f.write(b''.join(mol2[1]))
 
             else:
-                for idx, mol2 in enumerate(split_multimol2(mol2_file)):
-                    if mol2[0] not in ids:
-                        f.write(''.join(mol2[1]))
+                if write_mode == 'w':
+                    for idx, mol2 in enumerate(split_multimol2(mol2_file)):
+                        if mol2[0] not in ids:
+                            f.write(''.join(mol2[1]))
+                else:
+                    for idx, mol2 in enumerate(split_multimol2(mol2_file)):
+                        if mol2[0].decode('utf-8') not in ids:
+                            f.write(b''.join(mol2[1]))
             if verbose:
                 elapsed = time.time() - start
                 n_molecules = idx + 1
