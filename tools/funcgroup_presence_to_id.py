@@ -155,7 +155,11 @@ def main(input_dir, output_file, verbose, n_cpus):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='A command line tool for filtering mol2 files.',
+            description='Selecting molecules base on the presence'
+                        '\nof certain atoms or functional groups.',
+            epilog='Example:\n'
+            'python funcgroup_presence_to_id.py --i mol2s/ -o mol2ids.txt\\'
+            '\n  --selection ((atom_type == \'S.3\') | (atom_type == \'S.o2\')) --> (atom_type == \'O.2\') --processes 0',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
@@ -167,24 +171,39 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--selection',
                         type=str,
                         required=True,
-                        help='Selection string For example, ...')
-    parser.add_argument('-v', '--verbose',
-                        type=int,
-                        default=1,
-                        help='Verbosity level. If 0, does not print any'
-                             ' output.'
-                             ' If 1 (default), prints the file currently'
-                             ' processing.')
+                        help='Selection condition for the atom presence'
+                        ' checks.'
+                        '\n1) Require 2 atom types to be present:'
+                        '\n    "(atom_type == \'S.o2\') -->'
+                        ' (atom_type == \'O.2\')"'
+                        '\n2) Selection example to consider either'
+                        ' an S.o2 or S.3 atom and a O.2 atom to be present:'
+                        '\n    "((atom_type == \'S.3\') |'
+                        ' (atom_type == \'S.o2\')) -->'
+                        ' (atom_type == \'O.2\')"'
+                        '\n3) Selection example using logical ORs on '
+                        'both sides:\n'
+                        '    "((atom_type == \'S.3\') | (atom_type == '
+                        '\'S.o2\'))'
+                        ' -->  ((atom_type == \'O.2\') |'
+                        ' (atom_type == \'O.3\'))"')
     parser.add_argument('--processes',
                         type=int,
                         default=1,
                         help='Number of processes to run in parallel.'
-                             ' If processes>0, the specified number of CPUs'
-                             ' will be used.'
-                             ' If processes=0, all available CPUs will'
-                             ' be used.'
-                             ' If processes=-1, all available CPUs'
-                             ' minus `processes` will be used.')
+                             '\nIf processes > 0, the specified number of CPUs'
+                             '\nwill be used.'
+                             '\nIf processes = 0, all available CPUs will'
+                             '\nbe used.'
+                             '\nIf processes = -1, all available CPUs'
+                             '\nminus `processes` will be used.')
+    parser.add_argument('-v', '--verbose',
+                        type=int,
+                        default=1,
+                        help='Verbosity level. If 0, does not print any'
+                             '\noutput.'
+                             '\nIf 1 (default), prints the file currently'
+                             '\nprocessing.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 

@@ -106,13 +106,15 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
             description='A command line tool for counting MOL2 structures',
-            epilog='Example: python count_mol2.py -i mol2_dir\n',
+            epilog='Example 1: python count_mol2.py -i mol2_dir/'
+                   '\nExample 2: python count_mol2.py -i partition_1.mol2',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
-                        help='Input .mol2 or .mol2.gz file,'
-                             'or a directory of MOL2 files')
+                        help='Path to a .mol2 or .mol2.gz file,'
+                             '\nor a directory containing .mol2/.mol2.gz'
+                             'files')
 
     parser.add_argument('-v', '--version', action='version', version='v. 1.0')
 

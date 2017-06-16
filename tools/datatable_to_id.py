@@ -50,7 +50,10 @@ def read_and_write(source, target, selection,
             start = time.time()
         for chunk in reader:
 
-            mask = pd.eval(selection)
+            if selection is not None:
+                mask = pd.eval(selection)
+            else:
+                mask = chunk.index
             chunk.loc[mask, [id_column]].to_csv(f,
                                                 header=None,
                                                 index=None)
@@ -78,11 +81,17 @@ def columns_from_selection(s):
 
 def main(input_dir, output_file, verbose, selection, id_column):
 
-    parsed_sele = parse_selection_string(selection, df_name='chunk')
+    columns = [id_column]
+    if selection is None:
+        parsed_sele = None
+    else:
+        parsed_sele = parse_selection_string(selection, df_name='chunk')
+        columns += columns_from_selection(selection)
+
     dirpath = os.path.dirname(output_file)
     if not os.path.exists(dirpath):
         os.mkdir(dirpath)
-    columns = [id_column] + columns_from_selection(selection)
+
     read_and_write(source=args.input,
                    target=args.output,
                    selection=parsed_sele,
@@ -96,14 +105,17 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
             description='Write a file with molecule IDs from MOL2 files.',
-            epilog='Example: python mol2_to_id.py -i mol2_dir -o ids.txt\n',
+            epilog='Example:\n'
+                   'python datatable_to_id.py -i table.txt -o ids.txt \\'
+                   '\n --id_column ZINC_ID --selection "(NRB <= 7) & (MWT > 200)"\n',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input .mol2 or .mol2.gz file,'
-                             'or a directory of MOL2 files')
+                        help='Path to a datatable file where each row'
+                             '\nrepresents a molecule and each columns'
+                             '\nstore the molecular features')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
@@ -112,22 +124,25 @@ if __name__ == '__main__':
     parser.add_argument('--id_column',
                         type=str,
                         required=True,
-                        help='ID column.')
+                        help='Name of the Molecule ID column')
     parser.add_argument('--seperator',
                         type=str,
                         default='\t',
-                        help='Column seperator')
+                        help='Column seperator used\nin the input table')
     parser.add_argument('-s', '--selection',
                         type=str,
-                        required=True,
-                        help='Selection string For example, ...')
+                        default=None,
+                        help='Selection condition.\n'
+                        'single column selection example: (MWT > 500)\n'
+                        'logical OR example: (MWT > 500) | (MWT < 200)\n'
+                        'logical AND example: (NRB <= 7) & (MWT > 200)')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
                         help='Verbosity level. If 0, does not print any'
-                             ' output.'
-                             ' If 1 (default), prints the file currently'
-                             ' processing.')
+                             '\noutput.'
+                             '\nIf 1 (default), prints the file currently'
+                             '\nprocessing.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 

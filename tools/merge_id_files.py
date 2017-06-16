@@ -57,24 +57,27 @@ def main(id_file_path_1, id_file_path_2, output_path):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='Placeholder.',
-            epilog='Example: python mol2_to_id.py -i mol2_dir -o ids.txt\n',
+            description='Merges two Molecule ID files into'
+                        '\nwhile preventing duplicate entries.',
+            epilog='Example:\n'
+                   'python merge_id_files.py --input1 mol2s_1.txt'
+                   '--input1 mol2s_2.txt --output merged.txt\n',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('--input1',
                         type=str,
                         required=True,
                         help='Input ID file that contains molecule'
-                             'IDs (one ID per line)')
+                             '\nIDs (one ID per line)')
     parser.add_argument('--input2',
                         type=str,
                         required=True,
                         help='Input ID file that contains molecule'
-                             'IDs (one ID per line)')
+                             '\nIDs (one ID per line)')
     parser.add_argument('--output',
                         type=str,
                         required=True,
-                        help='Path to the output ID file.')
+                        help='Path to the output ID file')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 

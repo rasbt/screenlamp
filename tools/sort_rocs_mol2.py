@@ -80,14 +80,38 @@ def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
 
     query_mol2s = {}
 
+    multiconf_query = False
+    for idx, cont in enumerate(split_multimol2(query_path)):
+        if idx >= 1:
+            multiconf_query = True
+            break
+
     cnt = -1
-    for id_, cont in split_multimol2(query_path):
-        cnt += 1
-        mol_idx = '%s_%d' % (id_, cnt)
-        if mol_idx in query_names:
-            if id_suffix:
-                cont[1] = mol_idx + '\n'
-            query_mol2s[mol_idx] = ''.join(cont)
+
+    if query_path.endswith('.gz'):
+        for id_, cont in split_multimol2(query_path):
+            cnt += 1
+            cont = b''.join(cont).decode('utf-8').split('\n')
+            if multiconf_query:
+                mol_idx = '%s_%d' % (id_.decode('utf-8'), cnt)
+            else:
+                mol_idx = id_
+            if mol_idx in query_names:
+                if id_suffix:
+                    cont[1] = mol_idx + '\n'
+                query_mol2s[mol_idx] = ''.join(cont)
+
+    else:
+        for id_, cont in split_multimol2(query_path):
+            cnt += 1
+            if multiconf_query:
+                mol_idx = '%s_%d' % (id_, cnt)
+            else:
+                mol_idx = id_
+            if mol_idx in query_names:
+                if id_suffix:
+                    cont[1] = mol_idx + '\n'
+                query_mol2s[mol_idx] = ''.join(cont)
 
     out_path_base = os.path.join(output_dir, os.path.basename(inp_mol2_path)
                                  .split('.mol2')[0])
@@ -140,34 +164,51 @@ def main(input_dir, output_dir, query_path,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='A command line tool for filtering mol2 files.',
+            description='Sorts ROCS results by score and creates'
+                        '\nseparate .mol2 files for the database'
+                        ' and query molecules.',
+            epilog='Example:'
+                   '\npython sort_rocs_mol2.py -i rocs_results/ \\'
+                   '\n -o rocs_sorted/ --query mol.mol2 \\'
+                   '\n --sortby TanimotoCombo,ColorTanimoto \\'
+                   '\n --selection (TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input directory with .mol2 and .mol2.gz files')
+                        help='Input directory with results from a ROCS run.')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Directory for writing the output files')
-    parser.add_argument('-q', '--query',
-                        required=True,
+                        help='Directory path for writing the .mol2 overlay'
+                             '\nROCS status and ROCS report (.rpt) files')
+    parser.add_argument('--query',
                         type=str,
-                        help='Query molecule file')
+                        required=True,
+                        help='Path to the query molecule'
+                             '\nin .mol2 and/or .mol2.gz format.'
+                             '\nThe query molecule file could be a single'
+                             '\nstructure of multiple-conformers of the same'
+                             '\nstructure. If a multi-conformer file is'
+                             '\nsubmitted, please make sure that all'
+                             '\nconformers in the mol2 file have the same'
+                             '\nmolecule ID/Name.')
     parser.add_argument('-s', '--sortby',
                         type=str,
                         default='TanimotoCombo,ColorTanimoto',
-                        help='')
+                        help='Score column(s) in ROCS report files that'
+                             '\nthe structures should be sorted by')
     parser.add_argument('--selection',
                         type=str,
                         default='(TanimotoCombo >= 1.0)'
                                 ' & (ColorTanimoto >= 0.25)',
-                        help='')
+                        help='Selection string to exclude molecules above'
+                             '\nor below a certain score threshold')
     parser.add_argument('--column_seperator',
                         type=str,
                         default='\t',
-                        help='')
+                        help='Column separator used in the ROCS report files')
     parser.add_argument('--id_suffix',
                         type=str,
                         default='False',
@@ -177,8 +218,8 @@ if __name__ == '__main__':
                         default=1,
                         help='Verbosity level. If 0, does not print any'
                              ' output.'
-                             ' If 1 (default), prints the file currently'
-                             ' processing.')
+                             '\nIf 1 (default), prints the file currently'
+                             '\nprocessing.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 
@@ -194,7 +235,7 @@ if __name__ == '__main__':
 
     sortby = [s.strip() for s in args.sortby.split(',')]
     main(input_dir=args.input, output_dir=args.output, query_path=args.query,
-         sortby=sortby, 
+         sortby=sortby,
          verbose=args.verbose,
          column_seperator=args.column_seperator,
          id_suffix=id_suffix,

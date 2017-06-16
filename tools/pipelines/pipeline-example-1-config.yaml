@@ -77,6 +77,11 @@ ROCS settings:
   ROCS results sort by: TanimotoCombo,ColorTanimoto
   ROCS score threshold: (TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)
   query molecule path: /Users/sebastian/code/screenlamp/example-files/example_1/dataset/query/3kpzs_conf_subset_nowarts.mol2
+  # The query molecule above could be a single- or multi-conformer .mol2/.mol2.gz file.
+  # However, for ROCS, please make sure that the query file does not have
+  # "multi-conformer warts." I.e., all molecules in the multi-conformer .mol2/.mol2.gz
+  # file must have exactly the same molecule ID without any enumerating prefixes
+  # or suffixes.
 
 ################################################
 ### Step 07: MATCHING FUNCTIONAL GROUPS

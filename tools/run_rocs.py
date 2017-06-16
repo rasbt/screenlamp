@@ -80,12 +80,19 @@ def run_rocs(source_file, target_file, n_processes, settings):
     sys.stdout.write('Processing %s\n' % os.path.basename(source_file))
     sys.stdout.flush()
 
+    for idx, mol2 in enumerate(split_multimol2(QUERY_FILE)):
+        if idx >= 1:
+            mcquery = 'true'
+            break
+    if not idx:
+        mcquery = 'false'
+
     cmd = [EXECUTABLE,
            '-ref', QUERY_FILE,
            '-dbase', source_file,
            '-outputquery', 'false',
            '-prefix', prefix,
-           '-mcquery', 'true',
+           '-mcquery', mcquery,
            '-mpi_np', str(n_processes),
            '-oformat', 'mol2']
 
@@ -119,33 +126,51 @@ def main(input_dir, output_dir, n_processes, settings):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='A command line tool for filtering mol2 files.',
+            description='Wrapper running OpenEye ROCS on one'
+                        '\nor more database partitions.',
+            epilog='Example:\n'
+                   'python run_rocs.py -i database_conformers/ \\'
+                   '\n -o rocs_overlays/ --executable /.../rocs-3.2.1.4 \\'
+                   '\n --query query.mol2 \\'
+                   '\n --settings "-rankby TanimotoCombo -maxhits 0 \\'
+                   '\n -besthits 0 -progress percent --processes 0"',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input directory with .mol2 and .mol2.gz files')
+                        help='Path to input directory containing the database'
+                             '\nmolecules in .mol2 and/or .mol2.gz format'
+                             '\n.mol2.gz data')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Directory for writing the output files')
+                        help='Directory path for writing the .mol2 overlay'
+                             '\nROCS status and ROCS report (.rpt) files')
     parser.add_argument('--query',
                         type=str,
                         required=True,
-                        help='Query molecule')
+                        help='Path to the query molecule'
+                             '\nin .mol2 and/or .mol2.gz format.'
+                             '\nThe query molecule file could be a single'
+                             '\nstructure of multiple-conformers of the same'
+                             '\nstructure. If a multi-conformer file is'
+                             '\nsubmitted, please make sure that all'
+                             '\nconformers in the mol2 file have the same'
+                             '\nmolecule ID/Name.')
     parser.add_argument('--executable',
                         type=str,
-                        help='ROCS executable')
+                        help='Path to the ROCS executable on this machine')
     parser.add_argument('--settings',
                         type=str,
-                        default='-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent',
-                        help='Additional ROCS settings')
+                        default='-rankby TanimotoCombo -maxhits 0'
+                                ' -besthits 0 -progress percent',
+                        help='ROCS settings to use')
     parser.add_argument('-p', '--processes',
                         type=int,
                         default=1,
                         help='Number of processes to run in parallel.'
-                             ' Uses all CPUs if 0')
+                             '\nUses all CPUs if 0')
     parser.add_argument('-v', '--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()

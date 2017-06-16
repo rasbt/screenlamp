@@ -195,7 +195,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input directory with input tsv files')
+                        help='Input directory with input ,tsv files')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
@@ -216,9 +216,9 @@ if __name__ == '__main__':
                         type=int,
                         default=1,
                         help='Verbosity level. If 0, does not print any'
-                             ' output.'
-                             ' If 1 (default), prints the file currently'
-                             ' processing.')
+                             '\noutput.'
+                             '\nIf 1 (default), prints the file currently'
+                             '\nprocessing.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 

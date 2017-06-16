@@ -175,52 +175,82 @@ def main(input_dir, output_file, verbose, n_cpus):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='A command line tool for filtering mol2 files.',
+            description='A command line tool for filtering mol2 files'
+                        '\nby the presence of atoms or functional groups.',
+            epilog='\nThe following example how to select those molecules'
+                   '\nthat contain S.2 or S.o2 atom that is within'
+                   '\na 13-20 angstroms distance to a O.2 atom:\n\n'
+                   'python funcgroup_distance_to_id.py -i mol2_dir/ -o ids.txt \\'
+                   '\n --selection "((atom_type == \'S.3\') | (atom_type == \'S.o2\')) --> (atom_type == \'O.2\')" \\'
+                   '\n --distance 13-20  --processes 0',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
-                        help='Input directory with .mol2 and .mol2.gz files')
+                        help='Path to a .mol2 or .mol2.gz file,'
+                             '\nor a directory containing .mol2/.mol2.gz'
+                             'files')
     parser.add_argument('-o', '--output',
                         type=str,
                         help='Directory for writing the output files')
     parser.add_argument('-s', '--selection',
                         type=str,
                         required=True,
-                        help='Selection string For example, ...')
+                        help='Selection condition for the atom distance'
+                        ' checks.'
+                        '\n1) Selection example to compare 2 atom types:'
+                        '\n    "(atom_type == \'S.o2\') -->'
+                        ' (atom_type == \'O.2\')"'
+                        '\n2) Selection example to consider either'
+                        ' an S.o2 or S.3 atom to an O.2 atom:'
+                        '\n    "((atom_type == \'S.3\') |'
+                        ' (atom_type == \'S.o2\')) -->'
+                        ' (atom_type == \'O.2\')"'
+                        '\n3) Selection example using logical ORs on '
+                        'both sides:\n'
+                        '    "((atom_type == \'S.3\') | (atom_type == '
+                        '\'S.o2\'))'
+                        ' -->  ((atom_type == \'O.2\') |'
+                        ' (atom_type == \'O.3\'))"')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
                         help='Verbosity level. If 0, does not print any'
                              ' output.'
-                             ' If 1 (default), prints the file currently'
+                             '\nIf 1 (default), prints the file currently'
                              ' processing.')
     parser.add_argument('-d', '--distance',
                         type=str,
-                        help='Distance as "lowerbound-upperbound"')
+                        required=True,
+                        help='A distance range formatted'
+                             '\n as "lowerbound-upperbound".'
+                             '\nFor example, if 13-20 is provided as an'
+                             '\nargument, two atoms are considered a match'
+                             '\nif they are not closer than 13 angstroms and'
+                             '\n not farther than 20 angstroms.')
     parser.add_argument('--processes',
                         type=int,
                         default=1,
                         help='Number of processes to run in parallel.'
-                             ' If processes>0, the specified number of CPUs'
-                             ' will be used.'
-                             ' If processes=0, all available CPUs will'
-                             ' be used.'
-                             ' If processes=-1, all available CPUs'
-                             ' minus `processes` will be used.')
+                             '\nIf processes > 0, the specified number of CPUs'
+                             '\nwill be used.'
+                             '\nIf processes = 0, all available CPUs will'
+                             '\nbe used.'
+                             '\nIf processes = -1, all available CPUs'
+                             '\nminus `processes` will be used.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()
     DISTANCE = parse_distance_string(args.distance)
     if len(DISTANCE) != 2:
-        raise ValueError("Make sure you only have an lower and upper bound"
+        raise ValueError("Make sure you only have a lower and upper bound"
                          " for --distance"
-                         "\nFor example '13-20'")
+                         "\nFor example 13-20")
 
     SELECTION = parse_selection_string(args.selection)
     if len(SELECTION) != 2:
-        raise ValueError("Make sure you only have 2 --selection criteria"
+        raise ValueError("Make sure you have 2 --selection criteria"
                          " separated via '-->', for example,"
                          "\n\"((atom_type == 'S.3') |"
                          " (atom_type == 'S.o2'))\"")

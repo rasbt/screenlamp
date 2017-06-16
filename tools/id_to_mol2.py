@@ -135,8 +135,12 @@ def main(input_dir, id_file_path, output_dir, whitelist_filter, verbose):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='Write a file with molecule IDs from MOL2 files.',
-            epilog='Example: python mol2_to_id.py -i mol2_dir -o ids.txt\n',
+            description='Create filtered MOL2 files from ID and'
+                        ' input MOL2 files.',
+            epilog='Example:'
+                   '\npython id_to_mol2.py -i mol2_dir/'
+                   ' --id_file ids.txt'
+                   ' --output filtered_mol2_dir/',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
@@ -148,24 +152,24 @@ if __name__ == '__main__':
                         type=str,
                         required=True,
                         help='Input ID file that contains molecule'
-                             'IDs (one ID per line)')
+                             '\nIDs (one ID per line)')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
                         help='Output directory path for the'
-                             ' filtered MOL2 files')
+                             '\nfiltered MOL2 files')
     parser.add_argument('-w', '--whitelist',
                         type=str2bool,
                         default=True,
                         help='Uses ID file as whitelist if True (default).'
-                        ' Uses ID file as blacklist if False.')
+                        '\nUses ID file as blacklist if False.')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
                         help='Verbosity level. If 0, does not print any'
-                             ' output.'
-                             ' If 1 (default), prints the file currently'
-                             ' processing.')
+                             '\noutput.'
+                             '\nIf 1 (default), prints the file currently'
+                             '\nprocessing.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 

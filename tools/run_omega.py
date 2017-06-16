@@ -98,7 +98,12 @@ def main(input_dir, output_dir, n_processes, settings):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='A command line tool for filtering mol2 files.',
+            description='Wrapper running OpenEye OMEGA on one'
+                        '\nor more database partitions.',
+            epilog='Example:\n'
+                   'python run_omega.py -i dbase_mol2 \\'
+                   '\n -o dbase_conformers/ \\'
+                   '\n --executable /.../omega2-2.5.1.4 --processes 0',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
@@ -115,12 +120,12 @@ if __name__ == '__main__':
     parser.add_argument('--settings',
                         type=str,
                         default='-maxconfs 200 -warts false -progress percent',
-                        help='Additional OMEGA2 settings')
+                        help='OMEGA2 settings to use')
     parser.add_argument('-p', '--processes',
                         type=int,
                         default=1,
                         help='Number of processes to run in parallel.'
-                             ' Uses all CPUs if 0')
+                             '\nUses all CPUs if 0')
     parser.add_argument('-v', '--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()

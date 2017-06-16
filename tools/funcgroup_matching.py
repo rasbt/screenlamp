@@ -238,32 +238,52 @@ def main(input_dir, output_dir, verbose, n_cpus):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='A command line tool for filtering mol2 files.',
+            description='Generates tab-separated tables with containing atom'
+            '\n type and charge information from matching'
+            '\n atoms in pair-wise overlays.\n'
+            'Example:'
+            '\npython funcgroup_matching.py -i'
+            ' rocs_overlays_sorted/ -o matching_tables/ '
+            '--max_distance 1.3 --processes 0',
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input directory with .mol2 and .mol2.gz files')
+                        help='Path to a directory containing pairs '
+                             '\nof *_query.mol2/.mol2.gz '
+                             '\nand *_dbase.mol2/.mol2.gz files')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Directory for writing the output files')
+                        help='Path to a directory for writing'
+                             '\nthe output files')
     parser.add_argument('-d', '--max_distance',
                         type=float,
                         default=1.3,
-                        help='Distance')
-    parser.add_argument('-p', '--processes',
+                        help='The maximum distance, in angstroms, the'
+                        '\noverlayed atoms can be apart from each'
+                        '\nother for being considered a match.'
+                        '\nFor instance, a --max_distance 1.3 (default)'
+                        '\nwould count atoms as a match if they'
+                        '\nare within 0 and 1.3 angstroms'
+                        '\nto the target atom.')
+    parser.add_argument('--processes',
                         type=int,
                         default=1,
                         help='Number of processes to run in parallel.'
-                             ' Uses all CPUs if 0')
+                             '\nIf processes > 0, the specified number of CPUs'
+                             '\nwill be used.'
+                             '\nIf processes = 0, all available CPUs will'
+                             '\nbe used.'
+                             '\nIf processes = -1, all available CPUs'
+                             '\nminus `processes` will be used.')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
                         help='Verbosity level. If 0, does not print any'
                              ' output.'
-                             ' If 1 (default), prints the file currently'
+                             '\nIf 1 (default), prints the file currently'
                              ' processing.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
