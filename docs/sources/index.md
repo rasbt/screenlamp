@@ -4,7 +4,7 @@
 
 ![Python 3.6](https://img.shields.io/badge/Python-3.6-orange.svg)
 [![License](https://img.shields.io/badge/License-MIT-orange.svg)](license)
-[![JCIM](https://img.shields.io/badge/JCIM-doi:xxx.xxx.xxx-orange.svg)](license)
+[![JCIM](https://img.shields.io/badge/JOURNAL-doi:xxx.xxx.xxx-orange.svg)](license)
 
 ### A toolkit for ligand-based virtual screening
 
@@ -16,8 +16,7 @@
 
 The `screenlamp` toolkit was developed in the [Protein Structure Analysis & Design Laboratory](http://www.kuhnlab.bmb.msu.edu) at Michigan State University. For additional information on the theory behind the screenlamp project, please refer to the accompanying research publication:
 
-- Raschka, Sebastian, Anne M. Scott, Nan Liu, Mar Huertas, Weiming Li, and Leslie A. Kuhn 2016. "Screenlamp: A hypothesis-driven virtual screening toolkit for ligand-based receptor agonist and antagonist discovery" *Journal of Chemical Information and Modeling* XX (X). American Chemical Society: XXX-XX. doi:xx.xxxx/xxxxxxxx.
- {insert link to publisher website}
+- Raschka, Sebastian, Anne M. Scott, Nan Liu, Mar Huertas, Weiming Li, and Leslie A. Kuhn (2017). "Screenlamp: A hypothesis-driven, ligand-based toolkit to facilitate large-scale screening applied to discover potent GPCR inhibitors" *Journal* XX (X). Publisher: XXX-XX. doi:xx.xxxx/xxxxxxxx.
 
 ## Installation
 

@@ -24,7 +24,7 @@ extra_javascript:
 extra_css:
   - extra.css
 
-copyright: Copyright &copy; 2017 Michigan State University. Developed in the <a href="http://www.kuhnlab.bmb.msu.edu">PSA Lab</a>. <em>Sebastian Raschka et al. 2017</em>.
+copyright: Copyright &copy; 2017 Michigan State University. Developed in the <a href="http://www.kuhnlab.bmb.msu.edu">PSA Lab</a>.<br><em><a href="cite">Sebastian Raschka et al. 2017</a></em>.
 
 pages:
 - Home: index.md

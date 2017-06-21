@@ -4,13 +4,11 @@
 
 This tutorial explains how to use a pre-built screenlamp pipeline to perform an automated virtual screening on a small example dataset.
 
-In this particular screening pipeline, we are searching for mimics of a query molecule that contain a keto- group and sulfur atom in a specified distance to each other (13-20 angstroms) and have a high overall chemical and volumetric similarity towards the query. 
-
-(../images/automated-pipeline-flowchart.png)
+In this particular screening pipeline, we are searching for mimics of a query molecule that contain a keto-group and sulfur atom in a specified distance to each other (13-20 angstroms) and have a high overall chemical and volumetric similarity towards the query. Then, we are selecting a subset of database molecules where the keto-group of the query molecule overlays with a keto-group in the database molecules, and where the sulfur atom in the query overlays with a sulfur atom in the database molecules. The overall virtual screening pipeline is summarized in the flowchart below. For more details on the individual screening steps, please see the [Tools Tutorial](./example_1), which walks you through these steps using the same database and approach.
 
 ![](../images/automated-pipeline-flowchart.jpg)
 
-(A higher-resolution PDF version is available [here]().)
+(A higher-resolution PDF version of this flowchart is available [here](https://github.com/rasbt/screenlamp/blob/master/docs/sources/images/automated-pipeline-flowchart.pdf).)
 
 ### Requirements
 

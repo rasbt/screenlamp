@@ -31,29 +31,59 @@ def get_help_messages(path):
 def help_to_md(s):
     out_lines = []
 
+
+    example_section = False
     for line in s.split('\n'):
 
-        if not line:
+        lstripped = line.lstrip()
+        stripped = lstripped.rstrip()
+
+        if not stripped:
             continue
 
-        if line.startswith('usage:'):
-            usage = line.split('usage:')[-1].strip()
+        if stripped == "-v, --version         show program's version number and exit":
+            out_lines.append('- `-v, --version`  ')
+            out_lines.append("Show program's version number and exit")
+
+        elif stripped == "-h, --help            show this help message and exit":
+            out_lines.append('- `-h, --help`  ')
+            out_lines.append("Show this help message and exit")
+
+        elif stripped.startswith('Example:'):
+            example_section = True
+            out_lines.append('\n**Example:**\n\n```')
+
+        elif example_section:
+            if stripped.startswith('#'):
+                out_lines.append('```\n')
+                example_section = False
+            out_lines.append(stripped)
+
+        elif stripped.startswith('[-'):
+            out_lines.append('`%s`  ' % stripped)
+
+        elif stripped.startswith('usage:'):
+            usage = stripped.split('usage:')[-1]
             out_lines.append('\n**Usage:**\n\n    %s\n\n' % usage)
 
-        elif line.startswith('optional arguments:'):
-            out_lines.append('\n**Optional Arguments:**\n\n')
+        elif stripped.startswith('optional arguments:'):
+            out_lines.append('\n**Arguments:**\n\n')
+
+        elif stripped.startswith('  --') or stripped.startswith('python'):
+            out_lines.append('`%s`  ' % stripped)
 
         elif line.startswith('  -'):
-            out_lines.append('- `%s`' % line.lstrip())
+            out_lines.append('- `%s`  ' % stripped)
 
-        elif line.startswith('Example: '):
-            usage = line.split('Example:')[-1].strip()
-            out_lines.append('\n**Example:**\n\n```\n%s\n```' % usage)
-
+            #usage = line.split('Example')[-1].strip().strip(':')
+            
         else:
-            if line.startswith('  '):
-                line = '    - ' + line.strip()
-            out_lines.append(line + '\n')
+            if stripped.startswith('  '):
+                stripped = '     ' + stripped.strip()
+            out_lines.append(stripped)
+
+    if example_section:
+        out_lines.append('```\n')
 
     return out_lines
 
@@ -62,7 +92,7 @@ def main(dir_path):
     contents = []
     paths = get_pyfiles(dir_path)
     for f in paths:
-        contents.append('\n\n# %s\n\n' % os.path.basename(f))
+        contents.append('\n\n## %s\n\n' % os.path.basename(f))
         s = get_help_messages(f)
         lines = help_to_md(s)
         contents.extend(lines)
