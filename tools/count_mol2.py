@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
             description=('A command line tool for counting the number'
-                         ' of molecules in MOL2 files'),
+                         ' of molecules in MOL2 files.'),
             epilog="""Example: 
     python count_mol2.py -i mol2_dir/
     python count_mol2.py -i partition_1.mol2""",

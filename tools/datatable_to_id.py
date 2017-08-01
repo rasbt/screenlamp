@@ -104,7 +104,7 @@ def main(input_dir, output_file, verbose, selection, id_column):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='Write a file with molecule IDs from MOL2 files.',
+            description='Create a text file with molecule IDs from MOL2 files.',
             epilog="""Example:
 python datatable_to_id.py\\
   --input table.txt\\
@@ -122,8 +122,8 @@ python datatable_to_id.py\\
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Output path for the ID file.'
-                             ' For example, ids.txt')
+                        help='Output path for the ID file'
+                             ' (For example, `ids.txt`)')
     parser.add_argument('--id_column',
                         type=str,
                         required=True,
@@ -135,10 +135,10 @@ python datatable_to_id.py\\
     parser.add_argument('-s', '--selection',
                         type=str,
                         default=None,
-                        help='Selection condition.\n'
-                        'single column selection example: (MWT > 500)\n'
-                        'logical OR example: (MWT > 500) | (MWT < 200)\n'
-                        'logical AND example: (NRB <= 7) & (MWT > 200)')
+                        help='A conditional selection string:\n'
+                        '- Single column selection example: `"(MWT > 500)"`\n'
+                        '- Logical OR example: `"(MWT > 500) | (MWT < 200)"`\n'
+                        '- Logical AND example: `"(NRB <= 7) & (MWT > 200)"`')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,

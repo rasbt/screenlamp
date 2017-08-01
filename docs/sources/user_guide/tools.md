@@ -13,7 +13,7 @@ This page serves as a quick lookup reference for the different modules within sc
      count_mol2.py [-h] -i INPUT [-v]
 
 
-A command line tool for counting the number of molecules in MOL2 files
+A command line tool for counting the number of molecules in MOL2 files.
 
 **Arguments:**
 
@@ -46,7 +46,7 @@ python count_mol2.py -i partition_1.mol2
 
 `[--seperator SEPERATOR] [-s SELECTION] [-v VERBOSE]`  
 `[--version]`  
-Write a file with molecule IDs from MOL2 files.
+Create a text file with molecule IDs from MOL2 files.
 
 **Arguments:**
 
@@ -58,17 +58,17 @@ Path to a datatable file where each row
 represents a molecule and each columns
 store the molecular features
 - `-o OUTPUT, --output OUTPUT`  
-Output path for the ID file. For example, ids.txt
+Output path for the ID file (For example, `ids.txt`)
 - `--id_column ID_COLUMN`  
 Name of the Molecule ID column
 - `--seperator SEPERATOR`  
 Column seperator used
 in the input table
 - `-s SELECTION, --selection SELECTION`  
-Selection condition.
-single column selection example: (MWT > 500)
-logical OR example: (MWT > 500) | (MWT < 200)
-logical AND example: (NRB <= 7) & (MWT > 200)
+A conditional selection string:
+- Single column selection example: `"(MWT > 500)"`
+- Logical OR example: `"(MWT > 500) | (MWT < 200)"`
+- Logical AND example: `"(NRB <= 7) & (MWT > 200)"`
 - `-v VERBOSE, --verbose VERBOSE`  
 Verbosity level. If 0, does not print any
 output.

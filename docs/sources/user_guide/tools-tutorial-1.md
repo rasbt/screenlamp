@@ -308,14 +308,12 @@ d) when in doubt, one can run (as alternative for c) the tool 2 times. 1 time to
 --processes 0
 ```
 
-    Processing 1.mol2 | 231 mol/sec
-    Processing 2.mol2 | 276 mol/sec
-    Processing 3.mol2 | 264 mol/sec
-    Processing 4.mol2 | 229 mol/sec
-    Processing 5.mol2 | 236 mol/sec
-    Processing 6.mol2 | 241 mol/sec
-    Processing 7.mol2 | 262 mol/sec
-
+    Using selection: ["((pdmol.df.atom_type == 'S.3') | (pdmol.df.atom_type == 'S.o2'))", "(pdmol.df.atom_type == 'O.2')"]
+    Processing 1.mol2 | 351 mol/sec
+    Processing 2.mol2 | 364 mol/sec
+    Processing 3.mol2 | 348 mol/sec
+    Processing 4.mol2 | 329 mol/sec
+    Processing 5.mol2
 
 
 ```python
@@ -366,13 +364,14 @@ d) when in doubt, one can run (as alternative for c) the tool 2 times. 1 time to
 --processes 0
 ```
 
-    Processing 1.mol2 | 156 mol/sec
-    Processing 2.mol2 | 211 mol/sec
-    Processing 3.mol2 | 197 mol/sec
-    Processing 4.mol2 | 155 mol/sec
-    Processing 5.mol2 | 137 mol/sec
-    Processing 6.mol2 | 178 mol/sec
-    Processing 7.mol2 | 203 mol/sec
+    Using selection: ["((pdmol.df.atom_type == 'S.3') | (pdmol.df.atom_type == 'S.o2'))", "(pdmol.df.atom_type == 'O.2')"]
+    Processing 1.mol2 | 233 mol/sec
+    Processing 2.mol2 | 217 mol/sec
+    Processing 3.mol2 | 222 mol/sec
+    Processing 4.mol2 | 226 mol/sec
+    Processing 5.mol2 | 235 mol/sec
+    Processing 6.mol2 | 208 mol/sec
+    Processing 7.mol2 | 228 mol/sec
 
 
 
@@ -1232,15 +1231,16 @@ using `sort_rocs_mol2.py`
 --output project/rocs_overlays_sorted \
 --query ./dataset/query/3kpzs_conf_subset_nowarts.mol2 \
 --sortby TanimotoCombo \
+--id_suffix true
 ```
 
-    Processing 1_hits_1.mol2 | scanned 36 molecules | 7192 mol/sec
-    Processing 2_hits_1.mol2 | scanned 33 molecules | 3324 mol/sec
-    Processing 3_hits_1.mol2 | scanned 39 molecules | 6388 mol/sec
-    Processing 4_hits_1.mol2 | scanned 41 molecules | 6488 mol/sec
-    Processing 5_hits_1.mol2 | scanned 33 molecules | 6776 mol/sec
-    Processing 6_hits_1.mol2 | scanned 33 molecules | 5548 mol/sec
-    Processing 7_hits_1.mol2 | scanned 38 molecules | 7814 mol/sec
+    Processing 1_hits_1.mol2 | scanned 36 molecules | 1663 mol/sec
+    Processing 2_hits_1.mol2 | scanned 33 molecules | 4204 mol/sec
+    Processing 3_hits_1.mol2 | scanned 39 molecules | 7292 mol/sec
+    Processing 4_hits_1.mol2 | scanned 41 molecules | 7170 mol/sec
+    Processing 5_hits_1.mol2 | scanned 33 molecules | 7686 mol/sec
+    Processing 6_hits_1.mol2 | scanned 33 molecules | 7354 mol/sec
+    Processing 7_hits_1.mol2 | scanned 38 molecules | 4984 mol/sec
 
 
 - these can then be opened and viewed in pymol
@@ -1256,31 +1256,21 @@ will need suffixes:
 ```python
 !python ../../../../tools/funcgroup_matching.py \
 --input project/rocs_overlays_sorted \
---output project/funcgroup_matching_results
+--output project/funcgroup_matching_results \
+--max_distance 1.3 \
+--processes 0
 ```
 
-    Processing 1_hits_1_dbase.mol2/1_hits_1_query.mol2Traceback (most recent call last):
-      File "../../../../tools/funcgroup_matching.py", line 147, in <module>
-        main(input_dir=args.input, output_dir=args.output, verbose=args.verbose)
-      File "../../../../tools/funcgroup_matching.py", line 118, in main
-        read_and_write(q, d, verbose, cache)
-      File "../../../../tools/funcgroup_matching.py", line 93, in read_and_write
-        check_1dbase(pdmol2_query=q_pdmol, pdmol2_dbase=d_pdmol)
-      File "../../../../tools/funcgroup_matching.py", line 48, in check_1dbase
-        match = find_nearest(pdmol2=pdmol2_dbase, xyz=xyz)
-      File "../../../../tools/funcgroup_matching.py", line 60, in find_nearest
-        dist_series = pdmol2.distance(xyz=xyz)
-      File "/Users/sebastian/miniconda3/lib/python3.6/site-packages/biopandas/mol2/pandas_mol2.py", line 233, in distance
-        .subtract(xyz, axis=1), axis=1))
-      File "/Users/sebastian/miniconda3/lib/python3.6/site-packages/numpy/linalg/linalg.py", line 2206, in norm
-        return sqrt(add.reduce(s, axis=axis, keepdims=keepdims))
-    AttributeError: 'float' object has no attribute 'sqrt'
+    Processing 1_hits_1_dbase.mol2/1_hits_1_query.mol2 | scanned 36 molecules | 33 mol/sec
+    Processing 2_hits_1_dbase.mol2/2_hits_1_query.mol2 | scanned 33 molecules | 38 mol/sec
+    Processing 3_hits_1_dbase.mol2/3_hits_1_query.mol2 | scanned 39 molecules | 41 mol/sec
+    Processing 4_hits_1_dbase.mol2/4_hits_1_query.mol2 | scanned 41 molecules | 38 mol/sec
+    Processing 5_hits_1_dbase.mol2/5_hits_1_query.mol2 | scanned 33 molecules | 34 mol/sec
+    Processing 6_hits_1_dbase.mol2/6_hits_1_query.mol2 | scanned 33 molecules | 31 mol/sec
+    Processing 7_hits_1_dbase.mol2/7_hits_1_query.mol2 | scanned 38 molecules | 32 mol/sec
 
 
-- optimize distance for speed
-- get rid of iterrows?
-- parallelize
-- add threshold option
+# TODO
 
 
 ```python
