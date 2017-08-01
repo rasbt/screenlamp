@@ -167,11 +167,11 @@ if __name__ == '__main__':
             description='Sorts ROCS results by score and creates'
                         '\nseparate .mol2 files for the database'
                         ' and query molecules.',
-            epilog='Example:'
-                   '\npython sort_rocs_mol2.py -i rocs_results/ \\'
-                   '\n -o rocs_sorted/ --query mol.mol2 \\'
-                   '\n --sortby TanimotoCombo,ColorTanimoto \\'
-                   '\n --selection (TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)',
+            epilog="""Example:
+python sort_rocs_mol2.py -i rocs_results/\\
+   --output rocs_sorted/ --query mol.mol2\\
+   --sortby TanimotoCombo,ColorTanimoto\\
+   --selection "(TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)" """,
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

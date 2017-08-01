@@ -240,11 +240,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='Generates tab-separated tables with containing atom'
             '\n type and charge information from matching'
-            '\n atoms in pair-wise overlays.\n'
-            'Example:'
-            '\npython funcgroup_matching.py -i'
-            ' rocs_overlays_sorted/ -o matching_tables/ '
-            '--max_distance 1.3 --processes 0',
+            '\n atoms in pair-wise overlays.\n',
+            epilog="""Example:
+python funcgroup_matching.py\\
+   --input rocs_overlays_sorted/\\
+   --output matching_tables/\\
+   --max_distance 1.3\\
+   --processes 0""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

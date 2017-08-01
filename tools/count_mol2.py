@@ -105,16 +105,19 @@ def main(input_name):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='A command line tool for counting MOL2 structures',
-            epilog='Example 1: python count_mol2.py -i mol2_dir/'
-                   '\nExample 2: python count_mol2.py -i partition_1.mol2',
+            description=('A command line tool for counting the number'
+                         ' of molecules in MOL2 files'),
+            epilog="""Example: 
+    python count_mol2.py -i mol2_dir/
+    python count_mol2.py -i partition_1.mol2""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
+                        required=True,
                         type=str,
-                        help='Path to a .mol2 or .mol2.gz file,'
-                             '\nor a directory containing .mol2/.mol2.gz'
-                             'files')
+                        help='Path to a `.mol2` or `.mol2.gz`file,'
+                             '\nor a directory containing `.mol2`/`.mol2.gz`'
+                             ' files')
 
     parser.add_argument('-v', '--version', action='version', version='v. 1.0')
 

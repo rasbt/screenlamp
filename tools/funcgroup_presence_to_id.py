@@ -157,9 +157,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='Selecting molecules base on the presence'
                         '\nof certain atoms or functional groups.',
-            epilog='Example:\n'
-            'python funcgroup_presence_to_id.py --i mol2s/ -o mol2ids.txt\\'
-            '\n  --selection ((atom_type == \'S.3\') | (atom_type == \'S.o2\')) --> (atom_type == \'O.2\') --processes 0',
+            epilog="""Example:
+python funcgroup_presence_to_id.py --input mol2s/\\
+  --output mol2ids.txt\\
+  --selection "((atom_type == \'S.3\') | (atom_type == \'S.o2\')) --> (atom_type == \'O.2\')"\\
+  --processes 0""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

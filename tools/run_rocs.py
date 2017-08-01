@@ -128,12 +128,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='Wrapper running OpenEye ROCS on one'
                         '\nor more database partitions.',
-            epilog='Example:\n'
-                   'python run_rocs.py -i database_conformers/ \\'
-                   '\n -o rocs_overlays/ --executable /.../rocs-3.2.1.4 \\'
-                   '\n --query query.mol2 \\'
-                   '\n --settings "-rankby TanimotoCombo -maxhits 0 \\'
-                   '\n -besthits 0 -progress percent --processes 0"',
+            epilog="""Example:
+python run_rocs.py\\
+   --input database_conformers/\\
+   --output rocs_overlays/\\
+   --executable /.../rocs-3.2.1.4\\
+   --query query.mol2\\
+   --settings "-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent --processes 0" """,
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

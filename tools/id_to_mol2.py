@@ -137,10 +137,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='Create filtered MOL2 files from ID and'
                         ' input MOL2 files.',
-            epilog='Example:'
-                   '\npython id_to_mol2.py -i mol2_dir/'
-                   ' --id_file ids.txt'
-                   ' --output filtered_mol2_dir/',
+            epilog="""Example:
+python id_to_mol2.py --input mol2_dir/\\
+   --id_file ids.txt\\
+   --whitelist True\\
+   --output filtered_mol2_dir/""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

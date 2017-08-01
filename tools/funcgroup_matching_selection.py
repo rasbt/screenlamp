@@ -189,13 +189,20 @@ def main(input_dir, output_dir, atomtype_selection, charge_selection,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='A command line tool for filtering mol2 files.',
+            description='',
+            epilog="""Example:
+python funcgroup_matching_selection.py\\
+  --input 07_fgroup_matching_tables\\
+  --input_mol2 06_rocs_overlays_sorted\\
+  --output 08_funcgroup_selection\\
+  --atomtype_selection "((S1 == 'S.3') | (S1 == 'S.o2')) --> (O2 == 'O.2')"\\
+  --charge_selection FGROUP_CHARGE "((S1 >= 1.0)) --> (O2 <= -0.5)" """,
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input directory with input ,tsv files')
+                        help='Input directory with input .tsv files')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,

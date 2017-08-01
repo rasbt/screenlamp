@@ -105,9 +105,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
             description='Write a file with molecule IDs from MOL2 files.',
-            epilog='Example:\n'
-                   'python datatable_to_id.py -i table.txt -o ids.txt \\'
-                   '\n --id_column ZINC_ID --selection "(NRB <= 7) & (MWT > 200)"\n',
+            epilog="""Example:
+python datatable_to_id.py\\
+  --input table.txt\\
+  --output ids.txt\\
+  --id_column ZINC_ID\\
+  --selection "(NRB <= 7) & (MWT > 200)" """,
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

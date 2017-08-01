@@ -83,7 +83,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
             description='Write a file with molecule IDs from MOL2 files.',
-            epilog='Example:\npython mol2_to_id.py -i mol2_dir -o ids.txt\n',
+            epilog="""Example:
+python mol2_to_id.py\\
+   --input mol2_dir\\
+   --output ids.txt""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

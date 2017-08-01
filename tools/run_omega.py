@@ -100,10 +100,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='Wrapper running OpenEye OMEGA on one'
                         '\nor more database partitions.',
-            epilog='Example:\n'
-                   'python run_omega.py -i dbase_mol2 \\'
-                   '\n -o dbase_conformers/ \\'
-                   '\n --executable /.../omega2-2.5.1.4 --processes 0',
+            epilog="""Example:
+python run_omega.py\\
+   --input dbase_mol2\\
+   --output dbase_conformers/\\
+   --executable /.../omega2-2.5.1.4\\
+   --processes 0""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',

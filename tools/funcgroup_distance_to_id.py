@@ -177,12 +177,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='A command line tool for filtering mol2 files'
                         '\nby the presence of atoms or functional groups.',
-            epilog='\nThe following example how to select those molecules'
-                   '\nthat contain S.2 or S.o2 atom that is within'
-                   '\na 13-20 angstroms distance to a O.2 atom:\n\n'
-                   'python funcgroup_distance_to_id.py -i mol2_dir/ -o ids.txt \\'
-                   '\n --selection "((atom_type == \'S.3\') | (atom_type == \'S.o2\')) --> (atom_type == \'O.2\')" \\'
-                   '\n --distance 13-20  --processes 0',
+            epilog="""The following example how to select those molecules
+that contain S.2 or S.o2 atom that is within
+a 13-20 angstroms distance to a O.2 atom:
+
+python funcgroup_distance_to_id.py\\
+  --input mol2_dir/\\
+  --output ids.txt\\
+  --selection "((atom_type == \'S.3\') | (atom_type == \'S.o2\')) --> (atom_type == \'O.2\')"\\
+  --distance 13-20\\
+  --processes 0""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
