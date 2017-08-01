@@ -1,8 +1,7 @@
-
-
 # Tools API
 
-This page serves as a quick lookup reference for the different modules within screenlamp. Please see the [Tools Tutorial](example_1) for a more detailed explanation of the different modules and how they can be combined in a typical virtual screening pipeline.
+
+This page serves as a quick lookup reference for the different modules within screenlamp.Please see the Tools Tutorial for a more detailed explanation of the different modules and how they can be combined in a typical virtual screening pipeline.
 
 
 ## count_mol2.py
@@ -14,16 +13,16 @@ This page serves as a quick lookup reference for the different modules within sc
      count_mol2.py [-h] -i INPUT [-v]
 
 
-A command line tool for counting MOL2 structures
+A command line tool for counting the number of molecules in MOL2 files
 
 **Arguments:**
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
-Path to a .mol2 or .mol2.gz file,
-or a directory containing .mol2/.mol2.gzfiles
+Path to a `.mol2` or `.mol2.gz`file,
+or a directory containing `.mol2`/`.mol2.gz` files
 - `-v, --version`  
 Show program's version number and exit
 
@@ -53,7 +52,7 @@ Write a file with molecule IDs from MOL2 files.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Path to a datatable file where each row
 represents a molecule and each columns
@@ -107,7 +106,7 @@ by the presence of atoms or functional groups.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Path to a .mol2 or .mol2.gz file,
 or a directory containing .mol2/.mol2.gzfiles
@@ -169,7 +168,7 @@ atoms in pair-wise overlays.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Path to a directory containing pairs
 of *_query.mol2/.mol2.gz
@@ -228,7 +227,7 @@ python funcgroup_matching.py\
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Input directory with input .tsv files
 - `-o OUTPUT, --output OUTPUT`  
@@ -277,7 +276,7 @@ of certain atoms or functional groups.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Input directory with .mol2 and .mol2.gz files
 - `-o OUTPUT, --output OUTPUT`  
@@ -332,7 +331,7 @@ Create filtered MOL2 files from ID and input MOL2 files.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Input .mol2 or .mol2.gz file,or a directory of MOL2 files
 - `--id_file ID_FILE     Input ID file that contains molecule`  
@@ -411,7 +410,7 @@ Write a file with molecule IDs from MOL2 files.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Input .mol2 or .mol2.gz file,or a directory of MOL2 files
 - `-o OUTPUT, --output OUTPUT`  
@@ -447,7 +446,7 @@ or more database partitions.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Input directory with .mol2 and .mol2.gz files
 - `-o OUTPUT, --output OUTPUT`  
@@ -491,7 +490,7 @@ or more database partitions.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Path to input directory containing the database
 molecules in .mol2 and/or .mol2.gz format
@@ -548,7 +547,7 @@ separate .mol2 files for the database and query molecules.
 
 
 - `-h, --help`  
-Show this help message and exit`
+Show this help message and exit
 - `-i INPUT, --input INPUT`  
 Input directory with results from a ROCS run.
 - `-o OUTPUT, --output OUTPUT`  

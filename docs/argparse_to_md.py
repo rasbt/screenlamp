@@ -89,7 +89,12 @@ def help_to_md(s):
 
 
 def main(dir_path):
-    contents = []
+    s = ("This page serves as a quick lookup reference for the different"
+         " modules within screenlamp.Please see the Tools Tutorial for a"
+         " more detailed explanation of the different modules and how"
+         " they can be combined in a typical virtual screening pipeline.")
+
+    contents = ["# Tools API", "\n", s]
     paths = get_pyfiles(dir_path)
     for f in paths:
         contents.append('\n\n## %s\n\n' % os.path.basename(f))

@@ -8,7 +8,7 @@ repo_url: https://github.com/rasbt/screenlamp
 #include_search: true # not necessary for this theme
 docs_dir: sources
 site_dir: html
-theme: united
+theme_dir: united
 
 use_directory_urls: false
 site_favicon: favicon.ico
@@ -32,7 +32,7 @@ pages:
 - User Documentation: 
   - Overview: user_guide/doc-overview.md
   - Tools API: user_guide/tools.md
-  - Tools Tutorial: user_guide/example_1.md
+  - Tools Tutorial: user_guide/tools-tutorial-1.md
   - Pipeline Tutorial: user_guide/pipeline-tutorial-1.md
 - About:
   - Contact: contact.md

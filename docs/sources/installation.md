@@ -4,7 +4,9 @@
 
 ## Obtaining screenlamp
 
-You can download the latest version of screenlamp either from [Python's Package Index (PyPI)](https://pypi.python.org/pypi/screenlamp) or select the latest version bundle from the [GitHub repository](https://github.com/psa-lab/screenlamp/releases).
+You can download the latest version of screenlamp from the [GitHub repository](https://github.com/psa-lab/screenlamp/releases):
+
+[Insert Screenshot]
 
 ## Setting up your Python environment for screenlamp
 
@@ -27,6 +29,8 @@ To obtain one of the previous versions of screenlamp, please see the [Release No
 ### Development version
 
 You can download the latest development version of screenlamp as [ZIP](https://github.com/rasbt/screenlamp/archive/master.zip) file directly from GitHub.
+
+[Insert Screenshot]
 
 Alternatively, you can clone the screenlamp development version to your local machine by executing the following command:
 

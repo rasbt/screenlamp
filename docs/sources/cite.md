@@ -1,6 +1,9 @@
 # Citing screenlamp
 
-Screenlamp is research software and should be cited when you use it in your research. Please use the citation information given below.
+Screenlamp is research software and has been made available to other researchers under a permissive [Apache v2 open source license](license). If you use screenlamp in your scientific projects or any derivative work, the authors of the screenlamp software must be acknowledged and the following publication should be cited:
+
+- Raschka, Sebastian, Anne M. Scott, Nan Liu, Santosh Gunturu, Mar Huertas, Weiming Li, and Leslie A. Kuhn (2017). "Enabling the hypothesis-driven prioritization of small molecules in large databases: Screenlamp and its application to GPCR inhibitor discovery" [Journal] . [Publisher]: [DOI].
+
 
 ### BibTeX Entry
 
@@ -22,6 +25,3 @@ Screenlamp is research software and should be cited when you use it in your rese
 }
 ```
 
-### Formatted Citation Example
-
-Raschka, Sebastian, Anne M. Scott, Nan Liu, Mar Huertas, Weiming Li, and Leslie A. Kuhn (2017). "Screenlamp: A hypothesis-driven, ligand-based toolkit to facilitate large-scale screening applied to discover potent GPCR inhibitors" *Journal* XX (X). Publisher: XXX-XX. doi:xx.xxxx/xxxxxxxx.
