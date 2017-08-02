@@ -141,18 +141,20 @@ python run_rocs.py\\
                         type=str,
                         required=True,
                         help='Path to input directory containing the database'
-                             '\nmolecules in .mol2 and/or .mol2.gz format'
-                             '\n.mol2.gz data')
+                             '\nmolecules in `.mol2` and/or `.mol2.gz` format.'
+                        )
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Directory path for writing the .mol2 overlay'
-                             '\nROCS status and ROCS report (.rpt) files')
+                        help='(Required.) Directory path for writing'
+                             ' the `.mol2`'
+                             '\noverlay ROCS status and ROCS report (`.rpt`)'
+                             ' files.')
     parser.add_argument('--query',
                         type=str,
                         required=True,
-                        help='Path to the query molecule'
-                             '\nin .mol2 and/or .mol2.gz format.'
+                        help='(Required.) Path to the query molecule'
+                             '\nin `.mol2` and/or `.mol2.gz` format.'
                              '\nThe query molecule file could be a single'
                              '\nstructure of multiple-conformers of the same'
                              '\nstructure. If a multi-conformer file is'
@@ -161,17 +163,26 @@ python run_rocs.py\\
                              '\nmolecule ID/Name.')
     parser.add_argument('--executable',
                         type=str,
-                        help='Path to the ROCS executable on this machine')
+                        required=True,
+                        help="""(Required.) The path or command for running
+OpenEye ROCS on your system.""")
     parser.add_argument('--settings',
                         type=str,
                         default='-rankby TanimotoCombo -maxhits 0'
                                 ' -besthits 0 -progress percent',
-                        help='ROCS settings to use')
-    parser.add_argument('-p', '--processes',
+                        help='(Optional.) ROCS settings to use.')
+    parser.add_argument('--processes',
                         type=int,
                         default=1,
-                        help='Number of processes to run in parallel.'
-                             '\nUses all CPUs if 0')
+                        help='(Optional, default: `1`.) Number of processes to'
+                             ' run in parallel.'
+                             '\nIf processes > 0, the specified number of CPUs'
+                             '\nwill be used.'
+                             '\nIf processes = 0, all available CPUs will'
+                             '\nbe used.'
+                             '\nIf processes = -1, all available CPUs'
+                             '\nminus `processes` will be used.')
+
     parser.add_argument('-v', '--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()

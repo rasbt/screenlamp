@@ -147,27 +147,27 @@ python id_to_mol2.py --input mol2_dir/\\
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input .mol2 or .mol2.gz file,'
-                             'or a directory of MOL2 files')
+                        help='(Required.) Input `.mol2` or `.mol2.gz` file,'
+                             ' or a directory of MOL2 files.')
     parser.add_argument('--id_file',
                         type=str,
                         required=True,
-                        help='Input ID file that contains molecule'
-                             '\nIDs (one ID per line)')
+                        help='(Required.) Input ID file that contains molecule'
+                             '\nIDs (one ID per line).')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Output directory path for the'
-                             '\nfiltered MOL2 files')
+                        help='(Required.) Output directory path for the'
+                             '\nfiltered MOL2 files.')
     parser.add_argument('-w', '--whitelist',
                         type=str2bool,
                         default=True,
-                        help='Uses ID file as whitelist if True (default).'
+                        help='(Optional, default: `True`.) Uses ID file as whitelist if True (default).'
                         '\nUses ID file as blacklist if False.')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
-                        help='Verbosity level. If 0, does not print any'
+                        help='(Optional, default: `1`.) Verbosity level. If 0, does not print any'
                              '\noutput.'
                              '\nIf 1 (default), prints the file currently'
                              '\nprocessing.')

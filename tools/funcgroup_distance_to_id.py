@@ -176,57 +176,57 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
             description='A command line tool for filtering mol2 files'
-                        '\nby the presence of atoms or functional groups.',
-            epilog="""The following example how to select those molecules
-that contain S.2 or S.o2 atom that is within
-a 13-20 angstroms distance to a O.2 atom:
+                        '\nby the distance of two atoms or functional groups.',
+            epilog="""Example:
 
 python funcgroup_distance_to_id.py\\
   --input mol2_dir/\\
   --output ids.txt\\
   --selection "((atom_type == \'S.3\') | (atom_type == \'S.o2\')) --> (atom_type == \'O.2\')"\\
   --distance 13-20\\
-  --processes 0""",
+  --processes 0
+  
+
+  \# The example above selects those molecules
+  \# that contain S.2 or S.o2 atom that is within
+  \# a 13-20 angstroms distance to an 'O.2' (sp2/keto oxygen) atom
+
+  """,
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
-                        help='Path to a .mol2 or .mol2.gz file,'
-                             '\nor a directory containing .mol2/.mol2.gz'
-                             'files')
+                        required=True,
+                        help='(Required.) Path to a `.mol2` or `.mol2.gz` file,'
+                             '\nor a directory containing `.mol2`/`.mol2.gz`'
+                             'files.')
     parser.add_argument('-o', '--output',
                         type=str,
-                        help='Directory for writing the output files')
+                        required=True,
+                        help='(Required.) Directory for writing the output files.')
     parser.add_argument('-s', '--selection',
                         type=str,
                         required=True,
-                        help='Selection condition for the atom distance'
+                        help='(Required.) Selection condition for the atom distance'
                         ' checks.'
                         '\n1) Selection example to compare 2 atom types:'
-                        '\n    "(atom_type == \'S.o2\') -->'
-                        ' (atom_type == \'O.2\')"'
+                        '\n    `"(atom_type == \'S.o2\') -->'
+                        ' (atom_type == \'O.2\')"`.'
                         '\n2) Selection example to consider either'
                         ' an S.o2 or S.3 atom to an O.2 atom:'
-                        '\n    "((atom_type == \'S.3\') |'
+                        '\n    `"((atom_type == \'S.3\') |'
                         ' (atom_type == \'S.o2\')) -->'
-                        ' (atom_type == \'O.2\')"'
+                        ' (atom_type == \'O.2\')"`.'
                         '\n3) Selection example using logical ORs on '
                         'both sides:\n'
-                        '    "((atom_type == \'S.3\') | (atom_type == '
+                        '    `"((atom_type == \'S.3\') | (atom_type == '
                         '\'S.o2\'))'
                         ' -->  ((atom_type == \'O.2\') |'
-                        ' (atom_type == \'O.3\'))"')
-    parser.add_argument('-v', '--verbose',
-                        type=int,
-                        default=1,
-                        help='Verbosity level. If 0, does not print any'
-                             ' output.'
-                             '\nIf 1 (default), prints the file currently'
-                             ' processing.')
+                        ' (atom_type == \'O.3\'))"`.')
     parser.add_argument('-d', '--distance',
                         type=str,
                         required=True,
-                        help='A distance range formatted'
+                        help='(Required.) A distance range formatted'
                              '\n as "lowerbound-upperbound".'
                              '\nFor example, if 13-20 is provided as an'
                              '\nargument, two atoms are considered a match'
@@ -235,13 +235,20 @@ python funcgroup_distance_to_id.py\\
     parser.add_argument('--processes',
                         type=int,
                         default=1,
-                        help='Number of processes to run in parallel.'
+                        help='(Optional, default: `1`.) Number of processes to run in parallel.'
                              '\nIf processes > 0, the specified number of CPUs'
                              '\nwill be used.'
                              '\nIf processes = 0, all available CPUs will'
                              '\nbe used.'
                              '\nIf processes = -1, all available CPUs'
                              '\nminus `processes` will be used.')
+    parser.add_argument('-v', '--verbose',
+                        type=int,
+                        default=1,
+                        help='(Optional, default: `1`.) Verbosity level. If 0, does not print any'
+                             ' output.'
+                             '\nIf 1 (default), prints the file currently'
+                             ' processing.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 

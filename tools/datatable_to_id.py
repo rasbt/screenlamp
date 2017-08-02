@@ -116,33 +116,34 @@ python datatable_to_id.py\\
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Path to a datatable file where each row'
-                             '\nrepresents a molecule and each columns'
-                             '\nstore the molecular features')
+                        help='(Required.) Path to a datatable file where each'
+                             '\nrow represents a molecule and each columns'
+                             '\nstore the molecular features.')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Output path for the ID file'
-                             ' (For example, `ids.txt`)')
+                        help='(Required.) Output path for the ID file'
+                             ' (for example, `ids.txt`).')
     parser.add_argument('--id_column',
                         type=str,
                         required=True,
-                        help='Name of the Molecule ID column')
+                        help='(Required.) Name of the Molecule ID column.')
     parser.add_argument('--seperator',
                         type=str,
                         default='\t',
-                        help='Column seperator used\nin the input table')
+                        help=('(Optional, default: `"\t"`.) Column seperator used\nin the input table.\n'
+                              'Assumes tab-separated values by default.'))
     parser.add_argument('-s', '--selection',
                         type=str,
                         default=None,
-                        help='A conditional selection string:\n'
-                        '- Single column selection example: `"(MWT > 500)"`\n'
-                        '- Logical OR example: `"(MWT > 500) | (MWT < 200)"`\n'
-                        '- Logical AND example: `"(NRB <= 7) & (MWT > 200)"`')
+                        help='(Optional, default: `None`.) A conditional selection string:\n'
+                        ' Single column selection example: `"(MWT > 500)"`. '
+                        ' Logical OR example: `"(MWT > 500) | (MWT < 200)"`.'
+                        ' Logical AND example: `"(NRB <= 7) & (MWT > 200)"`.')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
-                        help='Verbosity level. If 0, does not print any'
+                        help='(Optional, default: `1`.) Verbosity level. If 0, does not print any'
                              '\noutput.'
                              '\nIf 1 (default), prints the file currently'
                              '\nprocessing.')

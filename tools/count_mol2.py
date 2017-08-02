@@ -115,9 +115,9 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input',
                         required=True,
                         type=str,
-                        help='Path to a `.mol2` or `.mol2.gz`file,'
+                        help='(Required.) Path to a `.mol2` or `.mol2.gz`file,'
                              '\nor a directory containing `.mol2`/`.mol2.gz`'
-                             ' files')
+                             ' files.')
 
     parser.add_argument('-v', '--version', action='version', version='v. 1.0')
 

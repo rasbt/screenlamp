@@ -155,8 +155,8 @@ def main(input_dir, output_file, verbose, n_cpus):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='Selecting molecules base on the presence'
-                        '\nof certain atoms or functional groups.',
+            description="""Checking molecules base on the presence
+of certain atoms or functional groups and writing the results to a text file.""",
             epilog="""Example:
 python funcgroup_presence_to_id.py --input mol2s/\\
   --output mol2ids.txt\\
@@ -166,10 +166,12 @@ python funcgroup_presence_to_id.py --input mol2s/\\
 
     parser.add_argument('-i', '--input',
                         type=str,
-                        help='Input directory with .mol2 and .mol2.gz files')
+                        required=True,
+                        help='(Required.) Input directory with `.mol2` and `.mol2.gz` files.')
     parser.add_argument('-o', '--output',
                         type=str,
-                        help='Directory for writing the output files')
+                        required=True,
+                        help='(Required.) Directory for writing the output files.')
     parser.add_argument('-s', '--selection',
                         type=str,
                         required=True,
@@ -192,7 +194,7 @@ python funcgroup_presence_to_id.py --input mol2s/\\
     parser.add_argument('--processes',
                         type=int,
                         default=1,
-                        help='Number of processes to run in parallel.'
+                        help='(Optional, default: `1`.) Number of processes to run in parallel.'
                              '\nIf processes > 0, the specified number of CPUs'
                              '\nwill be used.'
                              '\nIf processes = 0, all available CPUs will'
@@ -202,7 +204,7 @@ python funcgroup_presence_to_id.py --input mol2s/\\
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
-                        help='Verbosity level. If 0, does not print any'
+                        help='(Optional, default: `1`.) Verbosity level. If 0, does not print any'
                              '\noutput.'
                              '\nIf 1 (default), prints the file currently'
                              '\nprocessing.')

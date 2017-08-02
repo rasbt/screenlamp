@@ -252,18 +252,19 @@ python funcgroup_matching.py\\
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Path to a directory containing pairs '
-                             '\nof *_query.mol2/.mol2.gz '
-                             '\nand *_dbase.mol2/.mol2.gz files')
+                        help='(Required.) Path to a directory containing pairs '
+                             '\nof `*_query.mol2`/`.mol2.gz` '
+                             '\nand `*_dbase.mol2`/`.mol2.gz` files')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Path to a directory for writing'
+                        help='(Required.) Path to a directory for writing'
                              '\nthe output files')
     parser.add_argument('-d', '--max_distance',
                         type=float,
                         default=1.3,
-                        help='The maximum distance, in angstroms, the'
+                        help='(Optional, default: `1.3`.) The maximum distance,'
+                        '\nin angstroms, the'
                         '\noverlayed atoms can be apart from each'
                         '\nother for being considered a match.'
                         '\nFor instance, a --max_distance 1.3 (default)'
@@ -273,7 +274,8 @@ python funcgroup_matching.py\\
     parser.add_argument('--processes',
                         type=int,
                         default=1,
-                        help='Number of processes to run in parallel.'
+                        help='(Optional, default: `1`.) Number of processes to'
+                             ' run in parallel.'
                              '\nIf processes > 0, the specified number of CPUs'
                              '\nwill be used.'
                              '\nIf processes = 0, all available CPUs will'
@@ -283,8 +285,8 @@ python funcgroup_matching.py\\
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
-                        help='Verbosity level. If 0, does not print any'
-                             ' output.'
+                        help='(Optional, default: `1`.) Verbosity level. If 0,'
+                             ' does not print any output.'
                              '\nIf 1 (default), prints the file currently'
                              ' processing.')
 

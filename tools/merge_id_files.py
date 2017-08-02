@@ -57,8 +57,10 @@ def main(id_file_path_1, id_file_path_2, output_path):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='Merges two Molecule ID files into'
-                        '\nwhile preventing duplicate entries.',
+            description="""Merges two Molecule ID files
+(e.g., created via `datatable_to_id.py`, `funcgroup_presence_to_id.py`
+ or `mol2_to_id.py`) into a single ID file
+ while preventing duplicate entries.""",
             epilog="""Example:
 python merge_id_files.py\\
    --input1 mol2s_1.txt\\
@@ -66,20 +68,20 @@ python merge_id_files.py\\
    --output merged.txt""",
             formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_argument('--input1',
+    parser.add_argument('-i1', '--input1',
                         type=str,
                         required=True,
-                        help='Input ID file that contains molecule'
-                             '\nIDs (one ID per line)')
-    parser.add_argument('--input2',
+                        help='(Required.) Input ID file that contains molecule'
+                             '\nIDs (one ID per line).')
+    parser.add_argument('-i2', '--input2',
                         type=str,
                         required=True,
-                        help='Input ID file that contains molecule'
-                             '\nIDs (one ID per line)')
-    parser.add_argument('--output',
+                        help='(Required.) Input ID file that contains molecule'
+                             '\nIDs (one ID per line).')
+    parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Path to the output ID file')
+                        help='(Required.) Path to the output ID file.')
 
     parser.add_argument('--version', action='version', version='v. 1.0')
 

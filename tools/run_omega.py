@@ -111,23 +111,33 @@ python run_omega.py\\
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input directory with .mol2 and .mol2.gz files')
+                        help='Input directory with `.mol2`'
+                             ' and `.mol2.gz` files.')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Directory for writing the output files')
+                        help='Directory for writing the output files.')
     parser.add_argument('--executable',
                         type=str,
-                        help='OMEGA2 executable')
+                        required=True,
+                        help="""(Required.) The path or command for running
+OpenEye OMEGA2 on your system.""")
     parser.add_argument('--settings',
                         type=str,
                         default='-maxconfs 200 -warts false -progress percent',
-                        help='OMEGA2 settings to use')
-    parser.add_argument('-p', '--processes',
+                        help='(Optional.) OMEGA settings to use.')
+    parser.add_argument('--processes',
                         type=int,
                         default=1,
-                        help='Number of processes to run in parallel.'
-                             '\nUses all CPUs if 0')
+                        help='(Optional, default: `1`.) Number of processes to'
+                             ' run in parallel.'
+                             '\nIf processes > 0, the specified number of CPUs'
+                             '\nwill be used.'
+                             '\nIf processes = 0, all available CPUs will'
+                             '\nbe used.'
+                             '\nIf processes = -1, all available CPUs'
+                             '\nminus `processes` will be used.')
+
     parser.add_argument('-v', '--version', action='version', version='v. 1.0')
 
     args = parser.parse_args()

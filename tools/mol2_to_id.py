@@ -82,7 +82,7 @@ def main(input_dir, output_file, verbose):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='Write a file with molecule IDs from MOL2 files.',
+            description='Writes a file with molecule IDs from MOL2 files.',
             epilog="""Example:
 python mol2_to_id.py\\
    --input mol2_dir\\
@@ -92,17 +92,18 @@ python mol2_to_id.py\\
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Input .mol2 or .mol2.gz file,'
-                             'or a directory of MOL2 files')
+                        help='(Required.) Input `.mol2` or `.mol2.gz` file,'
+                             'or a directory of MOL2 files.')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='Output path for the ID file.'
-                             ' For example, ids.txt')
+                        help='(Required.) Output path for the ID file.'
+                             ' For example, `ids.txt`.')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
-                        help='Verbosity level. If 0, does not print any'
+                        help='(Optional, default: `1`.)'
+                             ' Verbosity level. If 0, does not print any'
                              ' output.'
                              ' If 1 (default), prints the file currently'
                              ' processing.')
