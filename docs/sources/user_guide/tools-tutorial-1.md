@@ -1,84 +1,105 @@
-# Data storage and project layout
+# Screenlamp Toolkit Tutorial
 
-- The initial dataset should be stored as `mol2` or `mol2.gz` files in a directory. For example:
+This tutorial explains how the individual screenlamp tools (located in the `screenlamp/tools` subdirectory) work in the context of a small virtual screening example. 
+
+The dataset and workflow we are going to use is simililar to the [Pipeline Tutorial](pipeline-tutorial-1/index.html), which uses a preconstructed, automated virtual pipeline based using the tools explained in this tutorial. While the [Pipeline Tutorial](pipeline-tutorial-1/index.html) provides a high level overview and a more convenient, preconstructred pipeline, this tool aims to explain the building blocks behind it so that users can understand and learn how to construct their own pipelines and/or modify the existing pipeline presented in the [Pipeline Tutorial](pipeline-tutorial-1/index.html).
+
+## Obtaining and Preparing the Dataset
+
+
+### MOL2 Input Files
+
+The tools presented in this tutorial can work with MOL2 files of arbitrary size. However, to minimize the computation time for the purposes of illustration, we are only going to use a small subset of molecules.
+
+A typical use case for these would be the screening of all ~18,000,000 *Drug-Like* molecules from [ZINC](http://zinc.docking.org), which is available in MOL2 format on ZINC [here](http://zinc.docking.org/subsets/drug-like). Please note that screenlamp supports both Tripos MOL2 (`*.mol2`) files and gzipped Tripos MOL2 files (`*.mol2.gz`) out of the box. Thus, if your input dataset is in gzipped format, you can use it right away without having to make any adjustments or decompressing it. However, please not that the decompressing and compressing operations that are performed when working with gzipped files have an additional toll on computational performance.
+
+With kind permission from John Irwin and the ZINC team, we are using a random subset of 70,000 small molecules that we prepared for this tutorial. This subset from ZINC is split into 7 multi-MOL2 file with 10,000 molecules each: `partition_mol2_1.mol2` to `partition_mol2_7.mol2`. 
+
+For this tutorial, please download the dataset by clicking the following link and unzip it on your machine that you are using for the virtual screening run: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/partition_1-7.zip](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/partition_1-7.zip)
+
+
+### Datatable for Prefiltering
+
+For this particular tutorial you'll also need a datatable containing general information about these molecules. Although the partitions you downloaded above are only a small, modified subset of [ZINC](http://zinc.docking.org) molecules, we are going to use the full ~18,000,000 molecule Drug-like table available for download at [http://zinc.docking.org/subsets/drug-like](http://zinc.docking.org/subsets/drug-like). To download the tab-separated table, click on the [Properties](http://zinc.docking.org/db/bysubset/3/3_prop.xls) link on the [ZINC Drug-like](http://zinc.docking.org/subsets/drug-like) page. Please note that the size of the datatable is about ~1.8 Gb, and thus, the download may take a while depending on your internet connection. Alternatively, we recommend using a smaller datatable containing only ~170,000 molecules; to download this table, please use the following link: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt)
+
+
+### Query Molecule
+
+The third datafile you'll need for ligand-based virtual screening is the query molecule. For this tutorial, please download the following multi-conformer MOL2 file: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2)
+
+## Data storage and project layout
+
+After downloading the files described in the previous subsection, create a new directory called `tk-tutorial_data` to store these files. The contents of this `tk-tutorial_data` directory should be as follows:
+
+![](../images/toolkit-tutorial/dataset-overview.png)
+
+Next, we are going to create a new directory, `tutorial-results`, to store the results we are going to generate in this tutorial. Note that throughout this tutorial, the `!` command denotes a new command line terminal prompt (e.g., bash shell):
 
 
 ```python
-!ls -lh dataset/mol2/
+! mkdir tutorial-results
 ```
 
-    total 603744
-    -rw-r--r--  1 sebastian  staff    42M May 10 22:41 1.mol2
-    -rw-r--r--  1 sebastian  staff    42M May 10 22:41 2.mol2
-    -rw-r--r--  1 sebastian  staff    42M May 10 22:41 3.mol2
-    -rw-r--r--  1 sebastian  staff    42M May 10 22:41 4.mol2
-    -rw-r--r--  1 sebastian  staff    42M May 10 22:41 5.mol2
-    -rw-r--r--  1 sebastian  staff    42M May 10 22:41 6.mol2
-    -rw-r--r--  1 sebastian  staff    42M May 10 22:41 7.mol2
+---
 
+**Important Note**
 
-- for a new project, it's best to create a new directory, for instance, we create a new subdirectory in 80698:
+All code in this tutorial is executed using a Python 3.6 interpreter. The code has not been tested in Python 2.7.
+
+---
+
+Note that this tutorial assumes that the screenlamp tools are available from a directory `'tools'`, but you can store them wherever you want.
+
+Before we start exploring the tools contained in screenlamp's `tools` folder, let's start with a simple script that we are going to use throughout this tutorial to count the number of structures in a mol2 file or directory containing mol2 files: 
+
+Using the `count_mol2.py` script, we can now count the number of structures in each mol2 file in our input directory like so:
 
 
 ```python
-!mkdir project
+! python tools/count_mol2.py -i tk-tutorial_data/partition_1-7/
 ```
 
-    mkdir: project: File exists
-
-
-Using the `count_mol2.py` script, we can count the number of structures in each mol2 file in the input directory:
-
-
-```python
-!python ../../../../tools/count_mol2.py -i dataset/mol2/
-```
-
-    1.mol2 : 10000
-    2.mol2 : 10000
-    3.mol2 : 10000
-    4.mol2 : 10000
-    5.mol2 : 10000
-    6.mol2 : 10000
-    7.mol2 : 10000
+    partition_1.mol2 : 10000
+    partition_2.mol2 : 10000
+    partition_3.mol2 : 10000
+    partition_4.mol2 : 10000
+    partition_5.mol2 : 10000
+    partition_6.mol2 : 10000
+    partition_7.mol2 : 10000
     Total : 70000
 
 
-Optionally, you may have files with data about the molecules, for instance:
+As we can see, each of the 7 partitions in our dataset contains 10,000 molecules, that is, 70,000 structures in total.
+
+## General Blacklist & Whitelist filtering
+
+### Generating ID files from molecules
+
+First, we are going to generate an ID file of all structures in the mol2 files of the 7 partitions. In the context of this tutorial, an "ID file" is a plaintext file that contains the molecule identifiers fetched from the mol2 files. 
+
+We can create such an ID file using the `mol2_to_id.py` script as shown below:
 
 
 ```python
-!ls -lh dataset/tables
+! python tools/mol2_to_id.py \
+  --input tk-tutorial_data/partition_1-7/ \
+  --output tutorial-results/all-mol2ids.txt
 ```
 
-    total 3310280
-    -rw-r--r--@ 1 sebastian  staff   1.6G Jan 11  2014 3_prop.xls
+    Processing partition_1.mol2 | scanned 10000 molecules | 15228 mol/sec
+    Processing partition_2.mol2 | scanned 10000 molecules | 16690 mol/sec
+    Processing partition_3.mol2 | scanned 10000 molecules | 19183 mol/sec
+    Processing partition_4.mol2 | scanned 10000 molecules | 15370 mol/sec
+    Processing partition_5.mol2 | scanned 10000 molecules | 15689 mol/sec
+    Processing partition_6.mol2 | scanned 10000 molecules | 14911 mol/sec
+    Processing partition_7.mol2 | scanned 10000 molecules | 13948 mol/sec
 
 
-# General Blacklist & Whitelist filtering
-
-- `mol2_to_id.py` generates a list of molecule IDs from MOL2 files
-- `id_to_mol2.py` filters mol2 files by IDs and creates new mol2 files. Via whitelisting, molecules that match those IDs are written. Via blacklisting, all molecules but the molecules that are in the list are written
-
-
-```python
-!python ../../../../tools/mol2_to_id.py \
---input dataset/mol2 \
---output project/all-mol2ids.txt
-```
-
-    Processing 1.mol2 | scanned 10000 molecules | 12824 mol/sec
-    Processing 2.mol2 | scanned 10000 molecules | 12196 mol/sec
-    Processing 3.mol2 | scanned 10000 molecules | 12604 mol/sec
-    Processing 4.mol2 | scanned 10000 molecules | 14002 mol/sec
-    Processing 5.mol2 | scanned 10000 molecules | 15695 mol/sec
-    Processing 6.mol2 | scanned 10000 molecules | 16035 mol/sec
-    Processing 7.mol2 | scanned 10000 molecules | 16698 mol/sec
-
+To check that the creation of the ID file was successful and to see how it generally looks like, we will use the Unix/Linux `head` command line tool to display the first 10 rows of the newly created ID file:
 
 
 ```python
-!head project/all-mol2ids.txt
+! head tutorial-results/all-mol2ids.txt
 ```
 
     ZINC57271411
@@ -93,103 +114,108 @@ Optionally, you may have files with data about the molecules, for instance:
     ZINC01458151
 
 
-- Say we are interested in a subset of molecules only. Consider this example: 1st we create a list of IDs:
+To illustrate the concept of whitelist and blacklist filtering in the following sections, let us now create a small ID list file, we name it `5-mol2ids.txt`, that contains 5 IDs only:
 
 
 ```python
-%%writefile project/random-sample-of-mol2ids.txt
-ZINC65255333
-ZINC06394508
-ZINC65292537
-ZINC65375610
-ZINC31820077
+! echo "\
+ZINC65255333\n\
+ZINC06394508\n\
+ZINC65292537\n\
+ZINC65375610\n\
+ZINC31820077" > tutorial-results/5-mol2ids.txt
 ```
 
-    Overwriting project/random-sample-of-mol2ids.txt
+### Whitelist Filtering
 
-
-### Whitelisting
+Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files for molecules that are listed in a ID file using the `whitefilter True` option. Executing the following command will look for the structures corresponding to the 5 molecule IDs listed in the `5-mol2ids.txt` that we created in the previous section, and write the corresponding structure files to a new directory that we will call `whitelist_example`:
 
 
 ```python
-!python ../../../../tools/id_to_mol2.py \
---input dataset/mol2 \
---output project/random-sample-of-mol2ids_mol2s_1 \
---id_file project/random-sample-of-mol2ids.txt \
---whitelist True
+! python tools/id_to_mol2.py \
+  --input tk-tutorial_data/partition_1-7/ \
+  --output tutorial-results/whitelist-example \
+  --id_file tutorial-results/5-mol2ids.txt \
+  --whitelist True
 ```
 
-    Processing 1.mol2 | scanned 10000 molecules | 17030 mol/sec
-    Processing 2.mol2 | scanned 10000 molecules | 17095 mol/sec
-    Processing 3.mol2 | scanned 10000 molecules | 17176 mol/sec
-    Processing 4.mol2 | scanned 10000 molecules | 16746 mol/sec
-    Processing 5.mol2 | scanned 10000 molecules | 17894 mol/sec
-    Processing 6.mol2 | scanned 10000 molecules | 17808 mol/sec
-    Processing 7.mol2 | scanned 10000 molecules | 17681 mol/sec
+    Processing partition_1.mol2 | scanned 10000 molecules | 17170 mol/sec
+    Processing partition_2.mol2 | scanned 10000 molecules | 14104 mol/sec
+    Processing partition_3.mol2 | scanned 10000 molecules | 15142 mol/sec
+    Processing partition_4.mol2 | scanned 10000 molecules | 14137 mol/sec
+    Processing partition_5.mol2 | scanned 10000 molecules | 15077 mol/sec
+    Processing partition_6.mol2 | scanned 10000 molecules | 14870 mol/sec
+    Processing partition_7.mol2 | scanned 10000 molecules | 14123 mol/sec
     Finished
 
 
-Now, the output directory, `80698/proj-1/selected-example-mol2ids`, should contain only mol2 files with the selected IDs:
+Now, the output directory, `tutorial-results/whitelist-example, should contain only mol2 files with the selected IDs:
 
 
 ```python
-!ls project/random-sample-of-mol2ids_mol2s_1
+! ls tutorial-results/whitelist-example
 ```
 
-    1.mol2 2.mol2 3.mol2 4.mol2 5.mol2 6.mol2 7.mol2
+    partition_1.mol2 partition_3.mol2 partition_5.mol2 partition_7.mol2
+    partition_2.mol2 partition_4.mol2 partition_6.mol2
 
+
+Please note that id_to_mol2 creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found via white list filtering. For example, the 5 structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
 
 
 ```python
-!python ../../../../tools/count_mol2.py \
---input project/random-sample-of-mol2ids_mol2s_1
+! python tools/count_mol2.py \
+  --input tutorial-results/whitelist-example
 ```
 
-    1.mol2 : 5
-    2.mol2 : 0
-    3.mol2 : 0
-    4.mol2 : 0
-    5.mol2 : 0
-    6.mol2 : 0
-    7.mol2 : 0
+    partition_1.mol2 : 5
+    partition_2.mol2 : 0
+    partition_3.mol2 : 0
+    partition_4.mol2 : 0
+    partition_5.mol2 : 0
+    partition_6.mol2 : 0
+    partition_7.mol2 : 0
     Total : 5
 
 
-### Blacklisting
+### Blacklist Filtering
 
-Similar to the previous approach, using a whitelist filter, we can do blacklist filtering, which means that all molecules are selected but the ones contained in the ID files. Set whitelist to False.
+Similar to the previous approach, using a whitelist filter, we can do blacklist filtering, which means that all molecules are selected ***but*** the ones contained in an ID file. In order to perform blacklist filtering, we use the setting `--whitelist False` as shown below:
 
 
 ```python
-!python ../../../../tools/id_to_mol2.py \
---input dataset/mol2 \
---output project/random-sample-of-mol2ids_mol2s_2 \
---id_file project/random-sample-of-mol2ids.txt \
---whitelist False
+! python tools/id_to_mol2.py \
+  --input tk-tutorial_data/partition_1-7/ \
+  --output tutorial-results/blacklist-example \
+  --id_file tutorial-results/5-mol2ids.txt \
+  --whitelist False
 ```
 
-    Processing 1.mol2 | scanned 10000 molecules | 14094 mol/sec
-    Processing 2.mol2 | scanned 10000 molecules | 13256 mol/sec
-    Processing 3.mol2 | scanned 10000 molecules | 13598 mol/sec
-    Processing 4.mol2 | scanned 10000 molecules | 12648 mol/sec
-    Processing 5.mol2 | scanned 10000 molecules | 12714 mol/sec
-    Processing 6.mol2 | scanned 10000 molecules | 12869 mol/sec
-    Processing 7.mol2 | scanned 10000 molecules | 12863 mol/sec
+    Processing partition_1.mol2 | scanned 10000 molecules | 12772 mol/sec
+    Processing partition_2.mol2 | scanned 10000 molecules | 8715 mol/sec
+    Processing partition_3.mol2 | scanned 10000 molecules | 9105 mol/sec
+    Processing partition_4.mol2 | scanned 10000 molecules | 13333 mol/sec
+    Processing partition_5.mol2 | scanned 10000 molecules | 9869 mol/sec
+    Processing partition_6.mol2 | scanned 10000 molecules | 12444 mol/sec
+    Processing partition_7.mol2 | scanned 10000 molecules | 12276 mol/sec
     Finished
 
 
+This time, we expect 69995 structures to be obtained after the filtering, since we scanned 70,000 molecules and had 5 molecules on our ID blacklist:
+
 
 ```python
-!python ../../../../tools/count_mol2.py -i project/random-sample-of-mol2ids_mol2s_2
+! python tools/count_mol2.py \
+  --input tutorial-results/blacklist-example
 ```
 
-    1.mol2 : 9995
-    2.mol2 : 10000
-    3.mol2 : 10000
-    4.mol2 : 10000
-    5.mol2 : 10000
-    6.mol2 : 10000
-    7.mol2 : 10000
+    partition_1.mol2 : 9995
+    partition_2.mol2 : 10000
+    partition_3.mol2 : 10000
+    partition_4.mol2 : 10000
+    partition_5.mol2 : 10000
+    partition_6.mol2 : 10000
+    partition_7.mol2 : 10000
     Total : 69995
 
 
