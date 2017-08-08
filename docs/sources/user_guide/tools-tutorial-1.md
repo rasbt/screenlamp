@@ -464,7 +464,7 @@ We have already completed step 1 so that we can use the ID file we created to se
 
 As we can see, we only have 14,872 by applying the atom- and functional group based selection criteria. To summarize the steps so far, in "Filtering Step 1" we selected 59,750 (molecules that have fewer than 7 rotatable bonds and are heavier than 200 g/mol) out of 70,000 molecules. Then, in this section ("Filtering Step 2"), we selected 14,872 out of those 59,750, molecules that have at least 1 keto and 1 sp3 sulfur atom.
 
-## Filtering Step 3 -- Distance between functional groups
+## Filtering Step 3 -- Distance between Functional Groups
 
 In this step, we will now select only those molecules that have a sp3 sulfur atom and a keto-group within a 13-20 angstrom distance:
 
@@ -523,8 +523,8 @@ Following the already familiar procedure, we can now select the MOL2 structures 
 
 
 ```python
-!python tools/count_mol2.py \
---input tutorial-results/03_fgroup_distance_mol2s
+! python tools/count_mol2.py \
+  --input tutorial-results/03_fgroup_distance_mol2s
 ```
 
     partition_1.mol2 : 16
@@ -539,17 +539,47 @@ Following the already familiar procedure, we can now select the MOL2 structures 
 
 After applying this filtering step, we can see that only 107 molecules out of the 14,872 from "Filtering Step 2" remain.
 
-# Generating Conformers via Omega
+## Step 4 -- Generating Conformers
+
+In this section, we are going to generate low-energy of the molecules we selected so far.
+
+![](images/tools-tutorial-1/pipe-step-4.jpg)
+
+Generating low-energy conformers of either database or reference molecule is highly recommended to account for the flexibility of molecules (for instance, rotatatable bonds) when overlaying molecules (in the next step, "Step 5 -- Overlaying Reference and Database molecules"). However, note that working with low-energy conformers increases the computational cost involved in computing the optimal overlays. For example, assuming that we have 10,000 database molecules and 1 reference molecule, generating 200 low-energy conformers of each of those database molecules would result in a database of 10,000x200 = 2,000,000 molecules. Consequently we will have to sample 2,000,000x1 overlays (200 overlays per database molecule) instead of 10,000 overlays to obtain the best-overlaying pairs. To take it a step further, we could also consider multiple conformers of the reference molecule. For example, if we create 200 conformers of the 1 reference molecule as well, we will have to overlay 2000,000x200 = 40,000,000 pairs. To summarize, the three different options as input for overlaying the reference molecule with the database molecule are given below, in increasing order of computational cost, which is proportional to the thoroughness of the sampling procedure:
+
+1) Overlay a single conformer for both database and the reference molecule
+2) Overlay a single reference molecule conformer with multiple database molecule conformers
+3) Overlay multiple reference molecule conformers with multiple database molecule conformers
+
+In this tutorial, we will use option 3), where we create up to 200 conformers of each database molecule using OpenEye Omega and overlay them with an existing multiconformer reference molecule that is already provided with the tutorial files (`3kpzs_query.mol2`, which contains 35 favorable-energy conformers of the reference molecule 3kPZS).
+
+
+Again, please note the creating multiple conformers of a molecule is optional. The program we are going to use is OpenEye Omega, but you may use alternative tools as well, as long as they can output those conformer structures in MOL2 file format. 
+
+**Please also note that the conformers of a given molecule (database or reference molecule) files should have the same molecule ID in the MOL2 files in order to parse the output of "Step 5 -- Overlaying Reference and Database molecules" without additional workarounds. For example, if you have a multiconformer MOL2 file such as `3kpzs_query.mol2`, make sure that the molecule IDs in the MOL2 file are all "3kPZS" and don't have any suffixes or prefixes such as "3kPZS_1, 3KPZS_2, ...". The reason why we want to avoid prefixes and suffixes in those conformer names is that the overlay tool OpenEye ROCS identifies conformers by their structure, not their names, and such molecule IDs would only result in annoying name mangling, which makes the results harder to parse downstream in the analysis pipeline.**
+
+
+---
+
+**Note**
+
+Optionally, "Filtering Step 3" can also be (re)applied to the outcome of this step, the low-energy conformers, to sort out conformers where functional groups are in a spatial arrangement that may not be consistent with prior knowledge, for example, that a molecule interacts via certain groups in a particular way with its binding partner.
+
+---
+
+
+While you can use OpenEye Omega directly from the command line as described in the documentation at https://www.eyesopen.com/omega, screenlamp provides a wrapper tool that generates multiconformer files of all mol2 files in a given directory using its default settings, which can be used as shown below (note that you need to provide an `--executable` path pointing to the Omega program on your machine:
 
 
 ```python
-! python ../../../../tools/run_omega.py \
---input project/prefilter_3/3keto-and-sulfur_distance-mol2s \
---output project/omega_confomers/ \
---executable "/Applications/OMEGA 2.5.1.4.app/Contents/MacOS/omega2-2.5.1.4" \
---processes 0
+! python tools/run_omega.py \
+  --input tutorial-results/03_fgroup_distance_mol2s \
+  --output tutorial-results/04_omega_confomers/ \
+  --executable "/Applications/OMEGA 2.5.1.4.app/Contents/MacOS/omega2-2.5.1.4" \
+  --processes 0
 ```
 
+    Processing tutorial-results/03_fgroup_distance_mol2s/partition_1.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
@@ -592,7 +622,52 @@ After applying this filtering step, we can see that only 107 molecules out of th
       Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
     
     Running as MPI Master
-    ...fur_distance-mol2s/1.mol2|****************************************|100.00%
+    ...ce_mol2s/partition_1.mol2|****************************************|100.00%
+    Processing tutorial-results/03_fgroup_distance_mol2s/partition_2.mol2
+    Slave started on host Sebastians-MacBook-Pro
+    Slave started on host Sebastians-MacBook-Pro
+    
+              :jGf:             .d8888b. 88d8b.d8b. .d8888b. .d8888b. .d8888b.
+            :jGDDDDf:           88'  `88 88'`88'`88 88ooood8 88'  `88 88'  `88
+          ,fDDDGjLDDDf,         88.  .88 88  88  88 88.  ... 88.  .88 88.  .88
+        ,fDDLt:   :iLDDL;       `88888P' dP  dP  dP `88888P' `8888P88 `88888P8
+      ;fDLt:         :tfDG;                                       .88
+    ,jft:   ,ijfffji,   :iff                                  d8888P
+         .jGDDDDDDDDDGt.      
+        ;GDDGt:''':tDDDG,          Copyright (c) 2004-2013
+       .DDDG:       :GDDG.         OpenEye Scientific Software, Inc.
+       ;DDDj         tDDDi    
+       ,DDDf         fDDD,         Version: 2.5.1.4
+        LDDDt.     .fDDDj          Built:   20130515
+        .tDDDDfjtjfDDDGt           OEChem version: 1.9.1
+          :ifGDDDDDGfi.            Platform: osx-10.8-clang++4-x64
+              .:::.                
+      ......................       
+      DDDDDDDDDDDDDDDDDDDDDD       
+      DDDDDDDDDDDDDDDDDDDDDD       
+    
+    Supported run modes:
+      Single processor
+      MPI Multiprocessor
+    
+      Licensed for the exclusive use of The Laboratory of Leslie Kuhn.
+      Licensed for use only in Michigan State University.
+      License expires on October 20, 2017.
+    
+    
+    To cite OMEGA please use the following:
+      OMEGA 2.5.1.4: OpenEye Scientific Software, Santa Fe, NM.
+      http://www.eyesopen.com.
+    
+      Hawkins, P.C.D.; Skillman, A.G.; Warren, G.L.; Ellingson, B.A.; Stahl, M.T.
+      Conformer Generation with OMEGA: Algorithm and Validation Using High
+      Quality Structures from the Protein Databank and the Cambridge 
+      Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
+    
+    Running as MPI Master
+    Slave started on host Sebastians-MacBook-Pro
+    ...ce_mol2s/partition_2.mol2|****************************************|100.00%
+    Processing tutorial-results/03_fgroup_distance_mol2s/partition_3.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
@@ -635,136 +710,8 @@ After applying this filtering step, we can see that only 107 molecules out of th
       Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
     
     Running as MPI Master
-    ...fur_distance-mol2s/2.mol2|****************************************|100.00%
-    Slave started on host Sebastians-MacBook-Pro
-    Slave started on host Sebastians-MacBook-Pro
-    
-              :jGf:             .d8888b. 88d8b.d8b. .d8888b. .d8888b. .d8888b.
-            :jGDDDDf:           88'  `88 88'`88'`88 88ooood8 88'  `88 88'  `88
-          ,fDDDGjLDDDf,         88.  .88 88  88  88 88.  ... 88.  .88 88.  .88
-        ,fDDLt:   :iLDDL;       `88888P' dP  dP  dP `88888P' `8888P88 `88888P8
-      ;fDLt:         :tfDG;                                       .88
-    ,jft:   ,ijfffji,   :iff                                  d8888P
-         .jGDDDDDDDDDGt.      
-        ;GDDGt:''':tDDDG,          Copyright (c) 2004-2013
-       .DDDG:       :GDDG.         OpenEye Scientific Software, Inc.
-       ;DDDj         tDDDi    
-       ,DDDf         fDDD,         Version: 2.5.1.4
-        LDDDt.     .fDDDj          Built:   20130515
-        .tDDDDfjtjfDDDGt           OEChem version: 1.9.1
-          :ifGDDDDDGfi.            Platform: osx-10.8-clang++4-x64
-              .:::.                
-      ......................       
-      DDDDDDDDDDDDDDDDDDDDDD       
-      DDDDDDDDDDDDDDDDDDDDDD       
-    
-    Supported run modes:
-      Single processor
-      MPI Multiprocessor
-    
-      Licensed for the exclusive use of The Laboratory of Leslie Kuhn.
-      Licensed for use only in Michigan State University.
-      License expires on October 20, 2017.
-    
-    
-    To cite OMEGA please use the following:
-      OMEGA 2.5.1.4: OpenEye Scientific Software, Santa Fe, NM.
-      http://www.eyesopen.com.
-    
-      Hawkins, P.C.D.; Skillman, A.G.; Warren, G.L.; Ellingson, B.A.; Stahl, M.T.
-      Conformer Generation with OMEGA: Algorithm and Validation Using High
-      Quality Structures from the Protein Databank and the Cambridge 
-      Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
-    
-    Slave started on host Sebastians-MacBook-Pro
-    Running as MPI Master
-    ...fur_distance-mol2s/3.mol2|****************************************|100.00%
-    Slave started on host Sebastians-MacBook-Pro
-    Slave started on host Sebastians-MacBook-Pro
-    
-              :jGf:             .d8888b. 88d8b.d8b. .d8888b. .d8888b. .d8888b.
-            :jGDDDDf:           88'  `88 88'`88'`88 88ooood8 88'  `88 88'  `88
-          ,fDDDGjLDDDf,         88.  .88 88  88  88 88.  ... 88.  .88 88.  .88
-        ,fDDLt:   :iLDDL;       `88888P' dP  dP  dP `88888P' `8888P88 `88888P8
-      ;fDLt:         :tfDG;                                       .88
-    ,jft:   ,ijfffji,   :iff                                  d8888P
-         .jGDDDDDDDDDGt.      
-        ;GDDGt:''':tDDDG,          Copyright (c) 2004-2013
-       .DDDG:       :GDDG.         OpenEye Scientific Software, Inc.
-       ;DDDj         tDDDi    
-       ,DDDf         fDDD,         Version: 2.5.1.4
-        LDDDt.     .fDDDj          Built:   20130515
-        .tDDDDfjtjfDDDGt           OEChem version: 1.9.1
-          :ifGDDDDDGfi.            Platform: osx-10.8-clang++4-x64
-    Slave started on host Sebastians-MacBook-Pro
-              .:::.                
-      ......................       
-      DDDDDDDDDDDDDDDDDDDDDD       
-      DDDDDDDDDDDDDDDDDDDDDD       
-    
-    Supported run modes:
-      Single processor
-      MPI Multiprocessor
-    
-      Licensed for the exclusive use of The Laboratory of Leslie Kuhn.
-      Licensed for use only in Michigan State University.
-      License expires on October 20, 2017.
-    
-    
-    To cite OMEGA please use the following:
-      OMEGA 2.5.1.4: OpenEye Scientific Software, Santa Fe, NM.
-      http://www.eyesopen.com.
-    
-      Hawkins, P.C.D.; Skillman, A.G.; Warren, G.L.; Ellingson, B.A.; Stahl, M.T.
-      Conformer Generation with OMEGA: Algorithm and Validation Using High
-      Quality Structures from the Protein Databank and the Cambridge 
-      Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
-    
-    Running as MPI Master
-    ...fur_distance-mol2s/4.mol2|****************************************|100.00%
-    Slave started on host Sebastians-MacBook-Pro
-    Slave started on host Sebastians-MacBook-Pro
-    
-              :jGf:             .d8888b. 88d8b.d8b. .d8888b. .d8888b. .d8888b.
-            :jGDDDDf:           88'  `88 88'`88'`88 88ooood8 88'  `88 88'  `88
-          ,fDDDGjLDDDf,         88.  .88 88  88  88 88.  ... 88.  .88 88.  .88
-        ,fDDLt:   :iLDDL;       `88888P' dP  dP  dP `88888P' `8888P88 `88888P8
-      ;fDLt:         :tfDG;                                       .88
-    ,jft:   ,ijfffji,   :iff                                  d8888P
-         .jGDDDDDDDDDGt.      
-        ;GDDGt:''':tDDDG,          Copyright (c) 2004-2013
-       .DDDG:       :GDDG.         OpenEye Scientific Software, Inc.
-       ;DDDj         tDDDi    
-       ,DDDf         fDDD,         Version: 2.5.1.4
-        LDDDt.     .fDDDj          Built:   20130515
-        .tDDDDfjtjfDDDGt           OEChem version: 1.9.1
-          :ifGDDDDDGfi.            Platform: osx-10.8-clang++4-x64
-              .:::.                
-      ......................       
-      DDDDDDDDDDDDDDDDDDDDDD       
-      DDDDDDDDDDDDDDDDDDDDDD       
-    
-    Supported run modes:
-      Single processor
-      MPI Multiprocessor
-    
-      Licensed for the exclusive use of The Laboratory of Leslie Kuhn.
-      Licensed for use only in Michigan State University.
-      License expires on October 20, 2017.
-    
-    
-    To cite OMEGA please use the following:
-      OMEGA 2.5.1.4: OpenEye Scientific Software, Santa Fe, NM.
-      http://www.eyesopen.com.
-    
-      Hawkins, P.C.D.; Skillman, A.G.; Warren, G.L.; Ellingson, B.A.; Stahl, M.T.
-      Conformer Generation with OMEGA: Algorithm and Validation Using High
-      Quality Structures from the Protein Databank and the Cambridge 
-      Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
-    
-    Slave started on host Sebastians-MacBook-Pro
-    Running as MPI Master
-    ...fur_distance-mol2s/5.mol2|****************************************|100.00%
+    ...ce_mol2s/partition_3.mol2|****************************************|100.00%
+    Processing tutorial-results/03_fgroup_distance_mol2s/partition_4.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
@@ -807,7 +754,9 @@ After applying this filtering step, we can see that only 107 molecules out of th
       Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
     
     Running as MPI Master
-    ...fur_distance-mol2s/6.mol2|****************************************|100.00%
+    ...ce_mol2s/partition_4.mol2|****************************************|100.00%
+    Processing tutorial-results/03_fgroup_distance_mol2s/partition_5.mol2
+    Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
     
@@ -825,7 +774,6 @@ After applying this filtering step, we can see that only 107 molecules out of th
         LDDDt.     .fDDDj          Built:   20130515
         .tDDDDfjtjfDDDGt           OEChem version: 1.9.1
           :ifGDDDDDGfi.            Platform: osx-10.8-clang++4-x64
-    Slave started on host Sebastians-MacBook-Pro
               .:::.                
       ......................       
       DDDDDDDDDDDDDDDDDDDDDD       
@@ -850,41 +798,140 @@ After applying this filtering step, we can see that only 107 molecules out of th
       Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
     
     Running as MPI Master
-    ...fur_distance-mol2s/7.mol2|****************************************|100.00%
+    ...ce_mol2s/partition_5.mol2|****************************************|100.00%
+    Processing tutorial-results/03_fgroup_distance_mol2s/partition_6.mol2
+    Slave started on host Sebastians-MacBook-Pro
+    Slave started on host Sebastians-MacBook-Pro
+    Slave started on host Sebastians-MacBook-Pro
+    
+              :jGf:             .d8888b. 88d8b.d8b. .d8888b. .d8888b. .d8888b.
+            :jGDDDDf:           88'  `88 88'`88'`88 88ooood8 88'  `88 88'  `88
+          ,fDDDGjLDDDf,         88.  .88 88  88  88 88.  ... 88.  .88 88.  .88
+        ,fDDLt:   :iLDDL;       `88888P' dP  dP  dP `88888P' `8888P88 `88888P8
+      ;fDLt:         :tfDG;                                       .88
+    ,jft:   ,ijfffji,   :iff                                  d8888P
+         .jGDDDDDDDDDGt.      
+        ;GDDGt:''':tDDDG,          Copyright (c) 2004-2013
+       .DDDG:       :GDDG.         OpenEye Scientific Software, Inc.
+       ;DDDj         tDDDi    
+       ,DDDf         fDDD,         Version: 2.5.1.4
+        LDDDt.     .fDDDj          Built:   20130515
+        .tDDDDfjtjfDDDGt           OEChem version: 1.9.1
+          :ifGDDDDDGfi.            Platform: osx-10.8-clang++4-x64
+              .:::.                
+      ......................       
+      DDDDDDDDDDDDDDDDDDDDDD       
+      DDDDDDDDDDDDDDDDDDDDDD       
+    
+    Supported run modes:
+      Single processor
+      MPI Multiprocessor
+    
+      Licensed for the exclusive use of The Laboratory of Leslie Kuhn.
+      Licensed for use only in Michigan State University.
+      License expires on October 20, 2017.
+    
+    
+    To cite OMEGA please use the following:
+      OMEGA 2.5.1.4: OpenEye Scientific Software, Santa Fe, NM.
+      http://www.eyesopen.com.
+    
+      Hawkins, P.C.D.; Skillman, A.G.; Warren, G.L.; Ellingson, B.A.; Stahl, M.T.
+      Conformer Generation with OMEGA: Algorithm and Validation Using High
+      Quality Structures from the Protein Databank and the Cambridge 
+      Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
+    
+    Running as MPI Master
+    ...ce_mol2s/partition_6.mol2|****************************************|100.00%
+    Processing tutorial-results/03_fgroup_distance_mol2s/partition_7.mol2
+    Slave started on host Sebastians-MacBook-Pro
+    Slave started on host Sebastians-MacBook-Pro
+    Slave started on host Sebastians-MacBook-Pro
+    
+              :jGf:             .d8888b. 88d8b.d8b. .d8888b. .d8888b. .d8888b.
+            :jGDDDDf:           88'  `88 88'`88'`88 88ooood8 88'  `88 88'  `88
+          ,fDDDGjLDDDf,         88.  .88 88  88  88 88.  ... 88.  .88 88.  .88
+        ,fDDLt:   :iLDDL;       `88888P' dP  dP  dP `88888P' `8888P88 `88888P8
+      ;fDLt:         :tfDG;                                       .88
+    ,jft:   ,ijfffji,   :iff                                  d8888P
+         .jGDDDDDDDDDGt.      
+        ;GDDGt:''':tDDDG,          Copyright (c) 2004-2013
+       .DDDG:       :GDDG.         OpenEye Scientific Software, Inc.
+       ;DDDj         tDDDi    
+       ,DDDf         fDDD,         Version: 2.5.1.4
+        LDDDt.     .fDDDj          Built:   20130515
+        .tDDDDfjtjfDDDGt           OEChem version: 1.9.1
+          :ifGDDDDDGfi.            Platform: osx-10.8-clang++4-x64
+              .:::.                
+      ......................       
+      DDDDDDDDDDDDDDDDDDDDDD       
+      DDDDDDDDDDDDDDDDDDDDDD       
+    
+    Supported run modes:
+      Single processor
+      MPI Multiprocessor
+    
+      Licensed for the exclusive use of The Laboratory of Leslie Kuhn.
+      Licensed for use only in Michigan State University.
+      License expires on October 20, 2017.
+    
+    
+    To cite OMEGA please use the following:
+      OMEGA 2.5.1.4: OpenEye Scientific Software, Santa Fe, NM.
+      http://www.eyesopen.com.
+    
+      Hawkins, P.C.D.; Skillman, A.G.; Warren, G.L.; Ellingson, B.A.; Stahl, M.T.
+      Conformer Generation with OMEGA: Algorithm and Validation Using High
+      Quality Structures from the Protein Databank and the Cambridge 
+      Structural Database. J. Chem. Inf. Model. 2010, 50, 572-584.
+    
+    Running as MPI Master
+    ...ce_mol2s/partition_7.mol2|****************************************|100.00%
 
+
+By default, Omega samples up to 50,000 conformer structures and keeps up to 200 conformers with favorable energy per molecule. Additional arguments can be provided using `--settings` flag of `run_omega.py`, for example, to increase the maximum number of conformers to keep from 200 to 500, you can provide the following, optional argument: `"--settings -maxconfs 500 \"`.
+
+Now that we created the conformers of the database molecules, let us inspect the number of structures that we would consider for the pair-wise overlays in the next step:
 
 
 ```python
-!python ../../../../tools/count_mol2.py \
---input project/omega_confomers/
+! python tools/count_mol2.py \
+  --input tutorial-results/04_omega_confomers/
 ```
 
-    1.mol2 : 6531
-    2.mol2 : 5840
-    3.mol2 : 6686
-    4.mol2 : 7402
-    5.mol2 : 5987
-    6.mol2 : 5833
-    7.mol2 : 6725
-    Total : 45004
+    partition_1.mol2 : 2940
+    partition_2.mol2 : 2768
+    partition_3.mol2 : 2263
+    partition_4.mol2 : 2550
+    partition_5.mol2 : 2394
+    partition_6.mol2 : 3433
+    partition_7.mol2 : 2693
+    Total : 19041
 
 
-# Overlaying conformers with query using ROCS
+As we can see, we now have 19,041 structures to consider, which means Omega created ~200 low-energy (favorable) conformers of the 107 single-conformer input structures in `03_fgroup_distance_mol2s`.
+
+## Step 5 -- Overlaying Reference and Database Molecules
+
+In this section we are going to overlay the database conformers we generated in `tutorial-results/04_omega_confomers/` that we generated in the previous step ("Step 4 -- Generating Conformers") with 35 3kPZS conformers provided in the tutorial material as `3kpzs_query.mol2`. (Note that if you are working with your own reference molecule, conformers can be generated similar to generating database molecules as described in section "Step 4 -- Generating Conformers").
+
+![](images/tools-tutorial-1/pipe-step-5.jpg)
+
+
+Screenlamp provides a wrapper tool `run_rocs.py` that wraps OpenEye ROCS for generating molecular overlays. For more information about ROCS, please see https://www.eyesopen.com/rocs. The `run_rocs.py` wrapper uses ROCs' default settings plus additional settings provided by a `--settings argument`. For more information about the ROCS settings, please refer to the official documentation at https://www.eyesopen.com/rocs. The settings we are going to use will overlay each query conformer with each database conformer, and it will only keep the best overlay for each multiconformer per. For instance, if we have 200 conformers of a database molecule A and 200 conformers of a reference molecule B, only the best overlay out of the 200x200 overlays will be kept.
 
 
 ```python
-!python ../../../../tools/run_rocs.py \
---input project/omega_confomers \
---output project/rocs_overlays/ \
---query dataset/query/3kpzs_conf_subset_nowarts.mol2 \
---executable "/Applications/ROCS 3.2.1.4.app/Contents/MacOS/rocs-3.2.1.4" \
---processes 0
+! python tools/run_rocs.py \
+  --input tutorial-results/04_omega_confomers/ \
+  --output tutorial-results/05_rocs_overlays/ \
+  --query tk-tutorial_data/3kpzs_query.mol2 \
+  --executable "/Applications/ROCS 3.2.1.4.app/Contents/MacOS/rocs-3.2.1.4" \
+  --settings "-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent" \
+  --processes 0
 ```
 
-    Processing 1.mol2
-    Slave started on host Sebastians-MacBook-Pro
-    Slave started on host Sebastians-MacBook-Pro
-    Slave started on host Sebastians-MacBook-Pro
+    Processing partition_1.mol2
               :jGf:               
             :jGDDDDf:             
           ,fDDDGjLDDDf,           'a8  ,a'8b   a''8b    a''8b  a8f'8
@@ -920,33 +967,35 @@ After applying this filtering step, we can see that only 107 molecules out of th
       Hawkins, P.C.D.; Skillman, A.G.; Nicholls, A. Comparison of Shape-Matching
       and Docking as Virtual Screening Tools. J. Med. Chem., 2007, 50, 74.
     
+    Slave started on host Sebastians-MacBook-Pro
+    Slave started on host Sebastians-MacBook-Pro
+    Slave started on host Sebastians-MacBook-Pro
     Running as MPI Master
-      database file: project/omega_confomers/1.mol2
+      database file: tutorial-results/04_omega_confomers/partition_1.mol2
     
-    Query being read from:         	dataset/query/3kpzs_conf_subset_nowarts.mol2
-    File prefix is:                	project/rocs_overlays_nowarts/1
-    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/workflow/example_1
-    Log file will be written to: 	project/rocs_overlays_nowarts/1.log
-    Statistics will be written to:	project/rocs_overlays_nowarts/1_1.rpt
-    Hit structures will written to:	project/rocs_overlays_nowarts/1_hits_1.mol2
-    Status file will be written to:	project/rocs_overlays_nowarts/1_1.status
+    Query being read from:         	tk-tutorial_data/3kpzs_query.mol2
+    File prefix is:                	tutorial-results/05_rocs_overlays/partition_1
+    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/user_guide
+    Log file will be written to: 	tutorial-results/05_rocs_overlays/partition_1.log
+    Statistics will be written to:	tutorial-results/05_rocs_overlays/partition_1_1.rpt
+    Hit structures will written to:	tutorial-results/05_rocs_overlays/partition_1_hits_1.mol2
+    Status file will be written to:	tutorial-results/05_rocs_overlays/partition_1_1.status
     
     Query(#1): 3KPZS has 35 conformer(s)
-    Database 1 of 1:              	project/omega_confomers/1.mol2
-    ...ct/omega_confomers/1.mol2|****************************************|100.00%
+    Database 1 of 1:              	tutorial-results/04_omega_confomers/partition_1.mol2
+    ...onfomers/partition_1.mol2|****************************************|100.00%
     
-    35 molecules in 67 seconds -> 0.5 molecules/sec
-                                  3412 overlays/sec
+    16 molecules in 41 seconds -> 0.4 molecules/sec
+                                  2510 overlays/sec
     
-    35 hits found
+    16 hits found
     =================================================
     
     Molecule read failures: 0
     #warnings             : 0
     #errors               : 0
     #queries processed    : 1
-    Processing 2.mol2
-    Slave started on host Sebastians-MacBook-Pro
+    Processing partition_2.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
               :jGf:               
@@ -984,32 +1033,33 @@ After applying this filtering step, we can see that only 107 molecules out of th
       Hawkins, P.C.D.; Skillman, A.G.; Nicholls, A. Comparison of Shape-Matching
       and Docking as Virtual Screening Tools. J. Med. Chem., 2007, 50, 74.
     
+    Slave started on host Sebastians-MacBook-Pro
     Running as MPI Master
-      database file: project/omega_confomers/2.mol2
+      database file: tutorial-results/04_omega_confomers/partition_2.mol2
     
-    Query being read from:         	dataset/query/3kpzs_conf_subset_nowarts.mol2
-    File prefix is:                	project/rocs_overlays_nowarts/2
-    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/workflow/example_1
-    Log file will be written to: 	project/rocs_overlays_nowarts/2.log
-    Statistics will be written to:	project/rocs_overlays_nowarts/2_1.rpt
-    Hit structures will written to:	project/rocs_overlays_nowarts/2_hits_1.mol2
-    Status file will be written to:	project/rocs_overlays_nowarts/2_1.status
+    Query being read from:         	tk-tutorial_data/3kpzs_query.mol2
+    File prefix is:                	tutorial-results/05_rocs_overlays/partition_2
+    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/user_guide
+    Log file will be written to: 	tutorial-results/05_rocs_overlays/partition_2.log
+    Statistics will be written to:	tutorial-results/05_rocs_overlays/partition_2_1.rpt
+    Hit structures will written to:	tutorial-results/05_rocs_overlays/partition_2_hits_1.mol2
+    Status file will be written to:	tutorial-results/05_rocs_overlays/partition_2_1.status
     
     Query(#1): 3KPZS has 35 conformer(s)
-    Database 1 of 1:              	project/omega_confomers/2.mol2
-    ...ct/omega_confomers/2.mol2|****************************************|100.00%
+    Database 1 of 1:              	tutorial-results/04_omega_confomers/partition_2.mol2
+    ...onfomers/partition_2.mol2|****************************************|100.00%
     
-    32 molecules in 59 seconds -> 0.5 molecules/sec
-                                  3464 overlays/sec
+    16 molecules in 47 seconds -> 0.3 molecules/sec
+                                  2061 overlays/sec
     
-    32 hits found
+    16 hits found
     =================================================
     
     Molecule read failures: 0
     #warnings             : 0
     #errors               : 0
     #queries processed    : 1
-    Processing 3.mol2
+    Processing partition_3.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
@@ -1049,32 +1099,31 @@ After applying this filtering step, we can see that only 107 molecules out of th
       and Docking as Virtual Screening Tools. J. Med. Chem., 2007, 50, 74.
     
     Running as MPI Master
-      database file: project/omega_confomers/3.mol2
+      database file: tutorial-results/04_omega_confomers/partition_3.mol2
     
-    Query being read from:         	dataset/query/3kpzs_conf_subset_nowarts.mol2
-    File prefix is:                	project/rocs_overlays_nowarts/3
-    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/workflow/example_1
-    Log file will be written to: 	project/rocs_overlays_nowarts/3.log
-    Statistics will be written to:	project/rocs_overlays_nowarts/3_1.rpt
-    Hit structures will written to:	project/rocs_overlays_nowarts/3_hits_1.mol2
-    Status file will be written to:	project/rocs_overlays_nowarts/3_1.status
+    Query being read from:         	tk-tutorial_data/3kpzs_query.mol2
+    File prefix is:                	tutorial-results/05_rocs_overlays/partition_3
+    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/user_guide
+    Log file will be written to: 	tutorial-results/05_rocs_overlays/partition_3.log
+    Statistics will be written to:	tutorial-results/05_rocs_overlays/partition_3_1.rpt
+    Hit structures will written to:	tutorial-results/05_rocs_overlays/partition_3_hits_1.mol2
+    Status file will be written to:	tutorial-results/05_rocs_overlays/partition_3_1.status
     
     Query(#1): 3KPZS has 35 conformer(s)
-    Database 1 of 1:              	project/omega_confomers/3.mol2
-    ...ct/omega_confomers/3.mol2|****************************************|100.00%
+    Database 1 of 1:              	tutorial-results/04_omega_confomers/partition_3.mol2
+    ...onfomers/partition_3.mol2|****************************************|100.00%
     
-    38 molecules in 75 seconds -> 0.5 molecules/sec
-                                  3120 overlays/sec
+    13 molecules in 30 seconds -> 0.4 molecules/sec
+                                  2640 overlays/sec
     
-    38 hits found
+    13 hits found
     =================================================
     
     Molecule read failures: 0
     #warnings             : 0
     #errors               : 0
     #queries processed    : 1
-    Processing 4.mol2
-    Slave started on host Sebastians-MacBook-Pro
+    Processing partition_4.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
               :jGf:               
@@ -1112,33 +1161,33 @@ After applying this filtering step, we can see that only 107 molecules out of th
       Hawkins, P.C.D.; Skillman, A.G.; Nicholls, A. Comparison of Shape-Matching
       and Docking as Virtual Screening Tools. J. Med. Chem., 2007, 50, 74.
     
+    Slave started on host Sebastians-MacBook-Pro
     Running as MPI Master
-      database file: project/omega_confomers/4.mol2
+      database file: tutorial-results/04_omega_confomers/partition_4.mol2
     
-    Query being read from:         	dataset/query/3kpzs_conf_subset_nowarts.mol2
-    File prefix is:                	project/rocs_overlays_nowarts/4
-    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/workflow/example_1
-    Log file will be written to: 	project/rocs_overlays_nowarts/4.log
-    Statistics will be written to:	project/rocs_overlays_nowarts/4_1.rpt
-    Hit structures will written to:	project/rocs_overlays_nowarts/4_hits_1.mol2
-    Status file will be written to:	project/rocs_overlays_nowarts/4_1.status
+    Query being read from:         	tk-tutorial_data/3kpzs_query.mol2
+    File prefix is:                	tutorial-results/05_rocs_overlays/partition_4
+    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/user_guide
+    Log file will be written to: 	tutorial-results/05_rocs_overlays/partition_4.log
+    Statistics will be written to:	tutorial-results/05_rocs_overlays/partition_4_1.rpt
+    Hit structures will written to:	tutorial-results/05_rocs_overlays/partition_4_hits_1.mol2
+    Status file will be written to:	tutorial-results/05_rocs_overlays/partition_4_1.status
     
     Query(#1): 3KPZS has 35 conformer(s)
-    Database 1 of 1:              	project/omega_confomers/4.mol2
-    ...ct/omega_confomers/4.mol2|****************************************|100.00%
+    Database 1 of 1:              	tutorial-results/04_omega_confomers/partition_4.mol2
+    ...onfomers/partition_4.mol2|****************************************|100.00%
     
-    40 molecules in 82 seconds -> 0.5 molecules/sec
-                                  3159 overlays/sec
+    15 molecules in 42 seconds -> 0.4 molecules/sec
+                                  2125 overlays/sec
     
-    40 hits found
+    15 hits found
     =================================================
     
     Molecule read failures: 0
     #warnings             : 0
     #errors               : 0
     #queries processed    : 1
-    Processing 5.mol2
-    Slave started on host Sebastians-MacBook-Pro
+    Processing partition_5.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
               :jGf:               
@@ -1176,32 +1225,33 @@ After applying this filtering step, we can see that only 107 molecules out of th
       Hawkins, P.C.D.; Skillman, A.G.; Nicholls, A. Comparison of Shape-Matching
       and Docking as Virtual Screening Tools. J. Med. Chem., 2007, 50, 74.
     
+    Slave started on host Sebastians-MacBook-Pro
     Running as MPI Master
-      database file: project/omega_confomers/5.mol2
+      database file: tutorial-results/04_omega_confomers/partition_5.mol2
     
-    Query being read from:         	dataset/query/3kpzs_conf_subset_nowarts.mol2
-    File prefix is:                	project/rocs_overlays_nowarts/5
-    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/workflow/example_1
-    Log file will be written to: 	project/rocs_overlays_nowarts/5.log
-    Statistics will be written to:	project/rocs_overlays_nowarts/5_1.rpt
-    Hit structures will written to:	project/rocs_overlays_nowarts/5_hits_1.mol2
-    Status file will be written to:	project/rocs_overlays_nowarts/5_1.status
+    Query being read from:         	tk-tutorial_data/3kpzs_query.mol2
+    File prefix is:                	tutorial-results/05_rocs_overlays/partition_5
+    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/user_guide
+    Log file will be written to: 	tutorial-results/05_rocs_overlays/partition_5.log
+    Statistics will be written to:	tutorial-results/05_rocs_overlays/partition_5_1.rpt
+    Hit structures will written to:	tutorial-results/05_rocs_overlays/partition_5_hits_1.mol2
+    Status file will be written to:	tutorial-results/05_rocs_overlays/partition_5_1.status
     
     Query(#1): 3KPZS has 35 conformer(s)
-    Database 1 of 1:              	project/omega_confomers/5.mol2
-    ...ct/omega_confomers/5.mol2|****************************************|100.00%
+    Database 1 of 1:              	tutorial-results/04_omega_confomers/partition_5.mol2
+    ...onfomers/partition_5.mol2|****************************************|100.00%
     
-    32 molecules in 67 seconds -> 0.5 molecules/sec
-                                  3128 overlays/sec
+    12 molecules in 40 seconds -> 0.3 molecules/sec
+                                  2095 overlays/sec
     
-    32 hits found
+    12 hits found
     =================================================
     
     Molecule read failures: 0
     #warnings             : 0
     #errors               : 0
     #queries processed    : 1
-    Processing 6.mol2
+    Processing partition_6.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
@@ -1241,31 +1291,31 @@ After applying this filtering step, we can see that only 107 molecules out of th
       and Docking as Virtual Screening Tools. J. Med. Chem., 2007, 50, 74.
     
     Running as MPI Master
-      database file: project/omega_confomers/6.mol2
+      database file: tutorial-results/04_omega_confomers/partition_6.mol2
     
-    Query being read from:         	dataset/query/3kpzs_conf_subset_nowarts.mol2
-    File prefix is:                	project/rocs_overlays_nowarts/6
-    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/workflow/example_1
-    Log file will be written to: 	project/rocs_overlays_nowarts/6.log
-    Statistics will be written to:	project/rocs_overlays_nowarts/6_1.rpt
-    Hit structures will written to:	project/rocs_overlays_nowarts/6_hits_1.mol2
-    Status file will be written to:	project/rocs_overlays_nowarts/6_1.status
+    Query being read from:         	tk-tutorial_data/3kpzs_query.mol2
+    File prefix is:                	tutorial-results/05_rocs_overlays/partition_6
+    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/user_guide
+    Log file will be written to: 	tutorial-results/05_rocs_overlays/partition_6.log
+    Statistics will be written to:	tutorial-results/05_rocs_overlays/partition_6_1.rpt
+    Hit structures will written to:	tutorial-results/05_rocs_overlays/partition_6_hits_1.mol2
+    Status file will be written to:	tutorial-results/05_rocs_overlays/partition_6_1.status
     
     Query(#1): 3KPZS has 35 conformer(s)
-    Database 1 of 1:              	project/omega_confomers/6.mol2
-    ...ct/omega_confomers/6.mol2|****************************************|100.00%
+    Database 1 of 1:              	tutorial-results/04_omega_confomers/partition_6.mol2
+    ...onfomers/partition_6.mol2|****************************************|100.00%
     
-    32 molecules in 68 seconds -> 0.5 molecules/sec
-                                  3002 overlays/sec
+    20 molecules in 66 seconds -> 0.3 molecules/sec
+                                  1821 overlays/sec
     
-    32 hits found
+    20 hits found
     =================================================
     
     Molecule read failures: 0
     #warnings             : 0
     #errors               : 0
     #queries processed    : 1
-    Processing 7.mol2
+    Processing partition_7.mol2
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
     Slave started on host Sebastians-MacBook-Pro
@@ -1305,24 +1355,24 @@ After applying this filtering step, we can see that only 107 molecules out of th
       and Docking as Virtual Screening Tools. J. Med. Chem., 2007, 50, 74.
     
     Running as MPI Master
-      database file: project/omega_confomers/7.mol2
+      database file: tutorial-results/04_omega_confomers/partition_7.mol2
     
-    Query being read from:         	dataset/query/3kpzs_conf_subset_nowarts.mol2
-    File prefix is:                	project/rocs_overlays_nowarts/7
-    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/workflow/example_1
-    Log file will be written to: 	project/rocs_overlays_nowarts/7.log
-    Statistics will be written to:	project/rocs_overlays_nowarts/7_1.rpt
-    Hit structures will written to:	project/rocs_overlays_nowarts/7_hits_1.mol2
-    Status file will be written to:	project/rocs_overlays_nowarts/7_1.status
+    Query being read from:         	tk-tutorial_data/3kpzs_query.mol2
+    File prefix is:                	tutorial-results/05_rocs_overlays/partition_7
+    Output directory:              	/Users/sebastian/code/screenlamp/docs/sources/user_guide
+    Log file will be written to: 	tutorial-results/05_rocs_overlays/partition_7.log
+    Statistics will be written to:	tutorial-results/05_rocs_overlays/partition_7_1.rpt
+    Hit structures will written to:	tutorial-results/05_rocs_overlays/partition_7_hits_1.mol2
+    Status file will be written to:	tutorial-results/05_rocs_overlays/partition_7_1.status
     
     Query(#1): 3KPZS has 35 conformer(s)
-    Database 1 of 1:              	project/omega_confomers/7.mol2
-    ...ct/omega_confomers/7.mol2|****************************************|100.00%
+    Database 1 of 1:              	tutorial-results/04_omega_confomers/partition_7.mol2
+    ...onfomers/partition_7.mol2|****************************************|100.00%
     
-    37 molecules in 75 seconds -> 0.5 molecules/sec
-                                  3138 overlays/sec
+    15 molecules in 40 seconds -> 0.4 molecules/sec
+                                  2356 overlays/sec
     
-    37 hits found
+    15 hits found
     =================================================
     
     Molecule read failures: 0
@@ -1330,52 +1380,82 @@ After applying this filtering step, we can see that only 107 molecules out of th
     #errors               : 0
     #queries processed    : 1
 
+
+Although we had 19,041 database conformers, our conformer database only consists 107 unique structures (see " Filtering Step 3 -- Distance between Functional Groups"), so we expect ROCS to yield 107 best-overlay pairs, which we can check via the familiar `count_mol2.py` tool. (Note that in your own analyses, the number of input structures to Omega and output overlays from ROCS is not always the same. Potential sources for this, which we observed, is either that Omega cannot parse certain input structures and/or ROCS sometimes includes duplicates in the results.)
 
 
 ```python
-!python ../../../../tools/count_mol2.py \
---input project/rocs_overlays/
+! python tools/count_mol2.py \
+  --input tutorial-results/05_rocs_overlays/
 ```
 
-    1_hits_1.mol2 : 35
-    2_hits_1.mol2 : 32
-    3_hits_1.mol2 : 38
-    4_hits_1.mol2 : 40
-    5_hits_1.mol2 : 32
-    6_hits_1.mol2 : 32
-    7_hits_1.mol2 : 37
-    Total : 246
+    partition_1_hits_1.mol2 : 16
+    partition_2_hits_1.mol2 : 16
+    partition_3_hits_1.mol2 : 13
+    partition_4_hits_1.mol2 : 15
+    partition_5_hits_1.mol2 : 12
+    partition_6_hits_1.mol2 : 20
+    partition_7_hits_1.mol2 : 15
+    Total : 107
 
 
-- After ROCS, we can sort the output files to create mol2 files with the overlays in sorted order by score
+## Step 6 -- Sorting Molecular Overlays
 
-- a) a mol2 file that contains the database molecule conformers in sort order
-- b) a mol2 files with the corresponding query conformers
+In this section, we are going to sort the pair-wise overlays be overlay score and select only those molecules that meet at certain similarity threshold before we continue with the functional group matching in Step 7.
 
-using `sort_rocs_mol2.py`
+![](images/tools-tutorial-1/pipe-step-6.jpg)
+
+To make screenlamp's functional group matching procedure as general as possible, that is, compatible to other overlay tools that generate MOL2 files (other than ROCS), we need to postprocess the ROCS results prior to the next functional group matching step (Step 7) using the `sort_rocs_mol2.py` utility tool provided in screenlamp.
+
+Essentially, the `sort_rocs_mol2.py` tool will create a pair of `*_query.mol2` and `*_dbase.mol2` files that contain the same number of structures each based on the ROCS overlays. The `*_dbase.mol2` file contains the database molecule and the `*_query.mol2` contains the conformer of the reference molecule that corresponds to the best-matching database-reference pair. In addition, we use the --sortby function to sort the molecules by TanimotoCombo and ColorTanimoto score (in descending order, best matches come first) for visualization and remove bad overlays by setting minumum score thresholds based on the TanimotoCombo and ColorTanimoto similarity scores. The TanimotoCombo scores measures the similarity between a pair of molecules based on the overall volumetric match (ShapeTanimoto) and the electrostatic similarity (ColorTanimoto). For more information about the different scoring metrics implemented in ROCS, please refer to the official ROCS documentation at https://www.eyesopen.com/rocs
 
 
 ```python
-!python ../../../../tools/sort_rocs_mol2.py \
---input project/rocs_overlays/ \
---output project/rocs_overlays_sorted \
---query ./dataset/query/3kpzs_conf_subset_nowarts.mol2 \
---sortby TanimotoCombo \
---id_suffix true
+! python tools/sort_rocs_mol2.py \
+  --input tutorial-results/05_rocs_overlays/ \
+  --query tk-tutorial_data/3kpzs_query.mol2 \
+  --output tutorial-results/06_rocs_overlays_sorted \
+  --sortby TanimotoCombo,ColorTanimoto \
+  --selection "(TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)"
 ```
 
-    Processing 1_hits_1.mol2 | scanned 36 molecules | 1663 mol/sec
-    Processing 2_hits_1.mol2 | scanned 33 molecules | 4204 mol/sec
-    Processing 3_hits_1.mol2 | scanned 39 molecules | 7292 mol/sec
-    Processing 4_hits_1.mol2 | scanned 41 molecules | 7170 mol/sec
-    Processing 5_hits_1.mol2 | scanned 33 molecules | 7686 mol/sec
-    Processing 6_hits_1.mol2 | scanned 33 molecules | 7354 mol/sec
-    Processing 7_hits_1.mol2 | scanned 38 molecules | 4984 mol/sec
+    Processing partition_1_hits_1.mol2 | scanned 12 molecules | 2087 mol/sec
+    Processing partition_2_hits_1.mol2 | scanned 14 molecules | 4453 mol/sec
+    Processing partition_3_hits_1.mol2 | scanned 11 molecules | 4344 mol/sec
+    Processing partition_4_hits_1.mol2 | scanned 13 molecules | 3959 mol/sec
+    Processing partition_5_hits_1.mol2 | scanned 11 molecules | 4680 mol/sec
+    Processing partition_6_hits_1.mol2 | scanned 19 molecules | 2931 mol/sec
+    Processing partition_7_hits_1.mol2 | scanned 13 molecules | 5610 mol/sec
 
 
-- these can then be opened and viewed in pymol
+After using the `sort_rocs_mol2.py` utility script, we have a new directory that contains pairs of `*_dbase.mol2` and `*_query.mol2` conformers from the ROCS overlays:
 
-# Matching Functional Groups
+
+```python
+! python tools/count_mol2.py \
+  --input tutorial-results/06_rocs_overlays_sorted
+```
+
+    partition_1_hits_1_dbase.mol2 : 11
+    partition_1_hits_1_query.mol2 : 11
+    partition_2_hits_1_dbase.mol2 : 13
+    partition_2_hits_1_query.mol2 : 13
+    partition_3_hits_1_dbase.mol2 : 10
+    partition_3_hits_1_query.mol2 : 10
+    partition_4_hits_1_dbase.mol2 : 12
+    partition_4_hits_1_query.mol2 : 12
+    partition_5_hits_1_dbase.mol2 : 10
+    partition_5_hits_1_query.mol2 : 10
+    partition_6_hits_1_dbase.mol2 : 18
+    partition_6_hits_1_query.mol2 : 18
+    partition_7_hits_1_dbase.mol2 : 12
+    partition_7_hits_1_query.mol2 : 12
+    Total : 172
+
+
+## Step 7 -- Matching Functional Groups
+
+![](images/tools-tutorial-1/pipe-step-7.jpg)
 
 will need suffixes:
 
@@ -1399,6 +1479,8 @@ will need suffixes:
     Processing 6_hits_1_dbase.mol2/6_hits_1_query.mol2 | scanned 33 molecules | 31 mol/sec
     Processing 7_hits_1_dbase.mol2/7_hits_1_query.mol2 | scanned 38 molecules | 32 mol/sec
 
+
+## Step 8 -- Selecting Functional Group Matches
 
 # TODO
 

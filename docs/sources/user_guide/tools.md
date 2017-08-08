@@ -536,7 +536,8 @@ molecule ID/Name.
 - `--executable EXECUTABLE`  
 (Required.) The path or command for running
 OpenEye ROCS on your system.
-- `--settings SETTINGS   (Optional.) ROCS settings to use.`  
+- `--settings SETTINGS   (Optional, default:" -rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent")`  
+ROCS settings to use.
 - `--processes PROCESSES`  
 (Optional, default: `1`.) Number of processes to run in parallel.
 If processes > 0, the specified number of CPUs
@@ -556,7 +557,8 @@ python run_rocs.py\
 --output rocs_overlays/\
 --executable /.../rocs-3.2.1.4\
 --query query.mol2\
---settings "-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent --processes 0"
+--settings "-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent"\
+--processes 0
 ```
 
 
