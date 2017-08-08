@@ -4,6 +4,10 @@ This tutorial explains how the individual screenlamp tools (located in the `scre
 
 The dataset and workflow we are going to use is simililar to the [Pipeline Tutorial](pipeline-tutorial-1/index.html), which uses a preconstructed, automated virtual pipeline based using the tools explained in this tutorial. While the [Pipeline Tutorial](pipeline-tutorial-1/index.html) provides a high level overview and a more convenient, preconstructred pipeline, this tool aims to explain the building blocks behind it so that users can understand and learn how to construct their own pipelines and/or modify the existing pipeline presented in the [Pipeline Tutorial](pipeline-tutorial-1/index.html).
 
+To explain the main steps in a typical filtering pipeline using screenlamp, this tutorial will work through the following individual steps performed by the pipeline in the [Pipeline Tutorial](pipeline-tutorial-1/index.html) incrementally:
+
+![](images/tools-tutorial-1/pipeline-overview.jpg)
+
 ## Obtaining and Preparing the Dataset
 
 
@@ -39,6 +43,9 @@ Next, we are going to create a new directory, `tutorial-results`, to store the r
 ```python
 ! mkdir tutorial-results
 ```
+
+    mkdir: tutorial-results: File exists
+
 
 ---
 
@@ -86,13 +93,13 @@ We can create such an ID file using the `mol2_to_id.py` script as shown below:
   --output tutorial-results/all-mol2ids.txt
 ```
 
-    Processing partition_1.mol2 | scanned 10000 molecules | 15228 mol/sec
-    Processing partition_2.mol2 | scanned 10000 molecules | 16690 mol/sec
-    Processing partition_3.mol2 | scanned 10000 molecules | 19183 mol/sec
-    Processing partition_4.mol2 | scanned 10000 molecules | 15370 mol/sec
-    Processing partition_5.mol2 | scanned 10000 molecules | 15689 mol/sec
-    Processing partition_6.mol2 | scanned 10000 molecules | 14911 mol/sec
-    Processing partition_7.mol2 | scanned 10000 molecules | 13948 mol/sec
+    Processing partition_1.mol2 | scanned 10000 molecules | 16925 mol/sec
+    Processing partition_2.mol2 | scanned 10000 molecules | 11431 mol/sec
+    Processing partition_3.mol2 | scanned 10000 molecules | 9346 mol/sec
+    Processing partition_4.mol2 | scanned 10000 molecules | 11809 mol/sec
+    Processing partition_5.mol2 | scanned 10000 molecules | 18886 mol/sec
+    Processing partition_6.mol2 | scanned 10000 molecules | 18984 mol/sec
+    Processing partition_7.mol2 | scanned 10000 molecules | 18110 mol/sec
 
 
 To check that the creation of the ID file was successful and to see how it generally looks like, we will use the Unix/Linux `head` command line tool to display the first 10 rows of the newly created ID file:
@@ -139,17 +146,19 @@ Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files f
   --whitelist True
 ```
 
-    Processing partition_1.mol2 | scanned 10000 molecules | 17170 mol/sec
-    Processing partition_2.mol2 | scanned 10000 molecules | 14104 mol/sec
-    Processing partition_3.mol2 | scanned 10000 molecules | 15142 mol/sec
-    Processing partition_4.mol2 | scanned 10000 molecules | 14137 mol/sec
-    Processing partition_5.mol2 | scanned 10000 molecules | 15077 mol/sec
-    Processing partition_6.mol2 | scanned 10000 molecules | 14870 mol/sec
-    Processing partition_7.mol2 | scanned 10000 molecules | 14123 mol/sec
+    Processing partition_1.mol2 | scanned 10000 molecules | 15319 mol/sec
+    Processing partition_2.mol2 | scanned 10000 molecules | 14400 mol/sec
+    Processing partition_3.mol2 | scanned 10000 molecules | 14980 mol/sec
+    Processing partition_4.mol2 | scanned 10000 molecules | 14893 mol/sec
+    Processing partition_5.mol2 | scanned 10000 molecules | 14170 mol/sec
+    Processing partition_6.mol2 | scanned 10000 molecules | 12873 mol/sec
+    Processing partition_7.mol2 | scanned 10000 molecules | 12457 mol/sec
     Finished
 
 
-Now, the output directory, `tutorial-results/whitelist-example, should contain only mol2 files with the selected IDs:
+The output directory, `tutorial-results/whitelist-example, should now contain only mol2 structures that are labeled with IDs contained in the `5-mol2ids.txt` text file.
+
+Please note that id_to_mol2 creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found via whitelist filtering. For example, the 5 structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
 
 
 ```python
@@ -159,8 +168,6 @@ Now, the output directory, `tutorial-results/whitelist-example, should contain o
     partition_1.mol2 partition_3.mol2 partition_5.mol2 partition_7.mol2
     partition_2.mol2 partition_4.mol2 partition_6.mol2
 
-
-Please note that id_to_mol2 creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found via white list filtering. For example, the 5 structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
 
 
 ```python
@@ -219,11 +226,24 @@ This time, we expect 69995 structures to be obtained after the filtering, since 
     Total : 69995
 
 
-# First Filtering Step -- Filtering via Features from Data Tables
+## Filtering Step  1 -- Filtering via Features from Data Tables
+
+In this section, we will apply the first filtering step, which constitutes step 1 in the pipeline overview:
+
+![](images/tools-tutorial-1/pipe-step-1.jpg)
+
+Filtering via screenlamp is typically done in 2 steps:
+
+- Step 1: create a ID file containing the names of the molecules of interest
+- Step 2: obtain the structures of molecules of interest, using the ID file, from MOL2 files
+
+In this filtering step, we are going to create an ID file of molecules of interest from a pre-existing data table, for instance, the "properties" files available on [ZINC](http://zinc.docking.org/subsets/drug-like). For this example, we are going to use the `small_table_p1-7.txt` subset that we downloaded earlier, since the whole data table of drug like molecules in ~2 Gb in size and may take a long time to download on machines with a low-bandwith internet connection. However, in case you have already downloaded the drug-like properties file (3_prop.xls) please feel free to use it instead. (Note that while `3_prop.xls` has a file ending that is typical for Microsoft Excel, it is not an Excel file but a plain text file with tab-separated columns.)
+
+To get a brief impression of the file contents, we use the `head` tool to display the first 10 entries:
 
 
 ```python
-!head dataset/tables/3_prop.xls
+! head tk-tutorial_data/small_table_p1-7.txt
 ```
 
     ZINC_ID	MWT	LogP	Desolv_apolar	Desolv_polar	HBD	HBA	tPSA	Charge	NRB	SMILES
@@ -231,15 +251,47 @@ This time, we expect 69995 structures to be obtained after the filtering, since 
     ZINC00000012	289.356	1.28	4.89	-24.55	2	4	66	0	5	c1ccc(cc1)C(c2ccccc2)[S@](=O)CC(=O)NO
     ZINC00000017	281.337	1.33	3.06	-23.33	2	6	87	0	4	CCC[S@](=O)c1ccc2c(c1)[nH]/c(=N\C(=O)OC)/[nH]2
     ZINC00000017	281.337	1.33	3.07	-19.2	2	6	87	0	4	CCC[S@](=O)c1ccc2c(c1)[nH]/c(=N/C(=O)OC)/[nH]2
-    ZINC00000018	212.318	2.00	5.87	-8.2	1	3	32	0	4	CC(C)C[C@@H]1C(=O)N(C(=S)N1)CC=C
+    ZINC00000018	212.31799999999998	2.0	5.87	-8.2	1	3	32	0	4	CC(C)C[C@@H]1C(=O)N(C(=S)N1)CC=C
     ZINC00000021	288.411	3.85	4.02	-40.52	1	3	30	1	6	CCC(=O)O[C@]1(CC[NH+](C[C@@H]1CC=C)C)c2ccccc2
-    ZINC00000022	218.276	3.21	0.47	-48.57	1	3	52	-1	5	C[C@@H](c1ccc(cc1)NCC(=C)C)C(=O)[O-]
-    ZINC00000025	251.353	3.60	2.4	-41.56	2	2	40	1	5	C[C@H](Cc1ccccc1)[NH2+][C@@H](C#N)c2ccccc2
+    ZINC00000022	218.27599999999998	3.21	0.47	-48.57	1	3	52	-1	5	C[C@@H](c1ccc(cc1)NCC(=C)C)C(=O)[O-]
+    ZINC00000025	251.35299999999998	3.6	2.4	-41.56	2	2	40	1	5	C[C@H](Cc1ccccc1)[NH2+][C@@H](C#N)c2ccccc2
     ZINC00000030	297.422	2.94	0.89	-37.97	3	3	47	1	6	C[C@@H](CC(c1ccccc1)(c2ccccc2)C(=O)N)[NH+](C)C
 
 
-- A valid query looks like this:
- 
+Using the `datatable_to_id.py` script, we can select only those molecule IDs (or names) (here: stored in the `ZINC_ID` column) that match certain criteria, which we can flexibly define based on the column data in this table. For example, we can select only those molecules that have at most 7 rotatable bonds and have a molecular weight of at least 200 g/mol using the selection string `"(NRB <= 7) & (MWT >= 200)"` as follows:
+
+
+```python
+! python tools/datatable_to_id.py \
+  --input tk-tutorial_data/small_table_p1-7.txt \
+  --output tutorial-results/01_selected_mol2s.txt \
+  --id_column "ZINC_ID" \
+  --selection "(NRB <= 7) & (MWT >= 200)"
+```
+
+    Using columns: ['ZINC_ID', 'NRB', 'MWT']
+    Using selection: (chunk.NRB <= 7) & (chunk.MWT >= 200)
+    Processed 169984 rows | 351943 rows/sec
+    Selected: 162622
+
+
+The selection syntax is quite simple: Each criterion must be surrounded by parentheses, and multiple criteria can be chained together using the logical AND symbol `'&'`. For example, to add a third criterion to the selection string to exclude larger molecules that are heavier than 400 g/mol, the selection string becomes `"(NRB <= 7) & (MWT >= 200) & (MWT <= 400)"`.
+
+The operators for comparison allowed:
+
+- `!=` : not equal to
+- `==` : equal to
+- `<`  : less than
+- `>`  : greater than
+- `>=` : equal to or greater than
+- `<=` : equal to or greater than
+
+
+If you encounter issues with certain selection strings, please check that the specified column is indeed present in the table you provided. Also, the `datatable_to_id.py` tool assumes that the input table is tab-separated. If you have tables that use a different delimiter to separate columns, please specify the column separator using the `--seperator` parameter. For example, if our input table was a CSV file, we would pass the following, additional argument to the `tools/datatable_to_id.py` function: `--seperator ","`.
+
+
+Below are some additional examples of correct and incorrect selection strings that can help you with debugging the selection strings if you should encounter problems:
+
 - Correct: `"(MWT >= 200) & (NRB <= 7)"`
 - Wrong: `"( MWT >= 200) & ( NRB <= 7)"` [spacing between parentheses and column names]
 - Wrong: `"MWT >= 200 & NRB <= 7"` [expressions seperated by logical '&' operator not enclosed in parentheses]
@@ -247,199 +299,251 @@ This time, we expect 69995 structures to be obtained after the filtering, since 
 - Wrong: `"(mwt>=200) & (nrb<=7)"` [no whitespace before and after operators for comparison]
 
 
+As mentioned in the beginning of this section, filtering consists of two steps:
+    
+1. Creating an ID file of molecule names
+2. Selecting molecules from MOL2 files using the ID file from step 1
 
-```python
-!python ../../../../tools/datatable_to_id.py \
---input dataset/tables/3_prop.xls \
---output project/prefilter_1/selected-mol2ids.txt \
---id_column ZINC_ID \
---selection "(NRB <= 7) & (MWT >= 200)"
-```
-
-    Using columns: ['ZINC_ID', 'NRB', 'MWT']
-    Using selection: (chunk.NRB <= 7) & (chunk.MWT >= 200)
-    Processed 18000000 rows | 355868 rows/sec
-    Selected: 17599186
-
-
-Next, we are going to use these IDs to select molecules from the existing mol2 files:
+We already completed step 1, and now, we are going the ID file we just created to create MOL2 files that only contain the molecules of interest (i.e., molecules with a maximum number of 7 rotatable bonds and a molecular weight of at least 200 g/mol2). Consequently, we use the ID file `tutorial-results/01_selected_mol2s.txt` to select the molecules of interest from out MOL2 database at `tk-tutorial_data/partition_1-7/` as follows:
 
 
 ```python
-!python ../../../../tools/id_to_mol2.py \
---input dataset/mol2 \
---output project/prefilter_1/selected-mol2s \
---id_file project/prefilter_1/selected-mol2ids.txt \
---whitelist True
+! python tools/id_to_mol2.py \
+  --input tk-tutorial_data/partition_1-7/ \
+  --output tutorial-results/01_selected_mol2s/ \
+  --id_file tutorial-results/01_selected_mol2s.txt \
+  --whitelist True
 ```
 
-    Processing 1.mol2 | scanned 10000 molecules | 12869 mol/sec
-    Processing 2.mol2 | scanned 10000 molecules | 9978 mol/sec
-    Processing 3.mol2 | scanned 10000 molecules | 10434 mol/sec
-    Processing 4.mol2 | scanned 10000 molecules | 12147 mol/sec
-    Processing 5.mol2 | scanned 10000 molecules | 12625 mol/sec
-    Processing 6.mol2 | scanned 10000 molecules | 13190 mol/sec
-    Processing 7.mol2 | scanned 10000 molecules | 13364 mol/sec
+    Processing partition_1.mol2 | scanned 10000 molecules | 12021 mol/sec
+    Processing partition_2.mol2 | scanned 10000 molecules | 9435 mol/sec
+    Processing partition_3.mol2 | scanned 10000 molecules | 7823 mol/sec
+    Processing partition_4.mol2 | scanned 10000 molecules | 10801 mol/sec
+    Processing partition_5.mol2 | scanned 10000 molecules | 8901 mol/sec
+    Processing partition_6.mol2 | scanned 10000 molecules | 8661 mol/sec
+    Processing partition_7.mol2 | scanned 10000 molecules | 8167 mol/sec
     Finished
 
 
 
 ```python
-!python ../../../../tools/count_mol2.py \
---input project/prefilter_1/selected-mol2s/
+! python tools/count_mol2.py \
+  --input tutorial-results/01_selected_mol2s/
 ```
 
-    1.mol2 : 9829
-    2.mol2 : 9799
-    3.mol2 : 9848
-    4.mol2 : 9835
-    5.mol2 : 9832
-    6.mol2 : 9841
-    7.mol2 : 9841
-    Total : 68825
+    partition_1.mol2 : 8628
+    partition_2.mol2 : 8501
+    partition_3.mol2 : 8537
+    partition_4.mol2 : 8476
+    partition_5.mol2 : 8535
+    partition_6.mol2 : 8518
+    partition_7.mol2 : 8555
+    Total : 59750
 
 
-# Second Filtering Step -- Presence and absence of functional groups
+As we can see from the output of `count_mol2.py`, we now have a slightly smaller database consisting of 59750 molecules (selected from the initial 70,000 structures).
 
-- allowed columns
-  - atom_id
-  - atom_name
-  - atom_type
-  - subst_id
-  - subst_name
-  - charge
-  
-(may change with updated biopandas)
+## Filtering Step 2 -- Presence and Absence of Functional Groups
 
-a) simultaneously true (here impossible): "((atom_type == 'S.3') | (atom_type == 'S.o2')) & (atom_type == 'O.2')"
+In this second filtering steps, we will select molecules that contain certain types of atoms and functional groups. In this simple example, we will consider molecules that contain at least one sp3 sulfur atom (as it can be found in sulfate groups) and at least one sp2 oxygen atom (keto-group). 
 
-- tries to find an S.3 or S.o2 atom that is also an O.2 atom at the same time
+![](images/tools-tutorial-1/pipe-step-2.jpg)
 
-b) simultaneously true and valid: "((atom_type == 'S.3') | (atom_type == 'S.o2')) & (charge < 0.0)"
+When we filter by atom type, we can use the following types to specify filtering criteria:
 
-- tries to find an S.3 or S.o2 atom that has a negative charge
+  - `atom_id`
+  - `atom_name`
+  - `atom_type`
+  - `subst_id`
+  - `subst_name`
+  - `charge`
 
-c) otherwise, "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')"
+Note that the most useful specifiers are `atom_type` and `charge` in the context of selecting atoms and functional groups of interest. The `atom_type` specifier is used to refer to the atom types in MOL2 structures (for example, O.2, O.3, H, S.2, and so forth). The `charge` specify refers to the partial charge column in MOL2 files.
 
-- tries to find an S.3 or S.o2 atom, then tries to find an O.2 atom as well
-
-d) when in doubt, one can run (as alternative for c) the tool 2 times. 1 time to select "(atom_type == 'S.3') | (atom_type == 'S.o2')" and a second time to select "(atom_type == 'O.2')".
+Before we discuss the selection string syntax in more detail, let us execute an example where we select only those molecules that contain at least one sp3 sulfur atom (as it can be found in sulfate groups) and at least one sp2 oxygen atom (keto-group):
 
 
 ```python
-!python ../../../../tools/funcgroup_to_id.py \
---input project/prefilter_1/selected-mol2s/ \
---output project/prefilter_2/3keto-and-sulfur-mol2ids.txt \
---selection "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')" \
---processes 0
+! python tools/funcgroup_presence_to_id.py \
+  --input tutorial-results/01_selected_mol2s/ \
+  --output tutorial-results/02_fgroup_presence_mol2s.txt \
+  --selection "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')" \
+  --processes 0
 ```
 
     Using selection: ["((pdmol.df.atom_type == 'S.3') | (pdmol.df.atom_type == 'S.o2'))", "(pdmol.df.atom_type == 'O.2')"]
-    Processing 1.mol2 | 351 mol/sec
-    Processing 2.mol2 | 364 mol/sec
-    Processing 3.mol2 | 348 mol/sec
-    Processing 4.mol2 | 329 mol/sec
-    Processing 5.mol2
+    Processing partition_1.mol2 | 231 mol/sec
+    Processing partition_2.mol2 | 260 mol/sec
+    Processing partition_3.mol2 | 277 mol/sec
+    Processing partition_4.mol2 | 256 mol/sec
+    Processing partition_5.mol2 | 268 mol/sec
+    Processing partition_6.mol2 | 279 mol/sec
+    Processing partition_7.mol2 | 277 mol/sec
+
+
+Note that the we use all available processes on our machine by setting `--processes 0`, to speed up the computation. Alternatively, if you don't want to utilize all available CPUs, you can specify the number of CPUs to use manually, for example, by setting `--processes 1` to only use 1 CPU.
+
+To better understand how the selection string "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')" works, let us break it down into 2 parts:
+
+1. "((atom_type == 'S.3') | (atom_type == 'S.o2'))"
+2. "--> (atom_type == 'O.2')"
+    
+In the first part, we use the logical OR operator '|' to select molecules that either contain an 'S.3' atom OR an 'S.o2' atom. Then, after this criterion has been applied to select the specified subset of molecules, the next criterion will be applied, the criterion followed by the '-->' string. In this case, the second criterion is to check the remaining molecules for the presence of an 'O.2' atom. In this context, you can think of the '-->' string as a "THEN" conditional statement. E.g., "select via filter ((atom_type == 'S.3') | (atom_type == 'S.o2')) THEN select via filter (atom_type == 'O.2')"
+
+
+Note that you can string an arbitrary number of criteria using the '-->' operator. For example, if we additionally require molecules to contain a fluor atom, we can modify the selection string as follows:
+
+"((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2') **--> (atom_type == 'F')**"
+
+Lastly, we can also incorporate partial charge information. For instance if we want to specify a partial charge range for the O.2 atom type, we could do it as follows, using the logical "&" operator:
+
+"((atom_type == 'S.3') | (atom_type == 'S.o2')) --> ((atom_type == 'O.2') **& (charge <= -0.3) & (charge >= -0.9))**"
+
+Please note that it doesn't make sense to use the logical AND operator (&) on the same column. For example, the selection string "((atom_type == 'S.3') | (atom_type == 'S.o2'))" means that a molecule must contain an atom that is either of type S.3 OR S.o2. However, the selection string "((atom_type == 'S.3') & (atom_type == 'S.o2'))" would mean that a molecule must contain an atom that has the type S.3 AND S.o2, which is impossible, because an atom can only have 1 type at the same time (in the MOL2 file format).
+
+
+---
+
+**Below, you can find a short list of Dos and Don'ts regarding the selection syntax**:
+
+a) Don't use the AND operator (&) on the same column within a selection: "((atom_type == 'S.3') | (atom_type == 'S.o2')) & (atom_type == 'O.2')"
+
+- This selects molecules with an S.3 or S.o2 atom that is also an O.2 atom at the same time. This is impossible!
+
+b) Use the AND operator on different columns within a slection: "((atom_type == 'S.3') | (atom_type == 'S.o2')) & (charge < 0.0)"
+
+- This selects molecules with an S.3 or S.o2 atom that also has a negative charge.
+
+c) Filter for multiple atoms by chaining criteria via the `-->` string: "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')"
+
+- This selects molecules with an S.3 or S.o2 atom. Then, based on those molecules, it selects only those molecules that also contain an O.2 atom.
+
+---
+
+As you remember from the "Filtering Step 1" section, filtering in screenlamp concists of two steps:
+
+1. Creating an ID file of molecule names
+2. Selecting molecules from MOL2 files using the ID file from step 1
+
+We have already completed step 1 so that we can use the ID file we created to select the MOL2 structures from the MOL2 directory as follows:
 
 
 ```python
-!python ../../../../tools/id_to_mol2.py \
---input project/prefilter_1/selected-mol2s \
---output  project/prefilter_2/3keto-and-sulfur-mol2s \
---id_file project/prefilter_2/3keto-and-sulfur-mol2ids.txt \
---whitelist True
+! python tools/id_to_mol2.py \
+  --input tutorial-results/01_selected_mol2s/ \
+  --output tutorial-results/02_fgroup_presence_mol2s \
+  --id_file tutorial-results/02_fgroup_presence_mol2s.txt \
+  --whitelist True
 ```
 
-    Processing 1.mol2 | scanned 9829 molecules | 12209 mol/sec
-    Processing 2.mol2 | scanned 9799 molecules | 15392 mol/sec
-    Processing 3.mol2 | scanned 9848 molecules | 12854 mol/sec
-    Processing 4.mol2 | scanned 9835 molecules | 11223 mol/sec
-    Processing 5.mol2 | scanned 9832 molecules | 12398 mol/sec
-    Processing 6.mol2 | scanned 9841 molecules | 12885 mol/sec
-    Processing 7.mol2 | scanned 9841 molecules | 12163 mol/sec
+    Processing partition_1.mol2 | scanned 8628 molecules | 13872 mol/sec
+    Processing partition_2.mol2 | scanned 8501 molecules | 12075 mol/sec
+    Processing partition_3.mol2 | scanned 8537 molecules | 9794 mol/sec
+    Processing partition_4.mol2 | scanned 8476 molecules | 12817 mol/sec
+    Processing partition_5.mol2 | scanned 8535 molecules | 15391 mol/sec
+    Processing partition_6.mol2 | scanned 8518 molecules | 12703 mol/sec
+    Processing partition_7.mol2 | scanned 8555 molecules | 11566 mol/sec
     Finished
 
 
 
 ```python
-!python ../../../../tools/count_mol2.py \
---input project/prefilter_2/3keto-and-sulfur-mol2s
+! python tools/count_mol2.py \
+--input tutorial-results/02_fgroup_presence_mol2s
 ```
 
-    1.mol2 : 2768
-    2.mol2 : 2795
-    3.mol2 : 2746
-    4.mol2 : 2847
-    5.mol2 : 2723
-    6.mol2 : 2859
-    7.mol2 : 2815
-    Total : 19553
+    partition_1.mol2 : 2140
+    partition_2.mol2 : 2118
+    partition_3.mol2 : 2064
+    partition_4.mol2 : 2107
+    partition_5.mol2 : 2068
+    partition_6.mol2 : 2189
+    partition_7.mol2 : 2186
+    Total : 14872
 
 
-# Third Filtering Step -- Distance between functional groups
+As we can see, we only have 14,872 by applying the atom- and functional group based selection criteria. To summarize the steps so far, in "Filtering Step 1" we selected 59,750 (molecules that have fewer than 7 rotatable bonds and are heavier than 200 g/mol) out of 70,000 molecules. Then, in this section ("Filtering Step 2"), we selected 14,872 out of those 59,750, molecules that have at least 1 keto and 1 sp3 sulfur atom.
 
-- could be done after omega
+## Filtering Step 3 -- Distance between functional groups
+
+In this step, we will now select only those molecules that have a sp3 sulfur atom and a keto-group within a 13-20 angstrom distance:
+
+![](images/tools-tutorial-1/pipe-step-3.jpg)
+
+Technically, we could have skipped the section "Filtering Step 2" and directly proceeded with the distance-based atom selection described in this section. However, note that distance calculations are computationally more expensive than merely checking for the presence of certain atoms and functional groups. Thus, but separating those two tasks, we can filter out molecules that don't contain a keto and a sp3 sulfur atoms first.
+
+The selection string syntax is analagous to the `--selection` parameter described in the "Filtering Step 2" --  please re-visit this section if you need a refresher. However, it shall be noted that the distance selection only works for a pair of atoms. For example, the following string
+
+"((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')"
+
+checks the distance between an atom A, which is either an S.3 or an S.o2 atom, and an atom B, which is a O.2 atom. If you want to compute the distance between multiple atoms, for example, the distance of atom A to atoms B and C, you need to repeat the distance selection multiple times. For example, you would perform the distance selection between A and B first, and then, in a second iteration, you would perform the distance selection on the results of the first selection, to select molecules based on the distance between atom A and C.
+
+Now, let us execute the first step of a filtering step in screenlamp and create an ID file of molecules that have an sp3 sulfur and a O.2 atom within a 13-20 angstrom distance. 
 
 
 ```python
-!python ../../../../tools/funcgroup_distance_to_id.py \
---input project/prefilter_2/3keto-and-sulfur-mol2s \
---output project/prefilter_3/3keto-and-sulfur_distance-mol2ids.txt \
---selection "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')" \
---distance "13-20" \
---processes 0
+! python tools/funcgroup_distance_to_id.py \
+  --input tutorial-results/02_fgroup_presence_mol2s \
+  --output tutorial-results/03_fgroup_distance_mol2s.txt \
+  --selection "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')" \
+  --distance "13-20" \
+  --processes 0
 ```
 
     Using selection: ["((pdmol.df.atom_type == 'S.3') | (pdmol.df.atom_type == 'S.o2'))", "(pdmol.df.atom_type == 'O.2')"]
-    Processing 1.mol2 | 233 mol/sec
-    Processing 2.mol2 | 217 mol/sec
-    Processing 3.mol2 | 222 mol/sec
-    Processing 4.mol2 | 226 mol/sec
-    Processing 5.mol2 | 235 mol/sec
-    Processing 6.mol2 | 208 mol/sec
-    Processing 7.mol2 | 228 mol/sec
+    Processing partition_1.mol2 | 200 mol/sec
+    Processing partition_2.mol2 | 193 mol/sec
+    Processing partition_3.mol2 | 154 mol/sec
+    Processing partition_4.mol2 | 212 mol/sec
+    Processing partition_5.mol2 | 160 mol/sec
+    Processing partition_6.mol2 | 209 mol/sec
+    Processing partition_7.mol2 | 206 mol/sec
 
+
+Following the already familiar procedure, we can now select the MOL2 structures using the generated ID file:
 
 
 ```python
-!python ../../../../tools/id_to_mol2.py \
---input project/prefilter_2/3keto-and-sulfur-mol2s \
---output project/prefilter_3/3keto-and-sulfur_distance-mol2s \
---id_file project/prefilter_3/3keto-and-sulfur_distance-mol2ids.txt \
---whitelist True
+! python tools/id_to_mol2.py \
+  --input tutorial-results/02_fgroup_presence_mol2s \
+  --output tutorial-results/03_fgroup_distance_mol2s \
+  --id_file tutorial-results/03_fgroup_distance_mol2s.txt \
+  --whitelist True
 ```
 
-    Processing 1.mol2 | scanned 2768 molecules | 15635 mol/sec
-    Processing 2.mol2 | scanned 2795 molecules | 14949 mol/sec
-    Processing 3.mol2 | scanned 2746 molecules | 14531 mol/sec
-    Processing 4.mol2 | scanned 2847 molecules | 15620 mol/sec
-    Processing 5.mol2 | scanned 2723 molecules | 15973 mol/sec
-    Processing 6.mol2 | scanned 2859 molecules | 15512 mol/sec
-    Processing 7.mol2 | scanned 2815 molecules | 16004 mol/sec
+    Processing partition_1.mol2 | scanned 2140 molecules | 12000 mol/sec
+    Processing partition_2.mol2 | scanned 2118 molecules | 10976 mol/sec
+    Processing partition_3.mol2 | scanned 2064 molecules | 11510 mol/sec
+    Processing partition_4.mol2 | scanned 2107 molecules | 12223 mol/sec
+    Processing partition_5.mol2 | scanned 2068 molecules | 15665 mol/sec
+    Processing partition_6.mol2 | scanned 2189 molecules | 10884 mol/sec
+    Processing partition_7.mol2 | scanned 2186 molecules | 15554 mol/sec
     Finished
 
 
 
 ```python
-!python ../../../../tools/count_mol2.py \
---input project/prefilter_3/3keto-and-sulfur_distance-mol2s
+!python tools/count_mol2.py \
+--input tutorial-results/03_fgroup_distance_mol2s
 ```
 
-    1.mol2 : 35
-    2.mol2 : 32
-    3.mol2 : 38
-    4.mol2 : 40
-    5.mol2 : 32
-    6.mol2 : 32
-    7.mol2 : 37
-    Total : 246
+    partition_1.mol2 : 16
+    partition_2.mol2 : 16
+    partition_3.mol2 : 13
+    partition_4.mol2 : 15
+    partition_5.mol2 : 12
+    partition_6.mol2 : 20
+    partition_7.mol2 : 15
+    Total : 107
 
+
+After applying this filtering step, we can see that only 107 molecules out of the 14,872 from "Filtering Step 2" remain.
 
 # Generating Conformers via Omega
 
 
 ```python
-!python ../../../../tools/run_omega.py \
+! python ../../../../tools/run_omega.py \
 --input project/prefilter_3/3keto-and-sulfur_distance-mol2s \
 --output project/omega_confomers/ \
 --executable "/Applications/OMEGA 2.5.1.4.app/Contents/MacOS/omega2-2.5.1.4" \
