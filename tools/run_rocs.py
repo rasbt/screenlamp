@@ -10,7 +10,7 @@
 # Software author email: mail@sebastianraschka.com
 #
 # Software source repository: https://github.com/rasbt/screenlamp
-# Documenatation: https://psa-lab.github.io/screenlamp
+# Documentation: https://psa-lab.github.io/screenlamp
 #
 # screenlamp was developed in the
 # Protein Structural Analysis & Design Laboratory
