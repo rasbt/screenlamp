@@ -31,8 +31,8 @@ pages:
 - Installation: installation.md
 - User Documentation: 
   - Overview: user_guide/doc-overview.md
-  - Tools API: user_guide/tools.md
-  - Tools Tutorial: user_guide/tools-tutorial-1.md
+  - Toolkit API: user_guide/tools.md
+  - Toolkit Tutorial: user_guide/tools-tutorial-1.md
   - Pipeline Tutorial: user_guide/pipeline-tutorial-1.md
 - About:
   - Contact: contact.md

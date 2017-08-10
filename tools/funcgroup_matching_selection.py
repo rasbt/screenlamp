@@ -77,7 +77,7 @@ def main(input_dir, output_dir, atomtype_selection, charge_selection,
         if verbose:
             start = time.time()
             sys.stdout.write('Processing %s/%s' % (os.path.basename(a_in),
-                                                   os.path.basename(a_in)))
+                                                   os.path.basename(c_in)))
             sys.stdout.flush()
 
         df_charge = pd.read_table(c_in, sep='\t')
