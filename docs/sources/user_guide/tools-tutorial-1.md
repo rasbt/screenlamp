@@ -1416,17 +1416,26 @@ Essentially, the `sort_rocs_mol2.py` tool will create a pair of `*_query.mol2` a
   --query tk-tutorial_data/3kpzs_query.mol2 \
   --output tutorial-results/06_rocs_overlays_sorted \
   --sortby TanimotoCombo,ColorTanimoto \
-  --selection "(TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)"
+  --selection "(TanimotoCombo >= 0.75) & (ColorTanimoto >= 0.1)"\
+  --id_suffix True
 ```
 
-    Processing partition_1_hits_1.mol2 | scanned 12 molecules | 2087 mol/sec
-    Processing partition_2_hits_1.mol2 | scanned 14 molecules | 4453 mol/sec
-    Processing partition_3_hits_1.mol2 | scanned 11 molecules | 4344 mol/sec
-    Processing partition_4_hits_1.mol2 | scanned 13 molecules | 3959 mol/sec
-    Processing partition_5_hits_1.mol2 | scanned 11 molecules | 4680 mol/sec
-    Processing partition_6_hits_1.mol2 | scanned 19 molecules | 2931 mol/sec
-    Processing partition_7_hits_1.mol2 | scanned 13 molecules | 5610 mol/sec
+    Processing partition_1_hits_1.mol2 | scanned 12 molecules | 2039 mol/sec
+    Processing partition_2_hits_1.mol2 | scanned 14 molecules | 5392 mol/sec
+    Processing partition_3_hits_1.mol2 | scanned 11 molecules | 3583 mol/sec
+    Processing partition_4_hits_1.mol2 | scanned 13 molecules | 5349 mol/sec
+    Processing partition_5_hits_1.mol2 | scanned 11 molecules | 4619 mol/sec
+    Processing partition_6_hits_1.mol2 | scanned 19 molecules | 4531 mol/sec
+    Processing partition_7_hits_1.mol2 | scanned 13 molecules | 5286 mol/sec
 
+
+---
+
+**Note about the id_suffix parameter**
+
+Note that if `--id_suffix True`, a molecule ID suffix will be added to the query molecules in the order the ROCS query molecules appear in a multi-conformer query file. For instance, if all query molecules are labeled "3kPZS", then the same structures in the output file are labeled 3kPZS_1, 3kPZS_2, and so on. Note that those modified conformer will correspond to the conformer names in the ROCS report tables. However, they may appear in an unsorted order in the _query files, which are sorted by the overlay score of the database molecules. For example, if the database molecule is called ZINC123_112, first entry in the _query file that corresponds to *_dbase file may by labeled 3kPZS_11 if the 11th 3kPZS conformer is the best match according to ROCS.
+
+---
 
 After using the `sort_rocs_mol2.py` utility script, we have a new directory that contains pairs of `*_dbase.mol2` and `*_query.mol2` conformers from the ROCS overlays:
 
@@ -1455,32 +1464,136 @@ After using the `sort_rocs_mol2.py` utility script, we have a new directory that
 
 ## Step 7 -- Matching Functional Groups
 
+Now that we have generate the multi-mol2 file pairs of the pair-wise overlays ('\*_query.mol2', and '\*_dbase.mol2') in "Step 6 -- Sorting Molecular Overlays," we can proceed with the tabulation of functional group matches:
+
 ![](images/tools-tutorial-1/pipe-step-7.jpg)
 
-will need suffixes:
+---
 
-- _dbase.mol2 / _dbase.mol2.gz and 
-- _query.mol2 / _query.mol2.gz and 
+**Note about file suffixes**
+
+If you created molecular overlays using a different protocol than the one described in this tutorial please make sure that the file layout and the naming convention match the ones described in "Step 6 -- Sorting Molecular Overlays." In particular, it is important that the database molecule MOL2 files have the following file endings:
+
+- _dbase.mol2 / _dbase.mol2.gz 
+
+and the query molecules should end in 
+
+- _query.mol2 / _query.mol2.gz 
+
+Everything in front of the underscore character can be arbitrary but must also be consistent between "query" and "dbase" pairs, as shown in "Step 6 -- Sorting Molecular Overlays" and in the file listing below:
+
+---
 
 
 ```python
-!python ../../../../tools/funcgroup_matching.py \
---input project/rocs_overlays_sorted \
---output project/funcgroup_matching_results \
---max_distance 1.3 \
---processes 0
+! ls -1 tutorial-results/06_rocs_overlays_sorted/
 ```
 
-    Processing 1_hits_1_dbase.mol2/1_hits_1_query.mol2 | scanned 36 molecules | 33 mol/sec
-    Processing 2_hits_1_dbase.mol2/2_hits_1_query.mol2 | scanned 33 molecules | 38 mol/sec
-    Processing 3_hits_1_dbase.mol2/3_hits_1_query.mol2 | scanned 39 molecules | 41 mol/sec
-    Processing 4_hits_1_dbase.mol2/4_hits_1_query.mol2 | scanned 41 molecules | 38 mol/sec
-    Processing 5_hits_1_dbase.mol2/5_hits_1_query.mol2 | scanned 33 molecules | 34 mol/sec
-    Processing 6_hits_1_dbase.mol2/6_hits_1_query.mol2 | scanned 33 molecules | 31 mol/sec
-    Processing 7_hits_1_dbase.mol2/7_hits_1_query.mol2 | scanned 38 molecules | 32 mol/sec
+    partition_1_hits_1_dbase.mol2
+    partition_1_hits_1_query.mol2
+    partition_2_hits_1_dbase.mol2
+    partition_2_hits_1_query.mol2
+    partition_3_hits_1_dbase.mol2
+    partition_3_hits_1_query.mol2
+    partition_4_hits_1_dbase.mol2
+    partition_4_hits_1_query.mol2
+    partition_5_hits_1_dbase.mol2
+    partition_5_hits_1_query.mol2
+    partition_6_hits_1_dbase.mol2
+    partition_6_hits_1_query.mol2
+    partition_7_hits_1_dbase.mol2
+    partition_7_hits_1_query.mol2
 
+
+For the functional group matching, we recommend using a threshold of 1.3 angstrom or less, since 1.5 angstrom constitutes the typical length of an atomic bond.
+
+
+```python
+! python tools/funcgroup_matching.py \
+  --input tutorial-results/06_rocs_overlays_sorted \
+  --output tutorial-results/07_funcgroup_matching \
+  --max_distance 1.3 \
+  --processes 0
+```
+
+    Processing partition_1_hits_1_dbase.mol2/partition_1_hits_1_query.mol2 | scanned 12 molecules | 21 mol/sec
+    Processing partition_2_hits_1_dbase.mol2/partition_2_hits_1_query.mol2 | scanned 14 molecules | 21 mol/sec
+    Processing partition_3_hits_1_dbase.mol2/partition_3_hits_1_query.mol2 | scanned 11 molecules | 20 mol/sec
+    Processing partition_4_hits_1_dbase.mol2/partition_4_hits_1_query.mol2 | scanned 13 molecules | 23 mol/sec
+    Processing partition_5_hits_1_dbase.mol2/partition_5_hits_1_query.mol2 | scanned 11 molecules | 20 mol/sec
+    Processing partition_6_hits_1_dbase.mol2/partition_6_hits_1_query.mol2 | scanned 19 molecules | 22 mol/sec
+    Processing partition_7_hits_1_dbase.mol2/partition_7_hits_1_query.mol2 | scanned 13 molecules | 23 mol/sec
+
+
+The functional group matching results are collected in tabular form as regular text (.tsv) files with tab-separated columns. 
+
+
+```python
+! ls -1 tutorial-results/07_funcgroup_matching
+```
+
+    partition_1_hits_1_atomtype.tsv
+    partition_1_hits_1_charge.tsv
+    partition_2_hits_1_atomtype.tsv
+    partition_2_hits_1_charge.tsv
+    partition_3_hits_1_atomtype.tsv
+    partition_3_hits_1_charge.tsv
+    partition_4_hits_1_atomtype.tsv
+    partition_4_hits_1_charge.tsv
+    partition_5_hits_1_atomtype.tsv
+    partition_5_hits_1_charge.tsv
+    partition_6_hits_1_atomtype.tsv
+    partition_6_hits_1_charge.tsv
+    partition_7_hits_1_atomtype.tsv
+    partition_7_hits_1_charge.tsv
+
+
+As we can see from the file listing above, the functional group matching tool generated two tables for each partition. For instance, the functional group matching tables that correspond to partition_1 are
+
+- partition_1_hits_1_atomtype.tsv
+- partition_1_hits_1_charge.tsv
+
+Below is an example of how a subsection of partition_1_hits_1_atomtype.tsv would look like if we would open it in a spreadsheet viewer (for example, LibreOffice Calc) for the purpose of illustration:
+
+![](images/tools-tutorial-1/atomtype-match-ex-1.png)
+
+Note that the table screenshot above only shows the first 6 columns of the file. 
+
+- The first column, dbase, refers to the database molecule's name
+- The second column lists the corresponding reference molecule.
+- The column headers after the second column correspond to the atom names of the reference (or query) molecule.
+
+For instance, the first cell below the column header C1, which contains the entry "O.2" (shown in the annotated screenshot below)
+
+![](images/tools-tutorial-1/atomtype-match-ex-2.png)
+
+lists the MOL2 atom type of the atom in the database molecule ZINC90224566_8 that overlays (or "matches") with the C1 atom in 3KPZS_22. Similarly, we can see that no atom in ZINC90224566_8 matches the C2 atom of 3KPZS_22, and an S.o2 atom matches the C3 atom of 3KPZS_22. 
+
+To illustrate how to read this table more visually, we can open the corresponding MOL2 files for partition_1 in PyMOL:
+
+![](images/tools-tutorial-1/pymol-overlay-ex-2.png)
+
+Shown below is a screenshot of a PyMOL session showing the 3D structure overaly of ZINC90224566_8 and 3KPZS_22. The red arrows highlight the three columns that were discussed in the previous paragraph (ZINC90224566_8 is shown in green and 3KPZS_22 is shown in cyan):
+
+![](images/tools-tutorial-1/pymol-overlay-ex-1.png)
+
+In addition to the atom type matching table, the functional group matching tool also outputs a second table for each partition analyzed. The format of this second table is identical to the atom type matching table except that its cells contain the partial charge information of the matching atom:
+
+![](images/tools-tutorial-1/charge-match-ex-1.png)
+
+Note that the cells containing "nan" (which stands for "not a number") correspond to the empty cells in the atom type matching table we saw previously. Or in other words, "nan" cells indicate that no atom in the database molecule is matching a particular atom in the query molecule.
+
+
+In the next step, "Step 8 -- Selecting Functional Group Matches," we will select database molecules of interest by specific functional group matching patterns or criteria.
 
 ## Step 8 -- Selecting Functional Group Matches
+
+
+```python
+
+```
+
+![](images/tools-tutorial-1/pipe-step-8.jpg)
 
 # TODO
 

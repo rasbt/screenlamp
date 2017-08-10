@@ -610,6 +610,22 @@ and a TanimotoCombo score smaller than 1.0 will be disregarded.
 in the input table.
 Assumes tab-separated values by default.
 - `--id_suffix ID_SUFFIX`  
+(Optional, default: `"False"`.)
+If `--id_suffix "True"`, a molecule ID suffix
+will be added to the query
+molecules in the order the ROCS query molecules
+appear in a multi-conformer query file.
+For instance, if all query molecules are labeled "3kPZS",
+then the same structures in the output file are labeled
+3kPZS_1, 3kPZS_2, ... Note that those modified conformer
+will correspond to the conformer names in the ROCS report
+tables. However, they may appear in an unsorted order in
+the _query files, which are sorted by the overlay score
+of the database molecules. For example, if the
+database molecule is called ZINC123_112, first
+entry in the _query file that corresponds to *_dbase
+file may by labeled 3kPZS_11 if the 11th 3kPZS conformer
+is the best match according to ROCS.
 - `-v VERBOSE, --verbose VERBOSE`  
 Verbosity level. If 0, does not print any output.
 If 1 (default), prints the file currently

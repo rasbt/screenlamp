@@ -217,7 +217,22 @@ python sort_rocs_mol2.py -i rocs_results/\\
     parser.add_argument('--id_suffix',
                         type=str,
                         default='False',
-                        help='')
+                        help='(Optional, default: `"False"`.)'
+                             '\nIf `--id_suffix "True"`, a molecule ID suffix'
+                             '\nwill be added to the query'
+                             '\nmolecules in the order the ROCS query molecules'
+                             '\nappear in a multi-conformer query file.'
+                             '\nFor instance, if all query molecules are labeled "3kPZS",'
+                             '\nthen the same structures in the output file are labeled'
+                             '\n3kPZS_1, 3kPZS_2, ... Note that those modified conformer'
+                             '\nwill correspond to the conformer names in the ROCS report'
+                             '\ntables. However, they may appear in an unsorted order in'
+                             '\nthe _query files, which are sorted by the overlay score'
+                             '\nof the database molecules. For example, if the'
+                             '\ndatabase molecule is called ZINC123_112, first'
+                             '\nentry in the _query file that corresponds to *_dbase'
+                             '\nfile may by labeled 3kPZS_11 if the 11th 3kPZS conformer'
+                             '\nis the best match according to ROCS.')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
@@ -239,6 +254,16 @@ python sort_rocs_mol2.py -i rocs_results/\\
                          args.id_suffix)
 
     sortby = [s.strip() for s in args.sortby.split(',')]
+
+    for s in args.selection.split(' '):
+        if s.startswith('(') and s[1:] not in args.sortby:
+            raise ValueError('Selection columns are a subset of'
+                             ' the --sortby columns. The column %s'
+                             ' is currently not contained in the'
+                             ' --sortby argument. Please add it '
+                             'there to use this column as a '
+                             'selection criterion.' % (s[1:]))
+
     main(input_dir=args.input, output_dir=args.output, query_path=args.query,
          sortby=sortby,
          verbose=args.verbose,

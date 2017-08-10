@@ -134,7 +134,8 @@ python run_rocs.py\\
    --output rocs_overlays/\\
    --executable /.../rocs-3.2.1.4\\
    --query query.mol2\\
-   --settings "-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent --processes 0" """,
+   --settings "-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent"\\
+   --processes 0""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
@@ -170,7 +171,8 @@ OpenEye ROCS on your system.""")
                         type=str,
                         default='-rankby TanimotoCombo -maxhits 0'
                                 ' -besthits 0 -progress percent',
-                        help='(Optional.) ROCS settings to use.')
+                        help='(Optional, default:" -rankby TanimotoCombo -maxhits 0'
+                             ' -besthits 0 -progress percent")\n ROCS settings to use.')
     parser.add_argument('--processes',
                         type=int,
                         default=1,
