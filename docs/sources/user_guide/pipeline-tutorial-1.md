@@ -4,7 +4,7 @@
 
 This tutorial explains how to use a pre-built screenlamp pipeline to perform an automated virtual screening on a small example dataset.
 
-In this particular screening pipeline, we are searching for mimics of a query molecule that contain a keto-group and sulfur atom in a specified distance to each other (13-20 angstroms) and have a high overall chemical and volumetric similarity towards the query. Then, we are selecting a subset of database molecules where the keto-group of the query molecule overlays with a keto-group in the database molecules, and where the sulfur atom in the query overlays with a sulfur atom in the database molecules. The overall virtual screening pipeline is summarized in the flowchart below. For more details on the individual screening steps, please see the [Toolkit Tutorial](./example_1), which walks you through these steps using the same database and approach.
+In this particular screening pipeline, we are searching for mimics of a query molecule that contain a keto-group and sulfur atom in a specified distance to each other (13-20 angstroms) and have a high overall chemical and volumetric similarity towards the query. Then, we are selecting a subset of database molecules where the keto-group of the query molecule overlays with a keto-group in the database molecules, and where the sulfur atom in the query overlays with a sulfur atom in the database molecules. The overall virtual screening pipeline is summarized in the flowchart below. For more details on the individual screening steps, please see the [Toolkit Tutorial](./tools-tutorial-1), which walks you through these steps using the same database and approach.
 
 ![](../images/automated-pipeline-flowchart.jpg)
 
@@ -12,7 +12,7 @@ In this particular screening pipeline, we are searching for mimics of a query mo
 
 ### Requirements
 
-Before you continue with tutorial, please see the [setup instructions](../installation/index.html#other-software-requirements) for screenlamp if this is your first screening run.
+Before you continue with the tutorial, please see the [setup instructions](../installation/index.html#other-software-requirements) for screenlamp if this is your first screening run.
 
 
 ## Obtaining and Preparing the Dataset
@@ -20,26 +20,26 @@ Before you continue with tutorial, please see the [setup instructions](../instal
 
 ### MOL2 Input Files
 
-The automated screenlamp pipeline that is being used in this tutorial is compatible with Tripos MOL2 files of arbitrary database origin and size. A typical use case for this pipeline would be the screening of all ~18,000,000 *Drug-Like* molecules from [ZINC](http://zinc.docking.org), which is available in MOL2 format on ZINC [here](http://zinc.docking.org/subsets/drug-like). Please note that screenlamp supports both Tripos MOL2 (`*.mol2`) files and gzipped Tripos MOL2 files (`*.mol2.gz`) out of the box. Thus, if your input dataset is in gzipped format, you can use it right away without having to make any adjustments or decompressing it. However, please not that the decompressing and compressing operations that are performed when working with gzipped files have an additional toll on computational performance.
+The automated screenlamp pipeline that is being used in this tutorial is compatible with Tripos MOL2 files of arbitrary database origin and size. A typical use case for this pipeline would be the screening of all ~18,000,000 *Drug-Like* molecules from [ZINC](http://zinc.docking.org), which is available in MOL2 format on ZINC [here](http://zinc.docking.org/subsets/drug-like). Please note that screenlamp supports both Tripos MOL2 (`*.mol2`) files and gzipped Tripos MOL2 files (`*.mol2.gz`) out of the box. Thus, if your input dataset is in gzipped format, you can use it right away without having to make any adjustments or decompressing it. However, please note that the decompressing and compressing operations that are performed when working with gzipped files have an additional toll on computational performance.
 
-**Please keep in mind that this screening pipeline with 18,000,000 input molecules and the pre-configured settings takes about a day to complete on a multi-core desktop computer**. Thus, it is recommended to work through this tutorial using a smaller dataset. With kind permission from John Irwin and the ZINC team, we recommend using a random subset of 70,000 small molecules that we prepared for this tutorial. It takes approximately 10 minutes for a multi-core Desktop computer to execute all steps in the automated, virtual screening pipeline described earlier. This subset from ZINC is split into 7 multi-MOL2 file with 10,000 molecules each: `partition_mol2_1.mol2` to `partition_mol2_7.mol2`. 
+**Please keep in mind that this screening pipeline with 18,000,000 input molecules and the preconfigured settings takes about a day to complete on a multi-core desktop computer**. Thus, it is recommended to work through this tutorial using a smaller dataset. With kind permission from John Irwin and the ZINC team, we recommend using a random subset of 70,000 small molecules that we prepared for this tutorial. It takes approximately 10 minutes for a multi-core Desktop computer to execute all steps in the automated, virtual screening pipeline described earlier. This subset from ZINC is split into 7 multi-MOL2 file with 10,000 molecules each: `partition_mol2_1.mol2` to `partition_mol2_7.mol2`. 
 
 For this tutorial, please download the dataset by clicking the following link and unzip it on your machine that you are using for the virtual screening run: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/partition_1-7.zip](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/partition_1-7.zip)
 
-### Datatable for Prefiltering
+### data table for Prefiltering
 
-For this particular tutorial you'll also need a datatable containing general information about these molecules. Although the partitions you downloaded above are only a small, modified subset of [ZINC](http://zinc.docking.org) molecules, we are going to use the full ~18,000,000 molecule Drug-like table available for download at [http://zinc.docking.org/subsets/drug-like](http://zinc.docking.org/subsets/drug-like). To download the tab-separated table, click on the [Properties](http://zinc.docking.org/db/bysubset/3/3_prop.xls) link on the [ZINC Drug-like](http://zinc.docking.org/subsets/drug-like) page. Please note that the size of the datatable is about ~1.8 Gb, and thus, the download may take a while depending on your internet connection. Alternatively, a smaller datatable containing only ~170,000 molecules, please use the following link: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt)
+For this particular tutorial, you'll also need a data table containing general information about these molecules. Although the partitions you downloaded above are only a small, modified subset of [ZINC](http://zinc.docking.org) molecules, we are going to use the full ~18,000,000 molecule Drug-like table available for download at [http://zinc.docking.org/subsets/drug-like](http://zinc.docking.org/subsets/drug-like). To download the tab-separated table, click on the [Properties](http://zinc.docking.org/db/bysubset/3/3_prop.xls) link on the [ZINC Drug-like](http://zinc.docking.org/subsets/drug-like) page. Please note that the size of the data table is about ~1.8 Gb, and thus, the download may take a while depending on your internet connection. Alternatively, a smaller data table containing only ~170,000 molecules, please use the following link: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt)
 
 
 ### Query Molecule
 
-The third datafile you'll need for ligand-based virtual screening is the query molecule. For this tutorial, please download the following multi-conformer MOL2 file: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2)
+The third data file you'll need for ligand-based virtual screening is the query molecule. For this tutorial, please download the following multi-conformer MOL2 file: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2)
 
 ## Editing the Configuration File
 
-Once you obtained the database molecules (mol2 partitions), the datatable of molecular properties, and the query molecule, you can prepare the configuration file that stores the information about your local file paths and screening settings.
+Once you obtained the database molecules (mol2 partitions), the data table of molecular properties, and the query molecule, you can prepare the configuration file that stores the information about your local file paths and screening settings.
 
-As your configuration file template, you can use the following YAML file the [`screenlamp/tools/pipelines/pipeline-example-1-config.yaml`](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1-config.yaml), create a local copy of it, and modify the file paths according to your system's configuration.
+As your configuration file template, you can use the following YAML file the [`screenlamp/tools/pipelines/pipeline-example-1-config.yaml`](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1-config.yaml), create a local copy of it and modify the file paths according to your system's configuration.
 
 ## Running the Automated Screening Pipeline
 

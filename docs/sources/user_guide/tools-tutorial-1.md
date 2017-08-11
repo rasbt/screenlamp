@@ -1,10 +1,10 @@
 # Screenlamp Toolkit Tutorial
 
-This tutorial explains how the individual screenlamp tools (located in the `screenlamp/tools` subdirectory) work in the context of a small virtual screening example. 
+This tutorial explains how the individual screenlamp tools (located in the [screenlamp/tools](https://github.com/rasbt/screenlamp/tree/master/tools) subdirectory) work in the context of a small virtual screening example. 
 
-The dataset and workflow we are going to use is simililar to the [Pipeline Tutorial](pipeline-tutorial-1/index.html), which uses a preconstructed, automated virtual pipeline based using the tools explained in this tutorial. While the [Pipeline Tutorial](pipeline-tutorial-1/index.html) provides a high level overview and a more convenient, preconstructred pipeline, this tool aims to explain the building blocks behind it so that users can understand and learn how to construct their own pipelines and/or modify the existing pipeline presented in the [Pipeline Tutorial](pipeline-tutorial-1/index.html).
+The workflow we are going to use is similar to the [Pipeline Tutorial](pipeline-tutorial-1), which uses a pre-constructed, automated virtual pipeline based using the tools explained in this tutorial. While the [Pipeline Tutorial](pipeline-tutorial-1) provides a high-level overview and a more convenient, pre-constructed pipeline, this tool aims to explain the building blocks behind it so that users can understand and learn how to construct their own pipelines and/or modify the existing pipeline presented in the [Pipeline Tutorial](pipeline-tutorial-1).
 
-To explain the main steps in a typical filtering pipeline using screenlamp, this tutorial will work through the following individual steps performed by the pipeline in the [Pipeline Tutorial](pipeline-tutorial-1/index.html) incrementally:
+To explain the main steps in a typical filtering pipeline using screenlamp, this tutorial will work through the following individual steps performed by the pipeline in the [Pipeline Tutorial](pipeline-tutorial-1) incrementally:
 
 ![](images/tools-tutorial-1/pipeline-overview.jpg)
 
@@ -16,9 +16,9 @@ To explain the main steps in a typical filtering pipeline using screenlamp, this
 
 ### MOL2 Input Files
 
-The tools presented in this tutorial can work with MOL2 files of arbitrary size. However, to minimize the computation time for the purposes of illustration, we are only going to use a small subset of molecules.
+The tools presented in this tutorial are compatible with MOL2 files of arbitrary size. However, to minimize the computation time for illustration throughout this tutorial, we are only going to use a small subset of molecules.
 
-A typical use case for these would be the screening of all ~18,000,000 *Drug-Like* molecules from [ZINC](http://zinc.docking.org), which is available in MOL2 format on ZINC [here](http://zinc.docking.org/subsets/drug-like). Please note that screenlamp supports both Tripos MOL2 (`*.mol2`) files and gzipped Tripos MOL2 files (`*.mol2.gz`) out of the box. Thus, if your input dataset is in gzipped format, you can use it right away without having to make any adjustments or decompressing it. However, please not that the decompressing and compressing operations that are performed when working with gzipped files have an additional toll on computational performance.
+A typical use case for these would be the screening of all ~18,000,000 *Drug-Like* molecules from [ZINC](http://zinc.docking.org), which is available in MOL2 format on ZINC [here](http://zinc.docking.org/subsets/drug-like). Please note that screenlamp supports both Tripos MOL2 (`*.mol2`) files and gzipped Tripos MOL2 files (`*.mol2.gz`) out of the box. Thus, if your input dataset is in gzipped format, you can use it right away without having to make any adjustments or decompressing it. However, please note that the decompressing and compressing operations that are performed when working with gzipped files have an additional toll on computational performance.
 
 With kind permission from John Irwin and the ZINC team, we are using a random subset of 70,000 small molecules that we prepared for this tutorial. This subset from ZINC is split into 7 multi-MOL2 file with 10,000 molecules each: `partition_mol2_1.mol2` to `partition_mol2_7.mol2`. 
 
@@ -27,28 +27,14 @@ For this tutorial, please download the dataset by clicking the following link an
 
 ### Datatable for Prefiltering
 
-For this particular tutorial you'll also need a datatable containing general information about these molecules. Although the partitions you downloaded above are only a small, modified subset of [ZINC](http://zinc.docking.org) molecules, we are going to use the full ~18,000,000 molecule Drug-like table available for download at [http://zinc.docking.org/subsets/drug-like](http://zinc.docking.org/subsets/drug-like). To download the tab-separated table, click on the [Properties](http://zinc.docking.org/db/bysubset/3/3_prop.xls) link on the [ZINC Drug-like](http://zinc.docking.org/subsets/drug-like) page. Please note that the size of the datatable is about ~1.8 Gb, and thus, the download may take a while depending on your internet connection. Alternatively, we recommend using a smaller datatable containing only ~170,000 molecules; to download this table, please use the following link: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt)
+For this particular tutorial, you'll also need a data table containing general information about these molecules. Although the partitions you downloaded above are only a small, modified subset of the [ZINC](http://zinc.docking.org) drug-like molecules, we could use the full ~18,000,000 molecule Drug-like table available for download at [http://zinc.docking.org/subsets/drug-like](http://zinc.docking.org/subsets/drug-like). To download the tab-separated table, click the [Properties](http://zinc.docking.org/db/bysubset/3/3_prop.xls) link on the [ZINC Drug-like](http://zinc.docking.org/subsets/drug-like) page. 
+
+However, Please note that the size of the data table is about ~1.8 Gb, and thus, the download may take a while depending on your internet connection. Alternatively, we recommend using a smaller data table containing only ~170,000 molecules; to download this table, please use the following link: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt)
 
 
 ### Query Molecule
 
-The third datafile you'll need for ligand-based virtual screening is the query molecule. For this tutorial, please download the following multi-conformer MOL2 file: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2)
-
-## Data storage and project layout
-
-After downloading the files described in the previous subsection, create a new directory called `tk-tutorial_data` to store these files. The contents of this `tk-tutorial_data` directory should be as follows:
-
-![](../images/toolkit-tutorial/dataset-overview.png)
-
-Next, we are going to create a new directory, `tutorial-results`, to store the results we are going to generate in this tutorial. Note that throughout this tutorial, the `!` command denotes a new command line terminal prompt (e.g., bash shell):
-
-
-```python
-! mkdir tutorial-results
-```
-
-    mkdir: tutorial-results: File exists
-
+The third data file you'll need for ligand-based virtual screening is the query molecule. For this tutorial, please download the following multi-conformer MOL2 file: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2)
 
 ---
 
@@ -58,7 +44,22 @@ All code in this tutorial is executed using a Python 3.6 interpreter. The code h
 
 ---
 
-Note that this tutorial assumes that the screenlamp tools are available from a directory `'tools'`, but you can store them wherever you want.
+## Data storage and project layout
+
+After downloading the files described in the previous subsection, create a new directory called `tk-tutorial_data` to store these files. Before you continue with the tutorial, please make sure that the `tk-tutorial_data` directory contains the following files and adheres to the following directory structure:
+
+![](../images/toolkit-tutorial/dataset-overview.png)
+
+Next, we are going to create a new directory, `tutorial-results`, to store the results we are going to generate in this tutorial:
+
+
+```python
+! mkdir tutorial-results
+```
+
+<div class="alert alert-block alert-info"> &#9888; Throughout this tutorial, the '!' command denotes a new command line terminal prompt (for example, bash shell).</div>
+
+<div class="alert alert-block alert-info"> &#9888; This tutorial assumes that the screenlamp tools are available from a directory called 'tools', but you can store the screenlamp tools in any directory you like as long as you replace 'tools' with the correct path to this directory.</div>
 
 Before we start exploring the tools contained in screenlamp's `tools` folder, let's start with a simple script that we are going to use throughout this tutorial to count the number of structures in a mol2 file or directory containing mol2 files: 
 
@@ -79,13 +80,17 @@ Using the `count_mol2.py` script, we can now count the number of structures in e
     Total : 70000
 
 
-As we can see, each of the 7 partitions in our dataset contains 10,000 molecules, that is, 70,000 structures in total.
+As we can see, each of the 7 partitions in our dataset contains 10,000 molecules; we will be working with 70,000 structures in total.
 
 ## General Blacklist & Whitelist filtering
 
 ### Generating ID files from molecules
 
-First, we are going to generate an ID file of all structures in the mol2 files of the 7 partitions. In the context of this tutorial, an "ID file" is a plaintext file that contains the molecule identifiers fetched from the mol2 files. 
+First, we are going to generate an ID file of all structures in the mol2 files of the 7 partitions. 
+
+<div class="alert alert-block alert-info">
+In the context of this tutorial, an "ID file" is a plaintext file that contains the molecule identifiers fetched from the mol2 files.
+</div>
 
 We can create such an ID file using the `mol2_to_id.py` script as shown below:
 
@@ -1679,11 +1684,6 @@ Essentially, this pipeline provides a more convenient way to interact with scree
 
 (You may use this pipeline as a template and modify it if you like to add additional steps or like to remove certain steps).
 
-By default, this pipeline uses the selection parameters used in this tutorial via the corresponding configuration file ([/tools/pipelines/pipeline-example-1-config.yaml](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1-config.yaml)). Since the reference molecule in your own project is likely a different one than the one we used in this tutorial, the configuration file offers a user-friendly way to tailor the analysis to your needs. 
+By default, this pipeline uses the selection parameters used in this tutorial via the corresponding configuration file ([tools/pipelines/pipeline-example-1-config.yaml](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1-config.yaml)). Since the reference molecule in your own project is likely a different one than the one we used in this tutorial, the configuration file offers a user-friendly way to tailor the analysis to your needs. 
 
 For more information about this pipeline, please also see the more detailed ["Tutorial on Using a Pre-constructed Screenlamp Pipeline"](pipeline-tutorial-1).
-
-
-```python
-
-```
