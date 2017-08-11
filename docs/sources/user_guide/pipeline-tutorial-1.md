@@ -1,4 +1,4 @@
-# Automated Pipeline Tutorial
+# Tutorial on Using a Pre-constructed Screenlamp Pipeline
 
 ## Overview
 

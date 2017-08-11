@@ -8,6 +8,9 @@ To explain the main steps in a typical filtering pipeline using screenlamp, this
 
 ![](images/tools-tutorial-1/pipeline-overview.jpg)
 
+
+(A higher-resolution PDF version of this flowchart is available [here](https://github.com/rasbt/screenlamp/blob/master/docs/sources/images/automated-pipeline-flowchart.pdf).)
+
 ## Obtaining and Preparing the Dataset
 
 
@@ -464,7 +467,7 @@ We have already completed step 1 so that we can use the ID file we created to se
 
 As we can see, we only have 14,872 by applying the atom- and functional group based selection criteria. To summarize the steps so far, in "Filtering Step 1" we selected 59,750 (molecules that have fewer than 7 rotatable bonds and are heavier than 200 g/mol) out of 70,000 molecules. Then, in this section ("Filtering Step 2"), we selected 14,872 out of those 59,750, molecules that have at least 1 keto and 1 sp3 sulfur atom.
 
-## Filtering Step 3 -- Distance between Functional Groups
+## Step 3 -- Filtering by Distance between Functional Groups
 
 In this step, we will now select only those molecules that have a sp3 sulfur atom and a keto-group within a 13-20 angstrom distance:
 
@@ -1588,14 +1591,97 @@ In the next step, "Step 8 -- Selecting Functional Group Matches," we will select
 
 ## Step 8 -- Selecting Functional Group Matches
 
-
-```python
-
-```
+In this section, we are going to use the functional group matching tables we created in step 7. 
 
 ![](images/tools-tutorial-1/pipe-step-8.jpg)
 
-# TODO
+The `funcgroup_matching_selection.py` tool operates on the functional group matching tables that we created in the previous section, "Step 7 -- Matching Functional Groups." To select molecules of interest, we can define two selection strings:
+
+1. `--atomtype_selection`, which operates on the MOL2 atom types stored in the \*_atomtype.tsv files  
+2. `--charge_selection`, which operates on the partial charges stored in the \*_charge.tsv files
+
+The selection strings work similar to the selection strings that were explained in Filtering "Step 2 -- Presence and Absence of Functional Groups." In the following example, we are going to select those molecules that
+
+1. Have a sp3 sulfur match with the S1 atom in the reference molecule; the matched atom has to be positively charged
+2. An sp2 oxygen match with the O2 atom in the reference molecule; the matched atom has to have a charge
+
+For reference, these atoms or functional groups are highlighted in the 3kPZS reference molecule shown in the screenshot below:
+
+![](images/tools-tutorial-1/3kpzs-keto-sulfur.png)
+
+Using the selection criteria discussed above, that is, selecting molecules that match the 3-keto and the sulfate-group sulfur in 3kPZS, we use `tools/funcgroup_matching_selection.py` as shown below:
+
+
+```python
+! python tools/funcgroup_matching_selection.py \
+  --input tutorial-results/07_funcgroup_matching \
+  --output tutorial-results/08_funcgroup_selection \
+  --atomtype_selection "((S1 == 'S.3') | (S1 == 'S.o2')) --> (O2 == 'O.2')" \
+  --charge_selection "((S1 >= 1.0)) --> (O2 <= -0.5)"
+```
+
+    Processing partition_1_hits_1_atomtype.tsv/partition_1_hits_1_charge.tsv | scanned 11 molecules | 140 mol/sec
+    Processing partition_2_hits_1_atomtype.tsv/partition_2_hits_1_charge.tsv | scanned 13 molecules | 407 mol/sec
+    Processing partition_3_hits_1_atomtype.tsv/partition_3_hits_1_charge.tsv | scanned 10 molecules | 354 mol/sec
+    Processing partition_4_hits_1_atomtype.tsv/partition_4_hits_1_charge.tsv | scanned 12 molecules | 379 mol/sec
+    Processing partition_5_hits_1_atomtype.tsv/partition_5_hits_1_charge.tsv | scanned 10 molecules | 361 mol/sec
+    Processing partition_6_hits_1_atomtype.tsv/partition_6_hits_1_charge.tsv | scanned 18 molecules | 577 mol/sec
+    Processing partition_7_hits_1_atomtype.tsv/partition_7_hits_1_charge.tsv | scanned 12 molecules | 411 mol/sec
+
+
+The output of this command will generate new \*_atomtype.tsv and \*_charge.tsv tables that only contain the matching molecules. However, it is often useful to collect the corresponding structures in MOL2 files, in sorted order, for inspection. To generate those MOL2 files, that contain the structures corresponding to the output tables, we can provide the overlays from "Step 6 -- Sorting Molecular Overlays" (06_rocs_overlays_sorted) as an argument to the `--input_mol2` parameters:
+
+
+```python
+! python tools/funcgroup_matching_selection.py \
+  --input tutorial-results/07_funcgroup_matching \
+  --input_mol2 tutorial-results/06_rocs_overlays_sorted \
+  --output tutorial-results/08_funcgroup_selection \
+  --atomtype_selection "((S1 == 'S.3') | (S1 == 'S.o2')) --> (O2 == 'O.2')" \
+  --charge_selection "((S1 >= 1.0)) --> (O2 <= -0.5)"
+```
+
+    Processing partition_1_hits_1_atomtype.tsv/partition_1_hits_1_charge.tsv | scanned 11 molecules | 96 mol/sec
+    Processing partition_2_hits_1_atomtype.tsv/partition_2_hits_1_charge.tsv | scanned 13 molecules | 333 mol/sec
+    Processing partition_3_hits_1_atomtype.tsv/partition_3_hits_1_charge.tsv | scanned 10 molecules | 228 mol/sec
+    Processing partition_4_hits_1_atomtype.tsv/partition_4_hits_1_charge.tsv | scanned 12 molecules | 234 mol/sec
+    Processing partition_5_hits_1_atomtype.tsv/partition_5_hits_1_charge.tsv | scanned 10 molecules | 253 mol/sec
+    Processing partition_6_hits_1_atomtype.tsv/partition_6_hits_1_charge.tsv | scanned 18 molecules | 457 mol/sec
+    Processing partition_7_hits_1_atomtype.tsv/partition_7_hits_1_charge.tsv | scanned 12 molecules | 275 mol/sec
+
+
+Now, let's have a look at one of the overlayed database molecule-reference molecule pairs from the functional group match selection:
+
+![](images/tools-tutorial-1/open-fgroup-match-overlays.png)
+
+For the purpose of illustration, the numbers 0.6 and 0.9 correspond to the distance between the matched oxygen and sulfur atoms, respectively:
+
+![](images/tools-tutorial-1/fgroup-match-overlays-pymol.png)
+
+## Conclusion
+
+While this tutorial provides a brief hands-on explantion of the different tools within screenlamp, and how to use them in concert, a real-world application would typically include millions of small molecules instead of the very small subset that we used in this tutorial. Also, the hypothesis-based selection (for instance, that matching the 3-keto and sulfate-sulfur in 3kPZS) is highly project-specific. To read more about this hypothesis-based selection approach, beyond this purely technical tutorial, please see our research publication ['Raschka, Sebastian, Anne M. Scott, Nan Liu, Santosh Gunturu, Mar Huertas, Weiming Li, and Leslie A. Kuhn (2017). "Enabling the hypothesis-driven prioritization of small molecules in large databases: Screenlamp and its application to GPCR inhibitor discovery"'](../cite)
+
+## Where to Go Next: Using and Building Pipelines for Automation
+
+Now that this tutorial introduced you to the individual tools within screenlamp, it is very easy to build pipelines that execute the individual steps automatically. For instance, a pipeline that automates the 8 steps we worked through in this tutorial is provided as [tools/pipelines/pipeline-example-1.py](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1.py).
+
+Essentially, this pipeline provides a more convenient way to interact with screenlamp in the way it was described in this tutorial:
+
+1. Select molecules based on database properties.
+2. Select molecules by the presence of particular functional groups.
+3. Select molecules by the distance between certain functional groups.
+4. Generate multiple favorable-energy conformers of each selected molecule.
+5. Overlay the conformers of the reference and database molecules
+6. Postprocess (sort) the overlay results and select molecules using similarity thresholds
+7. Generate functional group matching tables
+8. Select molecules based on functional group matching patterns
+
+(You may use this pipeline as a template and modify it if you like to add additional steps or like to remove certain steps).
+
+By default, this pipeline uses the selection parameters used in this tutorial via the corresponding configuration file ([/tools/pipelines/pipeline-example-1-config.yaml](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1-config.yaml)). Since the reference molecule in your own project is likely a different one than the one we used in this tutorial, the configuration file offers a user-friendly way to tailor the analysis to your needs. 
+
+For more information about this pipeline, please also see the more detailed ["Tutorial on Using a Pre-constructed Screenlamp Pipeline"](pipeline-tutorial-1).
 
 
 ```python

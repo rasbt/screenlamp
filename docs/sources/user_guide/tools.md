@@ -1,7 +1,7 @@
-# Toolkit API
+# Tools API
 
 
-This page serves as a quick lookup reference for the different modules within screenlamp.Please see the Toolkit Tutorial for a more detailed explanation of the different modules and how they can be combined in a typical virtual screening pipeline.
+This page serves as a quick lookup reference for the different modules within screenlamp.Please see the Tools Tutorial for a more detailed explanation of the different modules and how they can be combined in a typical virtual screening pipeline.
 
 
 ## count_mol2.py
@@ -221,13 +221,13 @@ python funcgroup_matching.py\
 
 **Usage:**
 
-     funcgroup_matching_selection.py [-h] -i INPUT --input_mol2 INPUT_MOL2
+     funcgroup_matching_selection.py [-h] -i INPUT [--input_mol2 INPUT_MOL2]
 
 
--o OUTPUT --atomtype_selection
-ATOMTYPE_SELECTION --charge_selection
-CHARGE_SELECTION [-v VERBOSE]
-`[--version]`  
+-o OUTPUT
+`[--atomtype_selection ATOMTYPE_SELECTION]`  
+`[--charge_selection CHARGE_SELECTION]`  
+`[-v VERBOSE] [--version]`  
 Selects molecules with certain functional group matching patterns after functional group matching.
 
 **Arguments:**
@@ -238,18 +238,22 @@ Show this help message and exit
 - `-i INPUT, --input INPUT`  
 (Required.) Input directory with input `.tsv` tables (functional group files generated via `funcgroup_matching.py`).
 - `--input_mol2 INPUT_MOL2`  
-(Required.) Input directory with input `.mol2` structures (ROCS overlays generated via `sort_rocs_mol2.py`).
+(Optional.) Input directory with input `.mol2` structures (ROCS overlays
+generated via `sort_rocs_mol2.py`). If provided, the MOL2 structures
+corresponding to the selected matches will be extracted from the
+input_mol2 directory and written to the output directory for visual inspection,
+for example, using PyMOL.
 - `-o OUTPUT, --output OUTPUT`  
 (Required.) Directory for writing the output files.
 - `--atomtype_selection ATOMTYPE_SELECTION`  
-(Required.) Selection condition for the atom types.
+(Optional, default="") Selection condition for the atom types.
 For example, the following selection query will make a selection based on
 matching 2 atoms in the reference molecule, S1 and O2:
 "((S1 == 'S.3') | (S1 == 'S.o2')) --> (O2 == 'O.2')".
 Here, S1 can either match an S.3 or an S.o2 atom in the database molecule.
 The second atom, O2, must match an atom of type O.2.
 - `--charge_selection CHARGE_SELECTION`  
-(Required.) Selection condition for the atom charges.
+(Optional, default="") Selection condition for the atom charges.
 For example, the following selection query will make a selection based on
 matching the charges in 2 atoms in the reference molecule, S1 and O2:
 "((S1 >= 1.0)) --> (O2 <= -0.5)".
