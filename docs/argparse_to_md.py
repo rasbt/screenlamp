@@ -90,7 +90,8 @@ def help_to_md(s):
 
 def main(dir_path):
     s = ("This page serves as a quick lookup reference for the different"
-         " modules within screenlamp.Please see the Tools Tutorial for a"
+         " modules within screenlamp. Please see the [Toolkit Tutorial](tools-tutorial-1)"
+         " for a"
          " more detailed explanation of the different modules and how"
          " they can be combined in a typical virtual screening pipeline.")
 

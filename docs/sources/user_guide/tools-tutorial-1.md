@@ -237,7 +237,7 @@ This time, we expect 69995 structures to be obtained after the filtering, since 
     Total : 69995
 
 
-## Filtering Step  1 -- Filtering via Features from Data Tables
+## Step 1 -- Filtering via Features from Data Tables
 
 In this section, we will apply the first filtering step, which constitutes step 1 in the pipeline overview:
 
@@ -442,7 +442,7 @@ c) Filter for multiple atoms by chaining criteria via the `-->` string: "((atom_
 
 ---
 
-As you remember from the "Filtering Step 1" section, filtering in screenlamp consists of two stages:
+As you remember from the "[Step 1 -- Filtering via Features from Data Tables](#Step-1----Filtering-via-Features-from-Data-Tables)" section, filtering in screenlamp consists of two stages:
 
 1. Creating an ID file of molecule names
 2. Selecting molecules from MOL2 files using the ID file from step 1
@@ -560,7 +560,7 @@ Following the already familiar procedure, we can now select the MOL2 structures 
     Total : 107
 
 
-After applying this distance-based filtering step, we can see that only 107 molecules out of the 14,872 from "Filtering Step 2" remain.
+After applying this distance-based filtering step, we can see that only 107 molecules out of the 14,872 from "[Filtering Step 2 -- Presence and Absence of Functional Groups](#Filtering Step 2 -- Presence and Absence of Functional Groups)" remain.
 
 ## Step 4 -- Generating Conformers
 
@@ -579,7 +579,7 @@ In this tutorial, we will use option 3), where we create up to 200 conformers of
 
 Again, please note the creating multiple conformers of a molecule is optional. The program we are going to use is OpenEye Omega, but you may use alternative tools as well, as long as they can output those conformer structures in MOL2 file format. 
 
-<div class="alert alert-block alert-info">  &#9888;Please also note that the conformers of a given molecule (database or reference molecule) files should have the same molecule ID in the MOL2 files to parse the output of "Step 5 -- Overlaying Reference and Database molecules" without additional workarounds. For example, if you have a multi-conformer MOL2 file such as 3kpzs_query.mol2, make sure that the molecule IDs in the MOL2 file are all "3kPZS" and don't have any suffixes or prefixes such as "3kPZS_1, 3KPZS_2, ...". The reason why we want to avoid prefixes and suffixes in those conformer names is that the overlay tool OpenEye ROCS identifies conformers by their structure, not their names, and such molecule IDs would only result in annoying name mangling, which makes the results harder to parse downstream in the analysis pipeline. </div>
+<div class="alert alert-block alert-info"> &#9888; Please also note that the conformers of a given molecule (database or reference molecule) files should have the same molecule ID in the MOL2 files to parse the output of "[Step 5 -- Overlaying Reference and Database molecules](#Step-5----Overlaying-Reference-and-Database-molecules)" without additional workarounds. For example, if you have a multi-conformer MOL2 file such as 3kpzs_query.mol2, make sure that the molecule IDs in the MOL2 file are all "3kPZS" and don't have any suffixes or prefixes such as "3kPZS_1, 3KPZS_2, ...". The reason why we want to avoid prefixes and suffixes in those conformer names is that the overlay tool OpenEye ROCS identifies conformers by their structure, not their names, and such molecule IDs would only result in annoying name mangling, which makes the results harder to parse downstream in the analysis pipeline. </div>
 
 <div class="alert alert-block alert-info"> &#9888;  Optionally, ["Step 3 -- Filtering by Distance between Functional Groups"](Step-3----Filtering-by-Distance-between-Functional-Groups) can also be repeated on the output of this step, the low-energy conformers, to sort out conformers where functional groups are in a spatial arrangement that may not be consistent with prior knowledge -- for example, experimental insights that a molecule interacts via certain groups in a particular way with its binding partner.</div>
 
@@ -1456,7 +1456,7 @@ Note that if `--id_suffix True`, a molecule ID suffix will be added to the query
 
 ---
 
-After using the `sort_rocs_mol2.py` utility script, we have a new directory that contains pairs of `\*_dbase.mol2` and `\*_query.mol2` conformers from the ROCS overlays:
+After using the `sort_rocs_mol2.py` utility script, we have a new directory that contains pairs of `*_dbase.mol2` and `*_query.mol2` conformers from the ROCS overlays:
 
 
 ```python
@@ -1483,13 +1483,15 @@ After using the `sort_rocs_mol2.py` utility script, we have a new directory that
 
 ## Step 7 -- Matching Functional Groups
 
-Now that we have generate the multi-mol2 file pairs of the pair-wise overlays ('\*_query.mol2', and '\*_dbase.mol2') in "Step 6 -- Sorting Molecular Overlays," we can proceed with the tabulation of functional group matches:
+Now that we have generated the multi-mol2 file pairs of the pair-wise overlays ('\*_query.mol2', and '\*_dbase.mol2') in "[Step 6 -- Sorting Molecular Overlays](#Step-6----Sorting-Molecular-Overlays)," we can proceed with the tabulation of functional group matches.
 
 ![](images/tools-tutorial-1/pipe-step-7.jpg)
 
 ---
 
-**Note about file suffixes**
+
+<div class="alert alert-block alert-info"> &#9888;
+**Note about file suffixes.**
 
 If you created molecular overlays using a different protocol than the one described in this tutorial please make sure that the file layout and the naming convention match the ones described in "Step 6 -- Sorting Molecular Overlays." In particular, it is important that the database molecule MOL2 files have the following file endings:
 
@@ -1500,6 +1502,8 @@ and the query molecules should end in
 - _query.mol2 / _query.mol2.gz 
 
 Everything in front of the underscore character can be arbitrary but must also be consistent between "query" and "dbase" pairs, as shown in "Step 6 -- Sorting Molecular Overlays" and in the file listing below:
+
+</div>
 
 ---
 
@@ -1524,7 +1528,7 @@ Everything in front of the underscore character can be arbitrary but must also b
     partition_7_hits_1_query.mol2
 
 
-For the functional group matching, we recommend using a threshold of 1.3 angstrom or less, since 1.5 angstrom constitutes the typical length of an atomic bond.
+For the functional group matching, we recommend using a threshold of 1.3 angstroms or less, since 1.5 angstrom constitutes the typical length of an atomic bond.
 
 
 ```python
@@ -1572,27 +1576,27 @@ As we can see from the file listing above, the functional group matching tool ge
 - partition_1_hits_1_atomtype.tsv
 - partition_1_hits_1_charge.tsv
 
-Below is an example of how a subsection of partition_1_hits_1_atomtype.tsv would look like if we would open it in a spreadsheet viewer (for example, LibreOffice Calc) for the purpose of illustration:
+Below is an example of how a subsection of partition_1_hits_1_atomtype.tsv would look like if we would open it in a spreadsheet viewer (for example, LibreOffice Calc) for illustration:
 
 ![](images/tools-tutorial-1/atomtype-match-ex-1.png)
 
-Note that the table screenshot above only shows the first 6 columns of the file. 
+Note that the table screenshot above only shows the first six columns of the file. 
 
 - The first column, dbase, refers to the database molecule's name
 - The second column lists the corresponding reference molecule.
 - The column headers after the second column correspond to the atom names of the reference (or query) molecule.
 
-For instance, the first cell below the column header C1, which contains the entry "O.2" (shown in the annotated screenshot below)
+For instance, the first cell below the column header C1, which contains the entry "O.2" (shown in the annotated screenshot below):
 
 ![](images/tools-tutorial-1/atomtype-match-ex-2.png)
 
-lists the MOL2 atom type of the atom in the database molecule ZINC90224566_8 that overlays (or "matches") with the C1 atom in 3KPZS_22. Similarly, we can see that no atom in ZINC90224566_8 matches the C2 atom of 3KPZS_22, and an S.o2 atom matches the C3 atom of 3KPZS_22. 
+Lists the MOL2 atom type of the atom in the database molecule ZINC90224566_8 that overlays (or "matches") with the C1 atom in 3KPZS_22. Similarly, we can see that no atom in ZINC90224566_8 matches the C2 atom of 3KPZS_22, and an S.o2 atom matches the C3 atom of 3KPZS_22. 
 
 To illustrate how to read this table more visually, we can open the corresponding MOL2 files for partition_1 in PyMOL:
 
 ![](images/tools-tutorial-1/pymol-overlay-ex-2.png)
 
-Shown below is a screenshot of a PyMOL session showing the 3D structure overaly of ZINC90224566_8 and 3KPZS_22. The red arrows highlight the three columns that were discussed in the previous paragraph (ZINC90224566_8 is shown in green and 3KPZS_22 is shown in cyan):
+Shown below is a screenshot of a PyMOL session showing the 3D structure overlay of ZINC90224566_8 and 3KPZS_22. The red arrows highlight the three columns that were discussed in the previous paragraph (ZINC90224566_8 is shown in green and 3KPZS_22 is shown in cyan):
 
 ![](images/tools-tutorial-1/pymol-overlay-ex-1.png)
 
@@ -1607,7 +1611,7 @@ In the next step, "Step 8 -- Selecting Functional Group Matches," we will select
 
 ## Step 8 -- Selecting Functional Group Matches
 
-In this section, we are going to use the functional group matching tables we created in step 7. 
+In this section, we are going to use the functional group matching tables we created in "[Step 7 -- Matching Functional Groups](#Step 7 -- Matching Functional Groups)". 
 
 ![](images/tools-tutorial-1/pipe-step-8.jpg)
 
@@ -1616,7 +1620,7 @@ The `funcgroup_matching_selection.py` tool operates on the functional group matc
 1. `--atomtype_selection`, which operates on the MOL2 atom types stored in the \*_atomtype.tsv files  
 2. `--charge_selection`, which operates on the partial charges stored in the \*_charge.tsv files
 
-The selection strings work similar to the selection strings that were explained in Filtering "Step 2 -- Presence and Absence of Functional Groups." In the following example, we are going to select those molecules that
+The selection strings work similar to the selection strings that were explained in Filtering "[Step 2 -- Presence and Absence of Functional Groups](#Step-2----Presence-and-Absence-of-Functional-Groups)." In the following example, we are going to select those molecules that
 
 1. Have a sp3 sulfur match with the S1 atom in the reference molecule; the matched atom has to be positively charged
 2. An sp2 oxygen match with the O2 atom in the reference molecule; the matched atom has to have a charge
@@ -1670,17 +1674,17 @@ Now, let's have a look at one of the overlayed database molecule-reference molec
 
 ![](images/tools-tutorial-1/open-fgroup-match-overlays.png)
 
-For the purpose of illustration, the numbers 0.6 and 0.9 correspond to the distance between the matched oxygen and sulfur atoms, respectively:
+For illustration, the numbers 0.6 and 0.9 correspond to the distance between the matched oxygen and sulfur atoms, respectively:
 
 ![](images/tools-tutorial-1/fgroup-match-overlays-pymol.png)
 
 ## Conclusion
 
-While this tutorial provides a brief hands-on explantion of the different tools within screenlamp, and how to use them in concert, a real-world application would typically include millions of small molecules instead of the very small subset that we used in this tutorial. Also, the hypothesis-based selection (for instance, that matching the 3-keto and sulfate-sulfur in 3kPZS) is highly project-specific. To read more about this hypothesis-based selection approach, beyond this purely technical tutorial, please see our research publication ['Raschka, Sebastian, Anne M. Scott, Nan Liu, Santosh Gunturu, Mar Huertas, Weiming Li, and Leslie A. Kuhn (2017). "Enabling the hypothesis-driven prioritization of small molecules in large databases: Screenlamp and its application to GPCR inhibitor discovery"'](../cite)
+While this tutorial provides a brief hands-on explanation of the different tools within screenlamp, and how to use them in concert, a real-world application would typically include millions of small molecules instead of the very small subset that we used in this tutorial. Also, the hypothesis-based selection (for instance, that matching the 3-keto and sulfate-sulfur in 3kPZS) is highly project-specific. To read more about this hypothesis-based selection approach, beyond this purely technical tutorial, please see our research publication ['Raschka, Sebastian, Anne M. Scott, Nan Liu, Santosh Gunturu, Mar Huertas, Weiming Li, and Leslie A. Kuhn (2017). "Enabling the hypothesis-driven prioritization of small molecules in large databases: Screenlamp and its application to GPCR inhibitor discovery"'](../cite)
 
 ## Where to Go Next: Using and Building Pipelines for Automation
 
-Now that this tutorial introduced you to the individual tools within screenlamp, it is very easy to build pipelines that execute the individual steps automatically. For instance, a pipeline that automates the 8 steps we worked through in this tutorial is provided as [tools/pipelines/pipeline-example-1.py](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1.py).
+Now that this tutorial introduced you to the individual tools within screenlamp, it is straightforward to build pipelines that execute the individual steps automatically. For instance, a pipeline that automates the 8 steps we worked through in this tutorial is provided as [tools/pipelines/pipeline-example-1.py](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1.py).
 
 Essentially, this pipeline provides a more convenient way to interact with screenlamp in the way it was described in this tutorial:
 
@@ -1689,7 +1693,7 @@ Essentially, this pipeline provides a more convenient way to interact with scree
 3. Select molecules by the distance between certain functional groups.
 4. Generate multiple favorable-energy conformers of each selected molecule.
 5. Overlay the conformers of the reference and database molecules
-6. Postprocess (sort) the overlay results and select molecules using similarity thresholds
+6. Post process (sort) the overlay results and select molecules using similarity thresholds
 7. Generate functional group matching tables
 8. Select molecules based on functional group matching patterns
 
@@ -1698,3 +1702,8 @@ Essentially, this pipeline provides a more convenient way to interact with scree
 By default, this pipeline uses the selection parameters used in this tutorial via the corresponding configuration file ([tools/pipelines/pipeline-example-1-config.yaml](https://github.com/rasbt/screenlamp/blob/master/tools/pipelines/pipeline-example-1-config.yaml)). Since the reference molecule in your own project is likely a different one than the one we used in this tutorial, the configuration file offers a user-friendly way to tailor the analysis to your needs. 
 
 For more information about this pipeline, please also see the more detailed ["Tutorial on Using a Pre-constructed Screenlamp Pipeline"](pipeline-tutorial-1).
+
+
+```python
+
+```
