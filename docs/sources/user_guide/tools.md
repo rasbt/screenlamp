@@ -1,7 +1,7 @@
 # Tools
 
 
-This page serves as a quick lookup reference for the different modules within screenlamp.Please see the Tools Tutorial for a more detailed explanation of the different modules and how they can be combined in a typical virtual screening pipeline.
+This page serves as a quick lookup reference for the different modules within screenlamp. Please see the [Toolkit Tutorial](tools-tutorial-1) for a more detailed explanation of the different modules and how they can be combined in a typical virtual screening pipeline.
 
 
 ## count_mol2.py

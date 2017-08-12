@@ -95,7 +95,7 @@ def main(dir_path):
          " more detailed explanation of the different modules and how"
          " they can be combined in a typical virtual screening pipeline.")
 
-    contents = ["# Tools API", "\n", s]
+    contents = ["# Tools", "\n", s]
     paths = get_pyfiles(dir_path)
     for f in paths:
         contents.append('\n\n## %s\n\n' % os.path.basename(f))
