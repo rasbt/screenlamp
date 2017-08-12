@@ -4,7 +4,7 @@
 # for hypothesis-driven virtual screening.
 #
 # Copyright (C) 2017 Michigan State University
-# License: MIT
+# License: Apache v2
 #
 # Software author: Sebastian Raschka <http://sebastianraschka.com>
 # Software author email: mail@sebastianraschka.com
@@ -170,6 +170,9 @@ def main(input_dir, output_file, verbose, n_cpus):
                    id_file_path=output_file,
                    verbose=verbose,
                    n_cpus=n_cpus)
+
+    if verbose:
+        print('Finished')
 
 
 if __name__ == '__main__':

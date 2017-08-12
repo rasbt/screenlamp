@@ -44,7 +44,7 @@ All code in this tutorial is executed using a Python 3.6 interpreter. The code h
 
 ---
 
-## Data storage and project layout
+## Data Storage and Project Layout
 
 After downloading the files described in the previous subsection, create a new directory called `tk-tutorial_data` to store these files. Before you continue with the tutorial, please make sure that the `tk-tutorial_data` directory contains the following files and adheres to the following directory structure:
 
@@ -61,7 +61,7 @@ Next, we are going to create a new directory, `tutorial-results`, to store the r
 
 <div class="alert alert-block alert-info"> &#9888; This tutorial assumes that the screenlamp tools are available from a directory called 'tools', but you can store the screenlamp tools in any directory you like as long as you replace 'tools' with the correct path to this directory.</div>
 
-Before we start exploring the tools contained in screenlamp's `tools` folder, let's start with a simple script that we are going to use throughout this tutorial to count the number of structures in a mol2 file or directory containing mol2 files: 
+Before we start exploring the tools contained in screenlamp's `tools` folder, let's start with a simple script that we are going to use throughout this tutorial to count the number of structures in a mol2 file or directory containing mol2 files.
 
 Using the `count_mol2.py` script, we can now count the number of structures in each mol2 file in our input directory like so:
 
@@ -82,17 +82,24 @@ Using the `count_mol2.py` script, we can now count the number of structures in e
 
 As we can see, each of the 7 partitions in our dataset contains 10,000 molecules; we will be working with 70,000 structures in total.
 
-## General Blacklist & Whitelist filtering
+## General Blacklist & Whitelist Filtering
 
-### Generating ID files from molecules
+This section provides a brief introduction to the general concept of how the filtering of structures is performed within screenlamp. The general workflow consists of two step
+
+1. Creating an "ID file" (more about this later)
+2. Use the "ID file" to select the corresponding 3D-structures from MOL2 files
+
+Furthermore, there are 2 kinds of filtering procedures. Via whitelist-filtering, we select all molecules that are **listed in** the ID file. Vice versa, blacklist-filtering is used to select all molecules that are **not listed in** the ID file.
+
+### Generating ID Files from Molecules
 
 First, we are going to generate an ID file of all structures in the mol2 files of the 7 partitions. 
 
-<div class="alert alert-block alert-info">
+<div class="alert alert-block alert-info"> &#9888; 
 In the context of this tutorial, an "ID file" is a plaintext file that contains the molecule identifiers fetched from the mol2 files.
 </div>
 
-We can create such an ID file using the `mol2_to_id.py` script as shown below:
+We can create such an ID file using the `mol2_to_id.py` screenlamp script as shown below:
 
 
 ```python
@@ -101,16 +108,17 @@ We can create such an ID file using the `mol2_to_id.py` script as shown below:
   --output tutorial-results/all-mol2ids.txt
 ```
 
-    Processing partition_1.mol2 | scanned 10000 molecules | 16925 mol/sec
-    Processing partition_2.mol2 | scanned 10000 molecules | 11431 mol/sec
-    Processing partition_3.mol2 | scanned 10000 molecules | 9346 mol/sec
-    Processing partition_4.mol2 | scanned 10000 molecules | 11809 mol/sec
-    Processing partition_5.mol2 | scanned 10000 molecules | 18886 mol/sec
-    Processing partition_6.mol2 | scanned 10000 molecules | 18984 mol/sec
-    Processing partition_7.mol2 | scanned 10000 molecules | 18110 mol/sec
+    Processing partition_1.mol2 | scanned 10000 molecules | 9992 mol/sec
+    Processing partition_2.mol2 | scanned 10000 molecules | 13691 mol/sec
+    Processing partition_3.mol2 | scanned 10000 molecules | 17576 mol/sec
+    Processing partition_4.mol2 | scanned 10000 molecules | 15460 mol/sec
+    Processing partition_5.mol2 | scanned 10000 molecules | 13929 mol/sec
+    Processing partition_6.mol2 | scanned 10000 molecules | 14212 mol/sec
+    Processing partition_7.mol2 | scanned 10000 molecules | 14279 mol/sec
+    Finished
 
 
-To check that the creation of the ID file was successful and to see how it generally looks like, we will use the Unix/Linux `head` command line tool to display the first 10 rows of the newly created ID file:
+To check that the creation of the ID file was successful and to see how it looks like, we will use the Unix/Linux `head` command line tool to display the first 10 rows of the newly created ID file:
 
 
 ```python
@@ -129,7 +137,7 @@ To check that the creation of the ID file was successful and to see how it gener
     ZINC01458151
 
 
-To illustrate the concept of whitelist and blacklist filtering in the following sections, let us now create a small ID list file, we name it `5-mol2ids.txt`, that contains 5 IDs only:
+To illustrate the concept of whitelist and blacklist filtering in the following sections, let us now create a small ID list file, we name it `5-mol2ids.txt`, that contains 5 IDs only, using the `echo` command in a Unix/Linux terminal:
 
 
 ```python
@@ -141,9 +149,13 @@ ZINC65375610\n\
 ZINC31820077" > tutorial-results/5-mol2ids.txt
 ```
 
+The execution of the preceeding command will create a text file that looks as follows:
+    
+![](images/tools-tutorial-1/5-mol2ids.png)
+
 ### Whitelist Filtering
 
-Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files for molecules that are listed in a ID file using the `whitefilter True` option. Executing the following command will look for the structures corresponding to the 5 molecule IDs listed in the `5-mol2ids.txt` that we created in the previous section, and write the corresponding structure files to a new directory that we will call `whitelist_example`:
+Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files for molecules that are listed in an ID file using the `--whitefilter True` option. Executing the following command will look for the structures corresponding to the five molecule IDs included in the `5-mol2ids.txt` that we created in the previous section, and write the corresponding structure files to a new directory that we will call `whitelist_example`:
 
 
 ```python
@@ -164,18 +176,9 @@ Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files f
     Finished
 
 
-The output directory, `tutorial-results/whitelist-example, should now contain only mol2 structures that are labeled with IDs contained in the `5-mol2ids.txt` text file.
+The output directory, `tutorial-results/whitelist-example`, should now contain only mol2 structures that are labeled with IDs contained in the `5-mol2ids.txt` text file.
 
-Please note that id_to_mol2 creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found via whitelist filtering. For example, the 5 structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
-
-
-```python
-! ls tutorial-results/whitelist-example
-```
-
-    partition_1.mol2 partition_3.mol2 partition_5.mol2 partition_7.mol2
-    partition_2.mol2 partition_4.mol2 partition_6.mol2
-
+Please note that `id_to_mol2.py` creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found for this particular partition via whitelist filtering and could remain empty. For example, the five structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
 
 
 ```python
@@ -195,7 +198,7 @@ Please note that id_to_mol2 creates a new file for each mol2 file it scanned; ho
 
 ### Blacklist Filtering
 
-Similar to the previous approach, using a whitelist filter, we can do blacklist filtering, which means that all molecules are selected ***but*** the ones contained in an ID file. In order to perform blacklist filtering, we use the setting `--whitelist False` as shown below:
+Similar to the whitelisting example in the previous section, we can use a ID file for blacklist filtering. Blacklist filtering means that all molecules that are ***not*** listed in an ID file will be selected. In order to perform blacklist filtering, we use the setting `--whitelist False` as shown below:
 
 
 ```python
@@ -242,12 +245,14 @@ In this section, we will apply the first filtering step, which constitutes step 
 
 Filtering via screenlamp is typically done in 2 steps:
 
-- Step 1: create a ID file containing the names of the molecules of interest
-- Step 2: obtain the structures of molecules of interest, using the ID file, from MOL2 files
+- Step 1: Create an ID file containing the names of the molecules of interest.
+- Step 2: Obtain the structures of molecules of interest, using the ID file, from MOL2 files.
 
-In this filtering step, we are going to create an ID file of molecules of interest from a pre-existing data table, for instance, the "properties" files available on [ZINC](http://zinc.docking.org/subsets/drug-like). For this example, we are going to use the `small_table_p1-7.txt` subset that we downloaded earlier, since the whole data table of drug like molecules in ~2 Gb in size and may take a long time to download on machines with a low-bandwith internet connection. However, in case you have already downloaded the drug-like properties file (3_prop.xls) please feel free to use it instead. (Note that while `3_prop.xls` has a file ending that is typical for Microsoft Excel, it is not an Excel file but a plain text file with tab-separated columns.)
+In this filtering step, we are going to create an ID file of molecules of interest from a pre-existing data table, for instance, the "properties" files available on [ZINC](http://zinc.docking.org/subsets/drug-like). For this example, we are going to use the `small_table_p1-7.txt` subset that we downloaded earlier (see ["Obtaining and Preparing the Dataset"](#Obtaining-and-Preparing-the-Dataset)), since the whole data table of drug like molecules is ~2 Gb in size, and thus it may take a long time to download it on machines with a low-bandwidth internet connection. However, in case you have already downloaded the drug-like properties file (3_prop.xls) from ZINC, please feel free to use it instead. 
 
-To get a brief impression of the file contents, we use the `head` tool to display the first 10 entries:
+<div class="alert alert-block alert-info"> &#9888; Note that while 3_prop.xls has a file ending that is typical for Microsoft Excel, it is not an Excel file but a plain text file with tab-separated columns.</div>
+
+To get a brief impression of the file contents, we use the `head` tool to display the first ten entries:
 
 
 ```python
@@ -266,7 +271,12 @@ To get a brief impression of the file contents, we use the `head` tool to displa
     ZINC00000030	297.422	2.94	0.89	-37.97	3	3	47	1	6	C[C@@H](CC(c1ccccc1)(c2ccccc2)C(=O)N)[NH+](C)C
 
 
-Using the `datatable_to_id.py` script, we can select only those molecule IDs (or names) (here: stored in the `ZINC_ID` column) that match certain criteria, which we can flexibly define based on the column data in this table. For example, we can select only those molecules that have at most 7 rotatable bonds and have a molecular weight of at least 200 g/mol using the selection string `"(NRB <= 7) & (MWT >= 200)"` as follows:
+Since it can sometimes be hard to read tab-separated tables as regular text output, the screenshot below shows the same table excerpt opened in a spreadsheet program such as LibreOffice Calc or Microsoft Excel:
+
+
+![](images/tools-tutorial-1/zincdata-spreadsheat.png)
+
+Using the `datatable_to_id.py` script, we can select only those molecule IDs (here: stored in the ZINC_ID column) that match certain criteria, which we can flexibly define based on the column data in this table. For example, we can select only those molecules that have at most 7 rotatable bonds and have a molecular weight of at least 200 g/mol using the selection string `"(NRB <= 7) & (MWT >= 200)"` as follows:
 
 
 ```python
@@ -283,9 +293,9 @@ Using the `datatable_to_id.py` script, we can select only those molecule IDs (or
     Selected: 162622
 
 
-The selection syntax is quite simple: Each criterion must be surrounded by parentheses, and multiple criteria can be chained together using the logical AND symbol `'&'`. For example, to add a third criterion to the selection string to exclude larger molecules that are heavier than 400 g/mol, the selection string becomes `"(NRB <= 7) & (MWT >= 200) & (MWT <= 400)"`.
+The selection syntax is quite simple: Parentheses must surround each criterion, and multiple criteria can be chained together using the logical AND symbol `'&'`. For example, to add a third criterion to the selection string to exclude larger molecules that are heavier than 400 g/mol, the selection string becomes `"(NRB <= 7) & (MWT >= 200) & (MWT <= 400)"`.
 
-The operators for comparison allowed:
+The following relational operators are supported in the selection string:
 
 - `!=` : not equal to
 - `==` : equal to
@@ -295,7 +305,7 @@ The operators for comparison allowed:
 - `<=` : equal to or greater than
 
 
-If you encounter issues with certain selection strings, please check that the specified column is indeed present in the table you provided. Also, the `datatable_to_id.py` tool assumes that the input table is tab-separated. If you have tables that use a different delimiter to separate columns, please specify the column separator using the `--seperator` parameter. For example, if our input table was a CSV file, we would pass the following, additional argument to the `tools/datatable_to_id.py` function: `--seperator ","`.
+If you encounter issues with individual selection strings, please check that the specified column is indeed present in the table you provided. Also, the `datatable_to_id.py` tool assumes that the input table is tab-separated. If you have tables that use a different delimiter to separate columns, please specify the column separator using the `--separator` parameter. For example, if our input table was a CSV file, we would pass the following, additional argument to the `tools/datatable_to_id.py` function: `--separator ","`.
 
 
 Below are some additional examples of correct and incorrect selection strings that can help you with debugging the selection strings if you should encounter problems:
@@ -307,7 +317,7 @@ Below are some additional examples of correct and incorrect selection strings th
 - Wrong: `"(mwt>=200) & (nrb<=7)"` [no whitespace before and after operators for comparison]
 
 
-As mentioned in the beginning of this section, filtering consists of two steps:
+As mentioned at the beginning of this section, filtering consists of two steps:
     
 1. Creating an ID file of molecule names
 2. Selecting molecules from MOL2 files using the ID file from step 1
@@ -349,15 +359,17 @@ We already completed step 1, and now, we are going the ID file we just created t
     Total : 59750
 
 
-As we can see from the output of `count_mol2.py`, we now have a slightly smaller database consisting of 59750 molecules (selected from the initial 70,000 structures).
+As we can see from the output of `count_mol2.py`, we now have a slightly smaller database consisting of 59750 molecules -- we started with 70,000 structures to which we applied the selection criteria `"(NRB <= 7) & (MWT >= 200)"`.
 
 ## Filtering Step 2 -- Presence and Absence of Functional Groups
 
-In this second filtering steps, we will select molecules that contain certain types of atoms and functional groups. In this simple example, we will consider molecules that contain at least one sp3 sulfur atom (as it can be found in sulfate groups) and at least one sp2 oxygen atom (keto-group). 
+In this second filtering step, we will select molecules that contain certain types of atoms and functional groups.
 
 ![](images/tools-tutorial-1/pipe-step-2.jpg)
 
-When we filter by atom type, we can use the following types to specify filtering criteria:
+In the simple example presented in this section, we will consider molecules that contain at least one sp3 sulfur atom (as it can be found in sulfate groups) and at least one sp2 oxygen atom (keto group). 
+
+When we filter by atom type, we can use the following MOL2 labels to specify filtering criteria:
 
   - `atom_id`
   - `atom_name`
@@ -366,7 +378,7 @@ When we filter by atom type, we can use the following types to specify filtering
   - `subst_name`
   - `charge`
 
-Note that the most useful specifiers are `atom_type` and `charge` in the context of selecting atoms and functional groups of interest. The `atom_type` specifier is used to refer to the atom types in MOL2 structures (for example, O.2, O.3, H, S.2, and so forth). The `charge` specify refers to the partial charge column in MOL2 files.
+Note that the most useful specifiers are `atom_type` and `charge` in the context of selecting atoms and functional groups of interest. The `atom_type` specifier is used to refer to the atom types in MOL2 structures (for example, O.2, O.3, H, S.2, and so forth). The `charge` specifier refers to the partial charge column in MOL2 files.
 
 Before we discuss the selection string syntax in more detail, let us execute an example where we select only those molecules that contain at least one sp3 sulfur atom (as it can be found in sulfate groups) and at least one sp2 oxygen atom (keto-group):
 
@@ -380,35 +392,37 @@ Before we discuss the selection string syntax in more detail, let us execute an 
 ```
 
     Using selection: ["((pdmol.df.atom_type == 'S.3') | (pdmol.df.atom_type == 'S.o2'))", "(pdmol.df.atom_type == 'O.2')"]
-    Processing partition_1.mol2 | 231 mol/sec
-    Processing partition_2.mol2 | 260 mol/sec
-    Processing partition_3.mol2 | 277 mol/sec
-    Processing partition_4.mol2 | 256 mol/sec
-    Processing partition_5.mol2 | 268 mol/sec
-    Processing partition_6.mol2 | 279 mol/sec
-    Processing partition_7.mol2 | 277 mol/sec
+    Processing partition_1.mol2 | 276 mol/sec
+    Processing partition_2.mol2 | 270 mol/sec
+    Processing partition_3.mol2 | 278 mol/sec
+    Processing partition_4.mol2 | 270 mol/sec
+    Processing partition_5.mol2 | 267 mol/sec
+    Processing partition_6.mol2 | 280 mol/sec
+    Processing partition_7.mol2 | 253 mol/sec
+    Finished
 
 
-Note that the we use all available processes on our machine by setting `--processes 0`, to speed up the computation. Alternatively, if you don't want to utilize all available CPUs, you can specify the number of CPUs to use manually, for example, by setting `--processes 1` to only use 1 CPU.
+Note that we used all available processes on our machine by setting `--processes 0`, to speed up the computation. Alternatively, if you don't want to utilize all available CPUs, you can specify the number of CPUs to use manually, for example, by setting `--processes 1` to only use 1 CPU.
 
 To better understand how the selection string "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')" works, let us break it down into 2 parts:
 
 1. "((atom_type == 'S.3') | (atom_type == 'S.o2'))"
 2. "--> (atom_type == 'O.2')"
     
-In the first part, we use the logical OR operator '|' to select molecules that either contain an 'S.3' atom OR an 'S.o2' atom. Then, after this criterion has been applied to select the specified subset of molecules, the next criterion will be applied, the criterion followed by the '-->' string. In this case, the second criterion is to check the remaining molecules for the presence of an 'O.2' atom. In this context, you can think of the '-->' string as a "THEN" conditional statement. E.g., "select via filter ((atom_type == 'S.3') | (atom_type == 'S.o2')) THEN select via filter (atom_type == 'O.2')"
+In the first part, we use the logical OR operator '|' to select molecules that either contain an 'S.3' atom OR an 'S.o2' atom. Then, after this criterion has been applied to select the specified subset of molecules, the next criterion will be used, which is the criterion followed by the '-->' string. In this case, the remaining molecules will be checked for the presence of an 'O.2' atom. 
+
+<div class="alert alert-block alert-info"> &#9888; In this context, you can think of the '-->' string as a "THEN" conditional statement. E.g., "select via filter ((atom_type == 'S.3') | (atom_type == 'S.o2')) THEN select via filter (atom_type == 'O.2')" </div>
 
 
-Note that you can string an arbitrary number of criteria using the '-->' operator. For example, if we additionally require molecules to contain a fluor atom, we can modify the selection string as follows:
+Note that you can string an arbitrary number of criteria using the '-->' operator. For example, if we additionally require molecules to contain a fluor atom, we can modify the selection string as follows (the modification is highlighted in bold font):
 
 "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2') **--> (atom_type == 'F')**"
 
-Lastly, we can also incorporate partial charge information. For instance if we want to specify a partial charge range for the O.2 atom type, we could do it as follows, using the logical "&" operator:
+Lastly, we can also incorporate partial charge information. For instance, if we want to specify a partial charge range for the O.2 atom type, we could do it as follows, using the logical "&" operator:
 
 "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> ((atom_type == 'O.2') **& (charge <= -0.3) & (charge >= -0.9))**"
 
-Please note that it doesn't make sense to use the logical AND operator (&) on the same column. For example, the selection string "((atom_type == 'S.3') | (atom_type == 'S.o2'))" means that a molecule must contain an atom that is either of type S.3 OR S.o2. However, the selection string "((atom_type == 'S.3') & (atom_type == 'S.o2'))" would mean that a molecule must contain an atom that has the type S.3 AND S.o2, which is impossible, because an atom can only have 1 type at the same time (in the MOL2 file format).
-
+Please note that it doesn't make sense to use the logical AND operator (&) on the same column. For example, the selection string "((atom_type == 'S.3') | (atom_type == 'S.o2'))" means that a molecule must contain an atom that is either of type S.3 OR S.o2. However, the selection string "((atom_type == 'S.3') & (atom_type == 'S.o2'))" would mean that a molecule must contain an atom that has the type S.3 AND S.o2 at the same time, which is impossible, because an atom can only have 1 type at the same time (in the MOL2 file format).
 
 ---
 
@@ -428,7 +442,7 @@ c) Filter for multiple atoms by chaining criteria via the `-->` string: "((atom_
 
 ---
 
-As you remember from the "Filtering Step 1" section, filtering in screenlamp concists of two steps:
+As you remember from the "Filtering Step 1" section, filtering in screenlamp consists of two stages:
 
 1. Creating an ID file of molecule names
 2. Selecting molecules from MOL2 files using the ID file from step 1
@@ -474,19 +488,19 @@ As we can see, we only have 14,872 by applying the atom- and functional group ba
 
 ## Step 3 -- Filtering by Distance between Functional Groups
 
-In this step, we will now select only those molecules that have a sp3 sulfur atom and a keto-group within a 13-20 angstrom distance:
+In this third step, we will now select only those molecules that have a sp3 sulfur atom and a keto-group within a 13-20 angstrom distance.
 
 ![](images/tools-tutorial-1/pipe-step-3.jpg)
 
-Technically, we could have skipped the section "Filtering Step 2" and directly proceeded with the distance-based atom selection described in this section. However, note that distance calculations are computationally more expensive than merely checking for the presence of certain atoms and functional groups. Thus, but separating those two tasks, we can filter out molecules that don't contain a keto and a sp3 sulfur atoms first.
+<div class="alert alert-block alert-info"> &#9888; Technically, we could have skipped the section "Filtering Step 2" and directly proceeded with the distance-based atom selection described in this section. However, note that distance calculations are computationally more expensive than merely checking for the presence of certain atoms and functional groups. Thus, but separating those two tasks, we can filter out molecules that don't contain a keto and a sp3 sulfur atoms first.</div>
 
-The selection string syntax is analagous to the `--selection` parameter described in the "Filtering Step 2" --  please re-visit this section if you need a refresher. However, it shall be noted that the distance selection only works for a pair of atoms. For example, the following string
+The selection string syntax is analogous to the `--selection` parameter described in the "Filtering Step 2" --  please revisit this section if you need a refresher. However, it shall be noted that the distance selection only works for a pair of atoms. For example, the following string
 
 "((atom_type == 'S.3') | (atom_type == 'S.o2')) --> (atom_type == 'O.2')"
 
-checks the distance between an atom A, which is either an S.3 or an S.o2 atom, and an atom B, which is a O.2 atom. If you want to compute the distance between multiple atoms, for example, the distance of atom A to atoms B and C, you need to repeat the distance selection multiple times. For example, you would perform the distance selection between A and B first, and then, in a second iteration, you would perform the distance selection on the results of the first selection, to select molecules based on the distance between atom A and C.
+checks the distance between an atom A, which is either an S.3 or an S.o2 atom, and an atom B, which is an O.2 atom. If you want to compute the distance between multiple atoms, for example, the distance of atom A to atoms B and C, you need to repeat the distance selection multiple times. For example, you would perform the distance selection between A and B first, and then, in a second iteration, you would perform the distance selection on the results of the first selection, to select molecules based on the distance between atom A and C.
 
-Now, let us execute the first step of a filtering step in screenlamp and create an ID file of molecules that have an sp3 sulfur and a O.2 atom within a 13-20 angstrom distance. 
+Now, let us execute the first step of a filtering step in screenlamp and create an ID file of molecules that have an sp3 sulfur and an O.2 atom within a 13-20 angstrom distance. 
 
 
 ```python
@@ -499,13 +513,14 @@ Now, let us execute the first step of a filtering step in screenlamp and create 
 ```
 
     Using selection: ["((pdmol.df.atom_type == 'S.3') | (pdmol.df.atom_type == 'S.o2'))", "(pdmol.df.atom_type == 'O.2')"]
-    Processing partition_1.mol2 | 200 mol/sec
-    Processing partition_2.mol2 | 193 mol/sec
-    Processing partition_3.mol2 | 154 mol/sec
-    Processing partition_4.mol2 | 212 mol/sec
-    Processing partition_5.mol2 | 160 mol/sec
-    Processing partition_6.mol2 | 209 mol/sec
-    Processing partition_7.mol2 | 206 mol/sec
+    Processing partition_1.mol2 | 196 mol/sec
+    Processing partition_2.mol2 | 235 mol/sec
+    Processing partition_3.mol2 | 244 mol/sec
+    Processing partition_4.mol2 | 228 mol/sec
+    Processing partition_5.mol2 | 226 mol/sec
+    Processing partition_6.mol2 | 228 mol/sec
+    Processing partition_7.mol2 | 220 mol/sec
+    Finished
 
 
 Following the already familiar procedure, we can now select the MOL2 structures using the generated ID file:
@@ -519,13 +534,13 @@ Following the already familiar procedure, we can now select the MOL2 structures 
   --whitelist True
 ```
 
-    Processing partition_1.mol2 | scanned 2140 molecules | 12000 mol/sec
-    Processing partition_2.mol2 | scanned 2118 molecules | 10976 mol/sec
-    Processing partition_3.mol2 | scanned 2064 molecules | 11510 mol/sec
-    Processing partition_4.mol2 | scanned 2107 molecules | 12223 mol/sec
-    Processing partition_5.mol2 | scanned 2068 molecules | 15665 mol/sec
-    Processing partition_6.mol2 | scanned 2189 molecules | 10884 mol/sec
-    Processing partition_7.mol2 | scanned 2186 molecules | 15554 mol/sec
+    Processing partition_1.mol2 | scanned 2140 molecules | 18214 mol/sec
+    Processing partition_2.mol2 | scanned 2118 molecules | 16030 mol/sec
+    Processing partition_3.mol2 | scanned 2064 molecules | 12371 mol/sec
+    Processing partition_4.mol2 | scanned 2107 molecules | 14275 mol/sec
+    Processing partition_5.mol2 | scanned 2068 molecules | 14494 mol/sec
+    Processing partition_6.mol2 | scanned 2189 molecules | 12596 mol/sec
+    Processing partition_7.mol2 | scanned 2186 molecules | 14133 mol/sec
     Finished
 
 
@@ -545,36 +560,28 @@ Following the already familiar procedure, we can now select the MOL2 structures 
     Total : 107
 
 
-After applying this filtering step, we can see that only 107 molecules out of the 14,872 from "Filtering Step 2" remain.
+After applying this distance-based filtering step, we can see that only 107 molecules out of the 14,872 from "Filtering Step 2" remain.
 
 ## Step 4 -- Generating Conformers
 
-In this section, we are going to generate low-energy of the molecules we selected so far.
+In this section, we are going to generate low-energy conformers of the molecules we have selected so far. In the next section, we are going to use these favorable-energy conformations and overlay them with a query molecule.
 
 ![](images/tools-tutorial-1/pipe-step-4.jpg)
 
-Generating low-energy conformers of either database or reference molecule is highly recommended to account for the flexibility of molecules (for instance, rotatatable bonds) when overlaying molecules (in the next step, "Step 5 -- Overlaying Reference and Database molecules"). However, note that working with low-energy conformers increases the computational cost involved in computing the optimal overlays. For example, assuming that we have 10,000 database molecules and 1 reference molecule, generating 200 low-energy conformers of each of those database molecules would result in a database of 10,000x200 = 2,000,000 molecules. Consequently we will have to sample 2,000,000x1 overlays (200 overlays per database molecule) instead of 10,000 overlays to obtain the best-overlaying pairs. To take it a step further, we could also consider multiple conformers of the reference molecule. For example, if we create 200 conformers of the 1 reference molecule as well, we will have to overlay 2000,000x200 = 40,000,000 pairs. To summarize, the three different options as input for overlaying the reference molecule with the database molecule are given below, in increasing order of computational cost, which is proportional to the thoroughness of the sampling procedure:
+Generating low-energy conformers of either database or reference molecule is highly recommended to account for the flexibility of molecules (for instance, rotatable bonds) when overlaying molecules (in the next step, "Step 5 -- Overlaying Reference and Database molecules"). However, note that working with low-energy conformers increases the computational cost involved in computing the optimal overlays. For example, assuming that we have 10,000 database molecules and one reference molecule, generating 200 low-energy conformers of each of those database molecules would result in a database of 10,000x200 = 2,000,000 molecules. Consequently, we will have to sample 2,000,000x1 overlays (200 overlays per database molecule) instead of 10,000 overlays to obtain the best-overlaying pairs. To take it a step further, we could also consider multiple conformers of the reference molecule. For example, if we create 200 conformers of the one reference molecule as well, we will have to overlay 2000,000x200 = 40,000,000 pairs. To summarize, the three different options as input for overlaying the reference molecule with the database molecule are given below, in increasing order of computational cost, which is proportional to the thoroughness of the sampling procedure:
 
 1) Overlay a single conformer for both database and the reference molecule
 2) Overlay a single reference molecule conformer with multiple database molecule conformers
 3) Overlay multiple reference molecule conformers with multiple database molecule conformers
 
-In this tutorial, we will use option 3), where we create up to 200 conformers of each database molecule using OpenEye Omega and overlay them with an existing multiconformer reference molecule that is already provided with the tutorial files (`3kpzs_query.mol2`, which contains 35 favorable-energy conformers of the reference molecule 3kPZS).
+In this tutorial, we will use option 3), where we create up to 200 conformers of each database molecule using OpenEye Omega and overlay them with an existing multi-conformer reference molecule that is already provided with the tutorial files (`3kpzs_query.mol2`, which contains 35 favorable-energy conformers of the reference molecule 3kPZS).
 
 
 Again, please note the creating multiple conformers of a molecule is optional. The program we are going to use is OpenEye Omega, but you may use alternative tools as well, as long as they can output those conformer structures in MOL2 file format. 
 
-**Please also note that the conformers of a given molecule (database or reference molecule) files should have the same molecule ID in the MOL2 files in order to parse the output of "Step 5 -- Overlaying Reference and Database molecules" without additional workarounds. For example, if you have a multiconformer MOL2 file such as `3kpzs_query.mol2`, make sure that the molecule IDs in the MOL2 file are all "3kPZS" and don't have any suffixes or prefixes such as "3kPZS_1, 3KPZS_2, ...". The reason why we want to avoid prefixes and suffixes in those conformer names is that the overlay tool OpenEye ROCS identifies conformers by their structure, not their names, and such molecule IDs would only result in annoying name mangling, which makes the results harder to parse downstream in the analysis pipeline.**
+<div class="alert alert-block alert-info">  &#9888;Please also note that the conformers of a given molecule (database or reference molecule) files should have the same molecule ID in the MOL2 files to parse the output of "Step 5 -- Overlaying Reference and Database molecules" without additional workarounds. For example, if you have a multi-conformer MOL2 file such as 3kpzs_query.mol2, make sure that the molecule IDs in the MOL2 file are all "3kPZS" and don't have any suffixes or prefixes such as "3kPZS_1, 3KPZS_2, ...". The reason why we want to avoid prefixes and suffixes in those conformer names is that the overlay tool OpenEye ROCS identifies conformers by their structure, not their names, and such molecule IDs would only result in annoying name mangling, which makes the results harder to parse downstream in the analysis pipeline. </div>
 
-
----
-
-**Note**
-
-Optionally, "Filtering Step 3" can also be (re)applied to the outcome of this step, the low-energy conformers, to sort out conformers where functional groups are in a spatial arrangement that may not be consistent with prior knowledge, for example, that a molecule interacts via certain groups in a particular way with its binding partner.
-
----
-
+<div class="alert alert-block alert-info"> &#9888;  Optionally, ["Step 3 -- Filtering by Distance between Functional Groups"](Step-3----Filtering-by-Distance-between-Functional-Groups) can also be repeated on the output of this step, the low-energy conformers, to sort out conformers where functional groups are in a spatial arrangement that may not be consistent with prior knowledge -- for example, experimental insights that a molecule interacts via certain groups in a particular way with its binding partner.</div>
 
 While you can use OpenEye Omega directly from the command line as described in the documentation at https://www.eyesopen.com/omega, screenlamp provides a wrapper tool that generates multiconformer files of all mol2 files in a given directory using its default settings, which can be used as shown below (note that you need to provide an `--executable` path pointing to the Omega program on your machine:
 
@@ -897,9 +904,9 @@ While you can use OpenEye Omega directly from the command line as described in t
     ...ce_mol2s/partition_7.mol2|****************************************|100.00%
 
 
-By default, Omega samples up to 50,000 conformer structures and keeps up to 200 conformers with favorable energy per molecule. Additional arguments can be provided using `--settings` flag of `run_omega.py`, for example, to increase the maximum number of conformers to keep from 200 to 500, you can provide the following, optional argument: `"--settings -maxconfs 500 \"`.
+By default, Omega samples up to 50,000 conformer structures and keeps up to 200 conformers with favorable energy per molecule. Additional arguments can be provided using `--settings` flag of `run_omega.py`. For example, to increase the maximum number of conformers to keep from 200 to 500, you can provide the following argument: `"--settings -maxconfs 500 \"`.
 
-Now that we created the conformers of the database molecules, let us inspect the number of structures that we would consider for the pair-wise overlays in the next step:
+Now that we created the conformers of the database molecules, let us count the number of structures that we would consider for the pair-wise overlays in the next step:
 
 
 ```python
@@ -921,12 +928,13 @@ As we can see, we now have 19,041 structures to consider, which means Omega crea
 
 ## Step 5 -- Overlaying Reference and Database Molecules
 
-In this section we are going to overlay the database conformers we generated in `tutorial-results/04_omega_confomers/` that we generated in the previous step ("Step 4 -- Generating Conformers") with 35 3kPZS conformers provided in the tutorial material as `3kpzs_query.mol2`. (Note that if you are working with your own reference molecule, conformers can be generated similar to generating database molecules as described in section "Step 4 -- Generating Conformers").
+In this section we are going to overlay the database conformers we generated in `tutorial-results/04_omega_confomers/` that we generated in the previous step ("[Step 4 -- Generating Conformers](Step-4----Generating-Conformers)") with 35 conformers of the reference molecule (called 3kPZS), which are provided in the tutorial dataset as `3kpzs_query.mol2`. 
+
+<div class="alert alert-block alert-info"> &#9888; Note that if you are working with your own reference molecule, conformers can be generated similar to generating database molecules as described in section "[Step 4 -- Generating Conformers](Step-4----Generating-Conformers)".</div>
 
 ![](images/tools-tutorial-1/pipe-step-5.jpg)
 
-
-Screenlamp provides a wrapper tool `run_rocs.py` that wraps OpenEye ROCS for generating molecular overlays. For more information about ROCS, please see https://www.eyesopen.com/rocs. The `run_rocs.py` wrapper uses ROCs' default settings plus additional settings provided by a `--settings argument`. For more information about the ROCS settings, please refer to the official documentation at https://www.eyesopen.com/rocs. The settings we are going to use will overlay each query conformer with each database conformer, and it will only keep the best overlay for each multiconformer per. For instance, if we have 200 conformers of a database molecule A and 200 conformers of a reference molecule B, only the best overlay out of the 200x200 overlays will be kept.
+Screenlamp provides a wrapper tool `run_rocs.py` that wraps OpenEye ROCS for generating molecular overlays. For more information about ROCS, please see https://www.eyesopen.com/rocs. The `run_rocs.py` wrapper uses ROCS's default settings plus additional settings provided as arguments to the `--settings` parameter of `run_rocs.py`. For more information about the ROCS settings, please refer to the official documentation at https://www.eyesopen.com/rocs. The settings we are going to use will overlay each query conformer with each database conformer, and it will only keep the best overlay for each multi-conformer per. For instance, if we have 200 conformers of a database molecule A and 200 conformers of a reference molecule B, only the single best overlay out of the 200x200 overlays will be kept.
 
 
 ```python
@@ -1389,7 +1397,10 @@ Screenlamp provides a wrapper tool `run_rocs.py` that wraps OpenEye ROCS for gen
     #queries processed    : 1
 
 
-Although we had 19,041 database conformers, our conformer database only consists 107 unique structures (see " Filtering Step 3 -- Distance between Functional Groups"), so we expect ROCS to yield 107 best-overlay pairs, which we can check via the familiar `count_mol2.py` tool. (Note that in your own analyses, the number of input structures to Omega and output overlays from ROCS is not always the same. Potential sources for this, which we observed, is either that Omega cannot parse certain input structures and/or ROCS sometimes includes duplicates in the results.)
+Although we had 19,041 database conformers, our conformer database only consists 107 unique structures (see " Filtering Step 3 -- Distance between Functional Groups"), so we expect ROCS to yield 107 best-overlay pairs, which we can check via the familiar `count_mol2.py` tool. 
+
+
+<div class="alert alert-block alert-info"> &#9888; Note that in your own analyses, the number of input structures to Omega and output overlays from ROCS is not always the same. Potential sources for this, which we observed, is either that Omega cannot parse certain input structures and/or ROCS sometimes includes duplicates in the results. </div>
 
 
 ```python
@@ -1409,13 +1420,13 @@ Although we had 19,041 database conformers, our conformer database only consists
 
 ## Step 6 -- Sorting Molecular Overlays
 
-In this section, we are going to sort the pair-wise overlays be overlay score and select only those molecules that meet at certain similarity threshold before we continue with the functional group matching in Step 7.
+In this section, we are going to sort the pair-wise overlays be overlay score and select only those molecules that meet at certain similarity threshold before we continue with the functional group matching in "[Step 7 -- Matching Functional Groups](Step 7 -- Matching Functional Groups)".
 
 ![](images/tools-tutorial-1/pipe-step-6.jpg)
 
-To make screenlamp's functional group matching procedure as general as possible, that is, compatible to other overlay tools that generate MOL2 files (other than ROCS), we need to postprocess the ROCS results prior to the next functional group matching step (Step 7) using the `sort_rocs_mol2.py` utility tool provided in screenlamp.
+To make screenlamp's functional group matching procedure ("[Step 7 -- Matching Functional Groups](Step 7 -- Matching Functional Groups)") requires a general data input format to support a variety of overlay tools (other than ROCS). To bring the ROCS results into a more general format, we are going to use the `sort_rocs_mol2.py` utility tool provided in screenlamp.
 
-Essentially, the `sort_rocs_mol2.py` tool will create a pair of `*_query.mol2` and `*_dbase.mol2` files that contain the same number of structures each based on the ROCS overlays. The `*_dbase.mol2` file contains the database molecule and the `*_query.mol2` contains the conformer of the reference molecule that corresponds to the best-matching database-reference pair. In addition, we use the --sortby function to sort the molecules by TanimotoCombo and ColorTanimoto score (in descending order, best matches come first) for visualization and remove bad overlays by setting minumum score thresholds based on the TanimotoCombo and ColorTanimoto similarity scores. The TanimotoCombo scores measures the similarity between a pair of molecules based on the overall volumetric match (ShapeTanimoto) and the electrostatic similarity (ColorTanimoto). For more information about the different scoring metrics implemented in ROCS, please refer to the official ROCS documentation at https://www.eyesopen.com/rocs
+Essentially, the `sort_rocs_mol2.py` tool will create a pair of `\*_query.mol2` and `\*_dbase.mol2` files that contain the same number of structures each based on the ROCS overlays. The `\*_dbase.mol2` file contains the database molecule and the `\*_query.mol2` contains the conformer of the reference molecule that corresponds to the best-matching database-reference pair. Besides, we use the `--sortby` parameter to sort the molecules by TanimotoCombo and ColorTanimoto score (in descending order, best matches come first) for visualization and remove bad overlays by setting minimum score thresholds based on the TanimotoCombo and ColorTanimoto similarity scores. The TanimotoCombo score measures the similarity between a pair of molecules based on the overall volumetric match (ShapeTanimoto) and the electrostatic similarity (ColorTanimoto). For more information about the different scoring metrics implemented in ROCS, please refer to the official ROCS documentation at https://www.eyesopen.com/rocs.
 
 
 ```python
@@ -1445,7 +1456,7 @@ Note that if `--id_suffix True`, a molecule ID suffix will be added to the query
 
 ---
 
-After using the `sort_rocs_mol2.py` utility script, we have a new directory that contains pairs of `*_dbase.mol2` and `*_query.mol2` conformers from the ROCS overlays:
+After using the `sort_rocs_mol2.py` utility script, we have a new directory that contains pairs of `\*_dbase.mol2` and `\*_query.mol2` conformers from the ROCS overlays:
 
 
 ```python

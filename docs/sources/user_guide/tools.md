@@ -44,7 +44,7 @@ python count_mol2.py -i partition_1.mol2
      datatable_to_id.py [-h] -i INPUT -o OUTPUT --id_column ID_COLUMN
 
 
-`[--seperator SEPERATOR] [-s SELECTION] [-v VERBOSE]`  
+`[--separator SEPARATOR] [-s SELECTION] [-v VERBOSE]`  
 `[--version]`  
 Create a text file with molecule IDs from MOL2 files.
 
@@ -61,7 +61,7 @@ store the molecular features.
 (Required.) Output path for the ID file (for example, `ids.txt`).
 - `--id_column ID_COLUMN`  
 (Required.) Name of the Molecule ID column.
-- `--seperator SEPERATOR`  
+- `--separator SEPARATOR`  
 (Optional, default: `"	"`.) Column seperator used
 in the input table.
 Assumes tab-separated values by default.

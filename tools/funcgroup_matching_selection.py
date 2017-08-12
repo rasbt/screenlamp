@@ -4,7 +4,7 @@
 # for hypothesis-driven virtual screening.
 #
 # Copyright (C) 2017 Michigan State University
-# License: MIT
+# License: Apache v2
 #
 # Software author: Sebastian Raschka <http://sebastianraschka.com>
 # Software author email: mail@sebastianraschka.com
@@ -206,17 +206,19 @@ python funcgroup_matching_selection.py\\
                               ' generated via `funcgroup_matching.py`).'))
     parser.add_argument('--input_mol2',
                         type=str,
-                        required=True,
-                        help=('(Required.) Input directory with input `.mol2` structures (ROCS overlays'
-                              ' generated via `sort_rocs_mol2.py`).'))
+                        help=('(Optional.) Input directory with input `.mol2` structures (ROCS overlays'
+                              '\ngenerated via `sort_rocs_mol2.py`). If provided, the MOL2 structures'
+                              '\ncorresponding to the selected matches will be extracted from the'
+                              '\ninput_mol2 directory and written to the output directory for visual inspection,'
+                              '\nfor example, using PyMOL.'))
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
                         help='(Required.) Directory for writing the output files.')
     parser.add_argument('--atomtype_selection',
                         type=str,
-                        required=True,
-                        help="""(Required.) Selection condition for the atom types.
+                        default="",
+                        help="""(Optional, default="") Selection condition for the atom types.
 For example, the following selection query will make a selection based on
 matching 2 atoms in the reference molecule, S1 and O2:
 "((S1 == 'S.3') | (S1 == 'S.o2')) --> (O2 == 'O.2')".
@@ -224,8 +226,8 @@ Here, S1 can either match an S.3 or an S.o2 atom in the database molecule.
 The second atom, O2, must match an atom of type O.2.""")
     parser.add_argument('--charge_selection',
                         type=str,
-                        required=True,
-                        help="""(Required.) Selection condition for the atom charges.
+                        default="",
+                        help="""(Optional, default="") Selection condition for the atom charges.
 For example, the following selection query will make a selection based on
 matching the charges in 2 atoms in the reference molecule, S1 and O2:
 "((S1 >= 1.0)) --> (O2 <= -0.5)".

@@ -4,7 +4,7 @@
 # for hypothesis-driven virtual screening.
 #
 # Copyright (C) 2017 Michigan State University
-# License: MIT
+# License: Apache v2
 #
 # Software author: Sebastian Raschka <http://sebastianraschka.com>
 # Software author email: mail@sebastianraschka.com
@@ -128,7 +128,7 @@ python datatable_to_id.py\\
                         type=str,
                         required=True,
                         help='(Required.) Name of the Molecule ID column.')
-    parser.add_argument('--seperator',
+    parser.add_argument('--separator',
                         type=str,
                         default='\t',
                         help=('(Optional, default: `"\t"`.) Column seperator used\nin the input table.\n'

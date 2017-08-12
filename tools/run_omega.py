@@ -4,7 +4,7 @@
 # for hypothesis-driven virtual screening.
 #
 # Copyright (C) 2017 Michigan State University
-# License: MIT
+# License: Apache v2
 #
 # Software author: Sebastian Raschka <http://sebastianraschka.com>
 # Software author email: mail@sebastianraschka.com

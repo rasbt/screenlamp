@@ -4,7 +4,7 @@
 # for hypothesis-driven virtual screening.
 #
 # Copyright (C) 2017 Michigan State University
-# License: MIT
+# License: Apache v2
 #
 # Software author: Sebastian Raschka <http://sebastianraschka.com>
 # Software author email: mail@sebastianraschka.com
@@ -77,6 +77,8 @@ def main(input_dir, output_file, verbose):
     mol2_to_idfile(mol2_files=mol2_files,
                    id_file_path=output_file,
                    verbose=verbose)
+    if verbose:
+        print('Finished')
 
 
 if __name__ == '__main__':
