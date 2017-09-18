@@ -66,7 +66,7 @@ def read_idfile(id_file_path):
     return ids
 
 
-def filter_and_write(mol2_files, ids, output_dir, whitelist_filter, verbose):
+def filter_and_write(mol2_files, ids, output_dir, includelist_filter, verbose):
     for mol2_file in mol2_files:
         if verbose:
             sys.stdout.write('Processing %s' % os.path.basename(mol2_file))
@@ -88,7 +88,7 @@ def filter_and_write(mol2_files, ids, output_dir, whitelist_filter, verbose):
             if verbose:
                 start = time.time()
 
-            if whitelist_filter:
+            if includelist_filter:
 
                 if write_mode == 'w':
                     for idx, mol2 in enumerate(split_multimol2(mol2_file)):
@@ -119,14 +119,14 @@ def filter_and_write(mol2_files, ids, output_dir, whitelist_filter, verbose):
 
 
 
-def main(input_dir, id_file_path, output_dir, whitelist_filter, verbose):
+def main(input_dir, id_file_path, output_dir, includelist_filter, verbose):
     mol2_files = get_mol2_files(dir_path=input_dir)
     ids = read_idfile(id_file_path)
 
     filter_and_write(mol2_files=mol2_files,
                      ids=ids,
                      output_dir=output_dir,
-                     whitelist_filter=whitelist_filter,
+                     includelist_filter=includelist_filter,
                      verbose=verbose)
     if verbose:
         print('Finished')
@@ -140,7 +140,7 @@ if __name__ == '__main__':
             epilog="""Example:
 python id_to_mol2.py --input mol2_dir/\\
    --id_file ids.txt\\
-   --whitelist True\\
+   --includelist True\\
    --output filtered_mol2_dir/""",
             formatter_class=argparse.RawTextHelpFormatter)
 
@@ -159,11 +159,11 @@ python id_to_mol2.py --input mol2_dir/\\
                         required=True,
                         help='(Required.) Output directory path for the'
                              '\nfiltered MOL2 files.')
-    parser.add_argument('-w', '--whitelist',
+    parser.add_argument('-w', '--includelist',
                         type=str2bool,
                         default=True,
-                        help='(Optional, default: `True`.) Uses ID file as whitelist if True (default).'
-                        '\nUses ID file as blacklist if False.')
+                        help='(Optional, default: `True`.) Uses ID file as includelist if True (default).'
+                        '\nUses ID file as excludelist if False.')
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=1,
@@ -179,5 +179,5 @@ python id_to_mol2.py --input mol2_dir/\\
     main(input_dir=args.input,
          id_file_path=args.id_file,
          output_dir=args.output,
-         whitelist_filter=args.whitelist,
+         includelist_filter=args.includelist,
          verbose=args.verbose)

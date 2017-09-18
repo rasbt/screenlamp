@@ -154,7 +154,7 @@ Step 01: SELECT MOLECULES FROM DATA TABLE
            '--input', INPUT_MOL2_PATH,
            '--id_file', os.path.join(PROJECT_PATH, '01_ids_from_database.txt'),
            '--output', os.path.join(PROJECT_PATH, '01_selected-mol2s'),
-           '--whitelist', 'True']
+           '--includelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if incremental:
@@ -200,7 +200,7 @@ Step 02: PREFILTER BY FUNCTIONAL GROUP PRESENCE
            '--id_file', os.path.join(PROJECT_PATH,
                                      '02_fgroup-presence_mol2ids.txt'),
            '--output', os.path.join(PROJECT_PATH, '02_fgroup-presence_mol2s'),
-           '--whitelist', 'True']
+           '--includelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if incremental:
@@ -247,7 +247,7 @@ Step 03: PREFILTER BY FUNCTIONAL GROUP DISTANCE
                                      '03_fgroup_distance_mol2ids.txt'),
            '--output', os.path.join(PROJECT_PATH,
                                     '03_fgroup_distance_mol2s'),
-           '--whitelist', 'True']
+           '--includelist', 'True']
 
     print('Running command:\n%s\n' % ' '.join(cmd))
     if incremental:

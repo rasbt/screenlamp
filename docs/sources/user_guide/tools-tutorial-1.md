@@ -89,7 +89,7 @@ This section provides a brief introduction to the general concept of how the fil
 1. Creating an "ID file" (more about this later)
 2. Use the "ID file" to select the corresponding 3D-structures from MOL2 files
 
-Furthermore, there are 2 kinds of filtering procedures. Via whitelist-filtering, we select all molecules that are **listed in** the ID file. Vice versa, blacklist-filtering is used to select all molecules that are **not listed in** the ID file.
+Furthermore, there are 2 kinds of filtering procedures. Via includelist-filtering, we select all molecules that are **listed in** the ID file. Vice versa, excludelist-filtering is used to select all molecules that are **not listed in** the ID file.
 
 ### Generating ID Files from Molecules
 
@@ -137,7 +137,7 @@ To check that the creation of the ID file was successful and to see how it looks
     ZINC01458151
 
 
-To illustrate the concept of whitelist and blacklist filtering in the following sections, let us now create a small ID list file, we name it `5-mol2ids.txt`, that contains 5 IDs only, using the `echo` command in a Unix/Linux terminal:
+To illustrate the concept of includelist and excludelist filtering in the following sections, let us now create a small ID list file, we name it `5-mol2ids.txt`, that contains 5 IDs only, using the `echo` command in a Unix/Linux terminal:
 
 
 ```python
@@ -155,15 +155,15 @@ The execution of the preceeding command will create a text file that looks as fo
 
 ### Whitelist Filtering
 
-Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files for molecules that are listed in an ID file using the `--whitefilter True` option. Executing the following command will look for the structures corresponding to the five molecule IDs included in the `5-mol2ids.txt` that we created in the previous section, and write the corresponding structure files to a new directory that we will call `whitelist_example`:
+Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files for molecules that are listed in an ID file using the `--whitefilter True` option. Executing the following command will look for the structures corresponding to the five molecule IDs included in the `5-mol2ids.txt` that we created in the previous section, and write the corresponding structure files to a new directory that we will call `includelist_example`:
 
 
 ```python
 ! python tools/id_to_mol2.py \
   --input tk-tutorial_data/partition_1-7/ \
-  --output tutorial-results/whitelist-example \
+  --output tutorial-results/includelist-example \
   --id_file tutorial-results/5-mol2ids.txt \
-  --whitelist True
+  --includelist True
 ```
 
     Processing partition_1.mol2 | scanned 10000 molecules | 15319 mol/sec
@@ -176,14 +176,14 @@ Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files f
     Finished
 
 
-The output directory, `tutorial-results/whitelist-example`, should now contain only mol2 structures that are labeled with IDs contained in the `5-mol2ids.txt` text file.
+The output directory, `tutorial-results/includelist-example`, should now contain only mol2 structures that are labeled with IDs contained in the `5-mol2ids.txt` text file.
 
-Please note that `id_to_mol2.py` creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found for this particular partition via whitelist filtering and could remain empty. For example, the five structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
+Please note that `id_to_mol2.py` creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found for this particular partition via includelist filtering and could remain empty. For example, the five structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
 
 
 ```python
 ! python tools/count_mol2.py \
-  --input tutorial-results/whitelist-example
+  --input tutorial-results/includelist-example
 ```
 
     partition_1.mol2 : 5
@@ -198,15 +198,15 @@ Please note that `id_to_mol2.py` creates a new file for each mol2 file it scanne
 
 ### Blacklist Filtering
 
-Similar to the whitelisting example in the previous section, we can use a ID file for blacklist filtering. Blacklist filtering means that all molecules that are ***not*** listed in an ID file will be selected. In order to perform blacklist filtering, we use the setting `--whitelist False` as shown below:
+Similar to the includelisting example in the previous section, we can use a ID file for excludelist filtering. Blacklist filtering means that all molecules that are ***not*** listed in an ID file will be selected. In order to perform excludelist filtering, we use the setting `--includelist False` as shown below:
 
 
 ```python
 ! python tools/id_to_mol2.py \
   --input tk-tutorial_data/partition_1-7/ \
-  --output tutorial-results/blacklist-example \
+  --output tutorial-results/excludelist-example \
   --id_file tutorial-results/5-mol2ids.txt \
-  --whitelist False
+  --includelist False
 ```
 
     Processing partition_1.mol2 | scanned 10000 molecules | 12772 mol/sec
@@ -219,12 +219,12 @@ Similar to the whitelisting example in the previous section, we can use a ID fil
     Finished
 
 
-This time, we expect 69995 structures to be obtained after the filtering, since we scanned 70,000 molecules and had 5 molecules on our ID blacklist:
+This time, we expect 69995 structures to be obtained after the filtering, since we scanned 70,000 molecules and had 5 molecules on our ID excludelist:
 
 
 ```python
 ! python tools/count_mol2.py \
-  --input tutorial-results/blacklist-example
+  --input tutorial-results/excludelist-example
 ```
 
     partition_1.mol2 : 9995
@@ -330,7 +330,7 @@ We already completed step 1, and now, we are going the ID file we just created t
   --input tk-tutorial_data/partition_1-7/ \
   --output tutorial-results/01_selected_mol2s/ \
   --id_file tutorial-results/01_selected_mol2s.txt \
-  --whitelist True
+  --includelist True
 ```
 
     Processing partition_1.mol2 | scanned 10000 molecules | 12021 mol/sec
@@ -455,7 +455,7 @@ We have already completed step 1 so that we can use the ID file we created to se
   --input tutorial-results/01_selected_mol2s/ \
   --output tutorial-results/02_fgroup_presence_mol2s \
   --id_file tutorial-results/02_fgroup_presence_mol2s.txt \
-  --whitelist True
+  --includelist True
 ```
 
     Processing partition_1.mol2 | scanned 8628 molecules | 13872 mol/sec
@@ -531,7 +531,7 @@ Following the already familiar procedure, we can now select the MOL2 structures 
   --input tutorial-results/02_fgroup_presence_mol2s \
   --output tutorial-results/03_fgroup_distance_mol2s \
   --id_file tutorial-results/03_fgroup_distance_mol2s.txt \
-  --whitelist True
+  --includelist True
 ```
 
     Processing partition_1.mol2 | scanned 2140 molecules | 18214 mol/sec

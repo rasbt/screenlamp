@@ -360,9 +360,9 @@ IDs (one ID per line).
 - `-o OUTPUT, --output OUTPUT`  
 (Required.) Output directory path for the
 filtered MOL2 files.
-- `-w WHITELIST, --whitelist WHITELIST`  
-(Optional, default: `True`.) Uses ID file as whitelist if True (default).
-Uses ID file as blacklist if False.
+- `-w WHITELIST, --includelist WHITELIST`  
+(Optional, default: `True`.) Uses ID file as includelist if True (default).
+Uses ID file as excludelist if False.
 - `-v VERBOSE, --verbose VERBOSE`  
 (Optional, default: `1`.) Verbosity level. If 0, does not print any
 output.
@@ -375,7 +375,7 @@ processing.
 ```
 python id_to_mol2.py --input mol2_dir/\
 --id_file ids.txt\
---whitelist True\
+--includelist True\
 --output filtered_mol2_dir/
 ```
 
