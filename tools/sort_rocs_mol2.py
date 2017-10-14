@@ -57,14 +57,14 @@ def parse_selection_string(s, df_name='df'):
 
 
 def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
-                   sortby, seperator, verbose, id_suffix, selection):
+                   sortby, separator, verbose, id_suffix, selection):
 
     if verbose:
         sys.stdout.write('Processing %s' % os.path.basename(inp_mol2_path))
         sys.stdout.flush()
 
     df = pd.read_table(report_path, usecols=['Name', 'ShapeQuery'] + sortby,
-                       sep=seperator)
+                       sep=separator)
 
     if sortby:
         df.sort_values(sortby, inplace=True, ascending=False)
@@ -148,7 +148,7 @@ def read_and_write(inp_mol2_path, report_path, output_dir, query_path,
 
 
 def main(input_dir, output_dir, query_path,
-         sortby, seperator, verbose, id_suffix, selection):
+         sortby, separator, verbose, id_suffix, selection):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
     inp_mol2_paths = get_mol2_files(input_dir)
@@ -158,7 +158,7 @@ def main(input_dir, output_dir, query_path,
         report_path = base.replace('.mol2', '.rpt').replace('_hits_', '_')
         report_path = os.path.join(os.path.dirname(mol2_path), report_path)
         read_and_write(mol2_path, report_path, output_dir, query_path,
-                       sortby, seperator, verbose, id_suffix, selection)
+                       sortby, separator, verbose, id_suffix, selection)
 
 
 if __name__ == '__main__':
@@ -209,10 +209,10 @@ python sort_rocs_mol2.py -i rocs_results/\\
                              '\nor below a certain score threshold. By default'
                              '\nall molecules with a ColorTanimoto score smaller than 0.25'
                              '\n and a TanimotoCombo score smaller than 1.0 will be disregarded.')
-    parser.add_argument('--seperator',
+    parser.add_argument('--separator',
                         type=str,
                         default='\t',
-                        help=('(Optional, default: `"\\t"`.) Column seperator used\nin the input table.\n'
+                        help=('(Optional, default: `"\\t"`.) Column separator used\nin the input table.\n'
                               'Assumes tab-separated values by default.'))
     parser.add_argument('--id_suffix',
                         type=str,
@@ -267,6 +267,6 @@ python sort_rocs_mol2.py -i rocs_results/\\
     main(input_dir=args.input, output_dir=args.output, query_path=args.query,
          sortby=sortby,
          verbose=args.verbose,
-         seperator=args.seperator,
+         separator=args.separator,
          id_suffix=id_suffix,
          selection=args.selection)

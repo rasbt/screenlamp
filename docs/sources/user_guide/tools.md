@@ -62,7 +62,7 @@ store the molecular features.
 - `--id_column ID_COLUMN`  
 (Required.) Name of the Molecule ID column.
 - `--separator SEPARATOR`  
-(Optional, default: `"	"`.) Column seperator used
+(Optional, default: `"	"`.) Column separator used
 in the input table.
 Assumes tab-separated values by default.
 - `-s SELECTION, --selection SELECTION`  
@@ -576,7 +576,7 @@ python overlay_molecules_rocs.py\
      sort_rocs_mol2.py [-h] -i INPUT -o OUTPUT --query QUERY [-s SORTBY]
 
 
-`[--selection SELECTION] [--seperator SEPERATOR]`  
+`[--selection SELECTION] [--separator SEPERATOR]`  
 `[--id_suffix ID_SUFFIX] [-v VERBOSE] [--version]`  
 Sorts ROCS results by score and creates
 separate .mol2 files for the database and query molecules.
@@ -609,8 +609,8 @@ Selection string to exclude molecules above
 or below a certain score threshold. By default
 all molecules with a ColorTanimoto score smaller than 0.25
 and a TanimotoCombo score smaller than 1.0 will be disregarded.
-- `--seperator SEPERATOR`  
-(Optional, default: `"\t"`.) Column seperator used
+- `--separator SEPERATOR`  
+(Optional, default: `"\t"`.) Column separator used
 in the input table.
 Assumes tab-separated values by default.
 - `--id_suffix ID_SUFFIX`  

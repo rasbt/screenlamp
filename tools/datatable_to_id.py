@@ -97,7 +97,7 @@ def main(input_dir, output_file, verbose, selection, id_column):
                    selection=parsed_sele,
                    columns=columns,
                    id_column=id_column,
-                   sep=args.seperator,
+                   sep=args.separator,
                    verbose=args.verbose)
 
 
@@ -131,7 +131,7 @@ python datatable_to_id.py\\
     parser.add_argument('--separator',
                         type=str,
                         default='\t',
-                        help=('(Optional, default: `"\t"`.) Column seperator used\nin the input table.\n'
+                        help=('(Optional, default: `"\t"`.) Column separator used\nin the input table.\n'
                               'Assumes tab-separated values by default.'))
     parser.add_argument('-s', '--selection',
                         type=str,

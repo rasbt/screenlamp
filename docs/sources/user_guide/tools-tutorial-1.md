@@ -312,7 +312,7 @@ Below are some additional examples of correct and incorrect selection strings th
 
 - Correct: `"(MWT >= 200) & (NRB <= 7)"`
 - Wrong: `"( MWT >= 200) & ( NRB <= 7)"` [spacing between parentheses and column names]
-- Wrong: `"MWT >= 200 & NRB <= 7"` [expressions seperated by logical '&' operator not enclosed in parentheses]
+- Wrong: `"MWT >= 200 & NRB <= 7"` [expressions separated by logical '&' operator not enclosed in parentheses]
 - Wrong: `"(mwt >= 200) & (nrb <= 7)"` [column names don't match the columns in the data table file]
 - Wrong: `"(mwt>=200) & (nrb<=7)"` [no whitespace before and after operators for comparison]
 
