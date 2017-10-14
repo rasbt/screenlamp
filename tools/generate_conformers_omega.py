@@ -31,21 +31,6 @@ import subprocess
 import sys
 import argparse
 from multiprocessing import cpu_count
-from biopandas.mol2.mol2_io import split_multimol2
-
-
-def check_query(query_path):
-    ids = [mol2[0] for mol2 in split_multimol2(query_path)]
-    n_ids = len(ids)
-    if n_ids > 1:
-        n_unique_ids = len(set(ids))
-        if n_unique_ids > 1:
-            raise ValueError('Please Make sure that you only submit one'
-                             ' molecule or, if you submit a multi-conformer'
-                             ' query, that conformers of the molecule'
-                             ' have all the same molecule ID labels.'
-                             ' Found %d molecules and %d unique labels'
-                             % (n_ids, n_unique_ids))
 
 
 def get_num_cpus(n_cpus):
@@ -73,29 +58,18 @@ def get_mol2_files(dir_path):
     return files
 
 
-def run_rocs(source_file, target_file, n_processes, settings):
+def run_omega(source_file, target_file, n_processes, settings):
 
     prefix = ''.join(target_file.split('.mol2')[:-1])
 
-    sys.stdout.write('Processing %s\n' % os.path.basename(source_file))
+    sys.stdout.write('Processing %s\n' % source_file)
     sys.stdout.flush()
 
-    for idx, mol2 in enumerate(split_multimol2(QUERY_FILE)):
-        if idx >= 1:
-            mcquery = 'true'
-            break
-    if not idx:
-        mcquery = 'false'
-
     cmd = [EXECUTABLE,
-           '-ref', QUERY_FILE,
-           '-dbase', source_file,
-           '-outputquery', 'false',
+           '-in', source_file,
+           '-out', target_file,
            '-prefix', prefix,
-           '-mcquery', mcquery,
-           '-mpi_np', str(n_processes),
-           '-oformat', 'mol2']
-
+           '-mpi_np', str(n_processes)]
     if settings:
         for s in settings.split():
             s = s.strip()
@@ -108,8 +82,6 @@ def run_rocs(source_file, target_file, n_processes, settings):
 def main(input_dir, output_dir, n_processes, settings):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
-
-    check_query(QUERY_FILE)
     mol2_in_files = get_mol2_files(input_dir)
     mol2_out_files = [os.path.join(output_dir, os.path.basename(mol2))
                       for mol2 in mol2_in_files]
@@ -117,62 +89,43 @@ def main(input_dir, output_dir, n_processes, settings):
     n_processes = get_num_cpus(n_processes)
 
     for i, j in zip(mol2_in_files, mol2_out_files):
-        run_rocs(source_file=i,
-                 target_file=j,
-                 n_processes=n_processes,
-                 settings=settings)
+        run_omega(source_file=i,
+                  target_file=j,
+                  n_processes=n_processes,
+                  settings=settings)
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-            description='Wrapper running OpenEye ROCS on one'
+            description='Wrapper running OpenEye OMEGA on one'
                         '\nor more database partitions.',
             epilog="""Example:
-python run_rocs.py\\
-   --input database_conformers/\\
-   --output rocs_overlays/\\
-   --executable /.../rocs-3.2.1.4\\
-   --query query.mol2\\
-   --settings "-rankby TanimotoCombo -maxhits 0 -besthits 0 -progress percent"\\
+python generate_conformers_omega.py\\
+   --input dbase_mol2\\
+   --output dbase_conformers/\\
+   --executable /.../omega2-2.5.1.4\\
    --processes 0""",
             formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-i', '--input',
                         type=str,
                         required=True,
-                        help='Path to input directory containing the database'
-                             '\nmolecules in `.mol2` and/or `.mol2.gz` format.'
-                        )
+                        help='Input directory with `.mol2`'
+                             ' and `.mol2.gz` files.')
     parser.add_argument('-o', '--output',
                         type=str,
                         required=True,
-                        help='(Required.) Directory path for writing'
-                             ' the `.mol2`'
-                             '\noverlay ROCS status and ROCS report (`.rpt`)'
-                             ' files.')
-    parser.add_argument('--query',
-                        type=str,
-                        required=True,
-                        help='(Required.) Path to the query molecule'
-                             '\nin `.mol2` and/or `.mol2.gz` format.'
-                             '\nThe query molecule file could be a single'
-                             '\nstructure of multiple-conformers of the same'
-                             '\nstructure. If a multi-conformer file is'
-                             '\nsubmitted, please make sure that all'
-                             '\nconformers in the mol2 file have the same'
-                             '\nmolecule ID/Name.')
+                        help='Directory for writing the output files.')
     parser.add_argument('--executable',
                         type=str,
                         required=True,
                         help="""(Required.) The path or command for running
-OpenEye ROCS on your system.""")
+OpenEye OMEGA2 on your system.""")
     parser.add_argument('--settings',
                         type=str,
-                        default='-rankby TanimotoCombo -maxhits 0'
-                                ' -besthits 0 -progress percent',
-                        help='(Optional, default:" -rankby TanimotoCombo -maxhits 0'
-                             ' -besthits 0 -progress percent")\n ROCS settings to use.')
+                        default='-maxconfs 200 -warts false -progress percent',
+                        help='(Optional.) OMEGA settings to use.')
     parser.add_argument('--processes',
                         type=int,
                         default=1,
@@ -189,7 +142,6 @@ OpenEye ROCS on your system.""")
 
     args = parser.parse_args()
 
-    QUERY_FILE = args.query
     EXECUTABLE = args.executable
 
     main(input_dir=args.input,

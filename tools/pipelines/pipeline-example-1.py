@@ -276,7 +276,7 @@ Step 04: OMEGA conformers
     """
     print(s)
 
-    cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'run_omega.py'),
+    cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'generate_conformers_omega.py'),
            '--input', os.path.join(PROJECT_PATH,
                                    '03_fgroup_distance_mol2s'),
            '--output', os.path.join(PROJECT_PATH, '04_omega_conformers'),
@@ -310,7 +310,7 @@ Step 05: ROCS OVERLAYS
     """
     print(s)
 
-    cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'run_rocs.py'),
+    cmd = ['python', os.path.join(SCREENLAMP_TOOLS_DIR, 'overlay_molecules_rocs.py'),
            '--input', os.path.join(PROJECT_PATH, '04_omega_conformers'),
            '--output', os.path.join(PROJECT_PATH, '05_rocs_overlays'),
            '--executable', ROCS_EXECUTABLE,

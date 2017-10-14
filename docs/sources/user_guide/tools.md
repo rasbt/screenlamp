@@ -455,13 +455,13 @@ python mol2_to_id.py\
 
 
 
-## run_omega.py
+## generate_conformers_omega.py
 
 
 
 **Usage:**
 
-     run_omega.py [-h] -i INPUT -o OUTPUT --executable EXECUTABLE
+     generate_conformers_omega.py [-h] -i INPUT -o OUTPUT --executable EXECUTABLE
 
 
 `[--settings SETTINGS] [--processes PROCESSES] [-v]`  
@@ -495,7 +495,7 @@ Show program's version number and exit
 **Example:**
 
 ```
-python run_omega.py\
+python generate_conformers_omega.py\
 --input dbase_mol2\
 --output dbase_conformers/\
 --executable /.../omega2-2.5.1.4\
@@ -504,13 +504,13 @@ python run_omega.py\
 
 
 
-## run_rocs.py
+## overlay_molecules_rocs.py
 
 
 
 **Usage:**
 
-     run_rocs.py [-h] -i INPUT -o OUTPUT --query QUERY --executable
+     overlay_molecules_rocs.py [-h] -i INPUT -o OUTPUT --query QUERY --executable
 
 
 EXECUTABLE [--settings SETTINGS] [--processes PROCESSES]
@@ -556,7 +556,7 @@ Show program's version number and exit
 **Example:**
 
 ```
-python run_rocs.py\
+python overlay_molecules_rocs.py\
 --input database_conformers/\
 --output rocs_overlays/\
 --executable /.../rocs-3.2.1.4\

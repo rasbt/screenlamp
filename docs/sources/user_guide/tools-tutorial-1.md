@@ -587,7 +587,7 @@ While you can use OpenEye Omega directly from the command line as described in t
 
 
 ```python
-! python tools/run_omega.py \
+! python tools/generate_conformers_omega.py \
   --input tutorial-results/03_fgroup_distance_mol2s \
   --output tutorial-results/04_omega_confomers/ \
   --executable "/Applications/OMEGA 2.5.1.4.app/Contents/MacOS/omega2-2.5.1.4" \
@@ -904,7 +904,7 @@ While you can use OpenEye Omega directly from the command line as described in t
     ...ce_mol2s/partition_7.mol2|****************************************|100.00%
 
 
-By default, Omega samples up to 50,000 conformer structures and keeps up to 200 conformers with favorable energy per molecule. Additional arguments can be provided using `--settings` flag of `run_omega.py`. For example, to increase the maximum number of conformers to keep from 200 to 500, you can provide the following argument: `"--settings -maxconfs 500 \"`.
+By default, Omega samples up to 50,000 conformer structures and keeps up to 200 conformers with favorable energy per molecule. Additional arguments can be provided using `--settings` flag of `generate_conformers_omega.py`. For example, to increase the maximum number of conformers to keep from 200 to 500, you can provide the following argument: `"--settings -maxconfs 500 \"`.
 
 Now that we created the conformers of the database molecules, let us count the number of structures that we would consider for the pair-wise overlays in the next step:
 
@@ -934,11 +934,11 @@ In this section we are going to overlay the database conformers we generated in 
 
 ![](images/tools-tutorial-1/pipe-step-5.jpg)
 
-Screenlamp provides a wrapper tool `run_rocs.py` that wraps OpenEye ROCS for generating molecular overlays. For more information about ROCS, please see https://www.eyesopen.com/rocs. The `run_rocs.py` wrapper uses ROCS's default settings plus additional settings provided as arguments to the `--settings` parameter of `run_rocs.py`. For more information about the ROCS settings, please refer to the official documentation at https://www.eyesopen.com/rocs. The settings we are going to use will overlay each query conformer with each database conformer, and it will only keep the best overlay for each multi-conformer per. For instance, if we have 200 conformers of a database molecule A and 200 conformers of a reference molecule B, only the single best overlay out of the 200x200 overlays will be kept.
+Screenlamp provides a wrapper tool `overlay_molecules_rocs.py` that wraps OpenEye ROCS for generating molecular overlays. For more information about ROCS, please see https://www.eyesopen.com/rocs. The `overlay_molecules_rocs.py` wrapper uses ROCS's default settings plus additional settings provided as arguments to the `--settings` parameter of `overlay_molecules_rocs.py`. For more information about the ROCS settings, please refer to the official documentation at https://www.eyesopen.com/rocs. The settings we are going to use will overlay each query conformer with each database conformer, and it will only keep the best overlay for each multi-conformer per. For instance, if we have 200 conformers of a database molecule A and 200 conformers of a reference molecule B, only the single best overlay out of the 200x200 overlays will be kept.
 
 
 ```python
-! python tools/run_rocs.py \
+! python tools/overlay_molecules_rocs.py \
   --input tutorial-results/04_omega_confomers/ \
   --output tutorial-results/05_rocs_overlays/ \
   --query tk-tutorial_data/3kpzs_query.mol2 \
