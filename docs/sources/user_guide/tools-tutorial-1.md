@@ -89,7 +89,7 @@ This section provides a brief introduction to the general concept of how the fil
 1. Creating an "ID file" (more about this later)
 2. Use the "ID file" to select the corresponding 3D-structures from MOL2 files
 
-Furthermore, there are 2 kinds of filtering procedures. Via includelist-filtering, we select all molecules that are **listed in** the ID file. Vice versa, excludelist-filtering is used to select all molecules that are **not listed in** the ID file.
+Furthermore, there are 2 kinds of filtering procedures. Via whitelist-filtering, we select all molecules that are **listed in** the ID file. Vice versa, blacklist-filtering is used to select all molecules that are **not listed in** the ID file.
 
 ### Generating ID Files from Molecules
 
@@ -137,7 +137,7 @@ To check that the creation of the ID file was successful and to see how it looks
     ZINC01458151
 
 
-To illustrate the concept of includelist and excludelist filtering in the following sections, let us now create a small ID list file, we name it `5-mol2ids.txt`, that contains 5 IDs only, using the `echo` command in a Unix/Linux terminal:
+To illustrate the concept of whitelist and blacklist filtering in the following sections, let us now create a small ID list file, we name it `5-mol2ids.txt`, that contains 5 IDs only, using the `echo` command in a Unix/Linux terminal:
 
 
 ```python
@@ -155,15 +155,15 @@ The execution of the preceeding command will create a text file that looks as fo
 
 ### Whitelist Filtering
 
-Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files for molecules that are listed in an ID file using the `--whitefilter True` option. Executing the following command will look for the structures corresponding to the five molecule IDs included in the `5-mol2ids.txt` that we created in the previous section, and write the corresponding structure files to a new directory that we will call `includelist_example`:
+Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files for molecules that are listed in an ID file using the `--whitefilter True` option. Executing the following command will look for the structures corresponding to the five molecule IDs included in the `5-mol2ids.txt` that we created in the previous section, and write the corresponding structure files to a new directory that we will call `whitelist_example`:
 
 
 ```python
 ! python tools/id_to_mol2.py \
   --input tk-tutorial_data/partition_1-7/ \
-  --output tutorial-results/includelist-example \
+  --output tutorial-results/whitelist-example \
   --id_file tutorial-results/5-mol2ids.txt \
-  --includelist True
+  --whitelist True
 ```
 
     Processing partition_1.mol2 | scanned 10000 molecules | 15319 mol/sec
@@ -176,14 +176,14 @@ Now, using the script `id_to_mol2.py`, we can filter a directory of mol2 files f
     Finished
 
 
-The output directory, `tutorial-results/includelist-example`, should now contain only mol2 structures that are labeled with IDs contained in the `5-mol2ids.txt` text file.
+The output directory, `tutorial-results/whitelist-example`, should now contain only mol2 structures that are labeled with IDs contained in the `5-mol2ids.txt` text file.
 
-Please note that `id_to_mol2.py` creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found for this particular partition via includelist filtering and could remain empty. For example, the five structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
+Please note that `id_to_mol2.py` creates a new file for each mol2 file it scanned; however, the creation of such a file does not imply that structures were found for this particular partition via whitelist filtering and could remain empty. For example, the five structure IDs in the `5-mol2ids.txt` all refer to structures from `partition_1` as we can check by running the already familiar `count_mol2.py` script:
 
 
 ```python
 ! python tools/count_mol2.py \
-  --input tutorial-results/includelist-example
+  --input tutorial-results/whitelist-example
 ```
 
     partition_1.mol2 : 5
@@ -198,15 +198,15 @@ Please note that `id_to_mol2.py` creates a new file for each mol2 file it scanne
 
 ### Blacklist Filtering
 
-Similar to the includelisting example in the previous section, we can use a ID file for excludelist filtering. Blacklist filtering means that all molecules that are ***not*** listed in an ID file will be selected. In order to perform excludelist filtering, we use the setting `--includelist False` as shown below:
+Similar to the whitelisting example in the previous section, we can use a ID file for blacklist filtering. Blacklist filtering means that all molecules that are ***not*** listed in an ID file will be selected. In order to perform blacklist filtering, we use the setting `--whitelist False` as shown below:
 
 
 ```python
 ! python tools/id_to_mol2.py \
   --input tk-tutorial_data/partition_1-7/ \
-  --output tutorial-results/excludelist-example \
+  --output tutorial-results/blacklist-example \
   --id_file tutorial-results/5-mol2ids.txt \
-  --includelist False
+  --whitelist False
 ```
 
     Processing partition_1.mol2 | scanned 10000 molecules | 12772 mol/sec
@@ -219,12 +219,12 @@ Similar to the includelisting example in the previous section, we can use a ID f
     Finished
 
 
-This time, we expect 69995 structures to be obtained after the filtering, since we scanned 70,000 molecules and had 5 molecules on our ID excludelist:
+This time, we expect 69995 structures to be obtained after the filtering, since we scanned 70,000 molecules and had 5 molecules on our ID blacklist:
 
 
 ```python
 ! python tools/count_mol2.py \
-  --input tutorial-results/excludelist-example
+  --input tutorial-results/blacklist-example
 ```
 
     partition_1.mol2 : 9995
@@ -312,7 +312,7 @@ Below are some additional examples of correct and incorrect selection strings th
 
 - Correct: `"(MWT >= 200) & (NRB <= 7)"`
 - Wrong: `"( MWT >= 200) & ( NRB <= 7)"` [spacing between parentheses and column names]
-- Wrong: `"MWT >= 200 & NRB <= 7"` [expressions separated by logical '&' operator not enclosed in parentheses]
+- Wrong: `"MWT >= 200 & NRB <= 7"` [expressions seperated by logical '&' operator not enclosed in parentheses]
 - Wrong: `"(mwt >= 200) & (nrb <= 7)"` [column names don't match the columns in the data table file]
 - Wrong: `"(mwt>=200) & (nrb<=7)"` [no whitespace before and after operators for comparison]
 
@@ -330,7 +330,7 @@ We already completed step 1, and now, we are going the ID file we just created t
   --input tk-tutorial_data/partition_1-7/ \
   --output tutorial-results/01_selected_mol2s/ \
   --id_file tutorial-results/01_selected_mol2s.txt \
-  --includelist True
+  --whitelist True
 ```
 
     Processing partition_1.mol2 | scanned 10000 molecules | 12021 mol/sec
@@ -455,7 +455,7 @@ We have already completed step 1 so that we can use the ID file we created to se
   --input tutorial-results/01_selected_mol2s/ \
   --output tutorial-results/02_fgroup_presence_mol2s \
   --id_file tutorial-results/02_fgroup_presence_mol2s.txt \
-  --includelist True
+  --whitelist True
 ```
 
     Processing partition_1.mol2 | scanned 8628 molecules | 13872 mol/sec
@@ -531,7 +531,7 @@ Following the already familiar procedure, we can now select the MOL2 structures 
   --input tutorial-results/02_fgroup_presence_mol2s \
   --output tutorial-results/03_fgroup_distance_mol2s \
   --id_file tutorial-results/03_fgroup_distance_mol2s.txt \
-  --includelist True
+  --whitelist True
 ```
 
     Processing partition_1.mol2 | scanned 2140 molecules | 18214 mol/sec
@@ -587,7 +587,7 @@ While you can use OpenEye Omega directly from the command line as described in t
 
 
 ```python
-! python tools/generate_conformers_omega.py \
+! python tools/run_omega.py \
   --input tutorial-results/03_fgroup_distance_mol2s \
   --output tutorial-results/04_omega_confomers/ \
   --executable "/Applications/OMEGA 2.5.1.4.app/Contents/MacOS/omega2-2.5.1.4" \
@@ -904,7 +904,7 @@ While you can use OpenEye Omega directly from the command line as described in t
     ...ce_mol2s/partition_7.mol2|****************************************|100.00%
 
 
-By default, Omega samples up to 50,000 conformer structures and keeps up to 200 conformers with favorable energy per molecule. Additional arguments can be provided using `--settings` flag of `generate_conformers_omega.py`. For example, to increase the maximum number of conformers to keep from 200 to 500, you can provide the following argument: `"--settings -maxconfs 500 \"`.
+By default, Omega samples up to 50,000 conformer structures and keeps up to 200 conformers with favorable energy per molecule. Additional arguments can be provided using `--settings` flag of `run_omega.py`. For example, to increase the maximum number of conformers to keep from 200 to 500, you can provide the following argument: `"--settings -maxconfs 500 \"`.
 
 Now that we created the conformers of the database molecules, let us count the number of structures that we would consider for the pair-wise overlays in the next step:
 
@@ -934,11 +934,11 @@ In this section we are going to overlay the database conformers we generated in 
 
 ![](images/tools-tutorial-1/pipe-step-5.jpg)
 
-Screenlamp provides a wrapper tool `overlay_molecules_rocs.py` that wraps OpenEye ROCS for generating molecular overlays. For more information about ROCS, please see https://www.eyesopen.com/rocs. The `overlay_molecules_rocs.py` wrapper uses ROCS's default settings plus additional settings provided as arguments to the `--settings` parameter of `overlay_molecules_rocs.py`. For more information about the ROCS settings, please refer to the official documentation at https://www.eyesopen.com/rocs. The settings we are going to use will overlay each query conformer with each database conformer, and it will only keep the best overlay for each multi-conformer per. For instance, if we have 200 conformers of a database molecule A and 200 conformers of a reference molecule B, only the single best overlay out of the 200x200 overlays will be kept.
+Screenlamp provides a wrapper tool `run_rocs.py` that wraps OpenEye ROCS for generating molecular overlays. For more information about ROCS, please see https://www.eyesopen.com/rocs. The `run_rocs.py` wrapper uses ROCS's default settings plus additional settings provided as arguments to the `--settings` parameter of `run_rocs.py`. For more information about the ROCS settings, please refer to the official documentation at https://www.eyesopen.com/rocs. The settings we are going to use will overlay each query conformer with each database conformer, and it will only keep the best overlay for each multi-conformer per. For instance, if we have 200 conformers of a database molecule A and 200 conformers of a reference molecule B, only the single best overlay out of the 200x200 overlays will be kept.
 
 
 ```python
-! python tools/overlay_molecules_rocs.py \
+! python tools/run_rocs.py \
   --input tutorial-results/04_omega_confomers/ \
   --output tutorial-results/05_rocs_overlays/ \
   --query tk-tutorial_data/3kpzs_query.mol2 \

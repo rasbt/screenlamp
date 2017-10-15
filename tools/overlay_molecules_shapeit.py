@@ -115,7 +115,7 @@ if __name__ == '__main__':
             description='Wrapper running Silicos-it Shape-it on one'
                         '\nor more database partitions.'
                         '\nFor more information about Shape-it, please see'
-                        'http://silicos-it.be.s3-website-eu-west-1.'
+                        ' http://silicos-it.be.s3-website-eu-west-1.'
                         'amazonaws.com/software/shape-it/1.0.1/shape-it.html',
             epilog="""Example:
 python overlay_molecules_shapeit.py\\
