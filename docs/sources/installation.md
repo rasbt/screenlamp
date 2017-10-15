@@ -14,7 +14,7 @@ Python package dependencies of screenlamp are listed in the `requirements.txt` f
 
     pip install -r requirements.txt
 
-The the main modules of screenlamp are located in the `tools/` subdirectory, and after satisfying the Python package requirements (see `requirements.txt`), they are ready to use. If you haven't used screenlamp before, it is recommended that to read the screenlamp [tutorial](user_guide/doc-overview.md).
+The the main modules of screenlamp are located in the `tools/` subdirectory, and after satisfying the Python package requirements (see [`requirements.txt`](https://github.com/rasbt/screenlamp/blob/master/requirements.txt)), they are ready to use. If you haven't used screenlamp before, it is recommended that to read the screenlamp [tutorial](user_guide/doc-overview.md).
 
 ## Other software requirements
 
