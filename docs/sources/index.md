@@ -10,7 +10,6 @@
 ![Python 3.6](https://img.shields.io/badge/Python-3.6-orange.svg)
 [![License](https://img.shields.io/badge/License-Apache_v2-orange.svg)](license)
 [![GitHub](https://img.shields.io/badge/Source-GitHub-orange.svg)](license)
-[![JCIM](https://img.shields.io/badge/Journal-doi:xxx.xxx.xxx-orange.svg)](license)
 
 ### A toolkit for ligand-based virtual screening
 
