@@ -19,12 +19,15 @@
 # If you are using screenlamp in your research, please cite
 # the following journal article:
 #
-# Sebastian Raschka, Anne M. Scott, Nan Liu,
+# Raschka, Sebastian,  Anne M. Scott, Nan Liu,
 #   Santosh Gunturu, Mar Huertas, Weiming Li,
-#   and Leslie A. Kuhn.
-# "Screenlamp: A hypothesis-driven, ligand-based toolkit to
-#    facilitate large-scale screening,
-#    applied to discover potent GPCR inhibitors"
+#   and Leslie A. Kuhn. 2017
+#
+# Enabling the hypothesis-driven prioritization of
+#   ligand candidates in big databases:
+#   Screenlamp and its application to GPCR inhibitor
+#   discovery for invasive species control.
+#
 
 import subprocess
 import os
