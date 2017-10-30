@@ -24,16 +24,16 @@ The automated screenlamp pipeline that is being used in this tutorial is compati
 
 **Please keep in mind that this screening pipeline with 18,000,000 input molecules and the preconfigured settings takes about a day to complete on a multi-core desktop computer**. Thus, it is recommended to work through this tutorial using a smaller dataset. With kind permission from John Irwin and the ZINC team, we recommend using a random subset of 70,000 small molecules that we prepared for this tutorial. It takes approximately 10 minutes for a multi-core Desktop computer to execute all steps in the automated, virtual screening pipeline described earlier. This subset from ZINC is split into 7 multi-MOL2 file with 10,000 molecules each: `partition_mol2_1.mol2` to `partition_mol2_7.mol2`. 
 
-For this tutorial, please download the dataset by clicking the following link and unzip it on your machine that you are using for the virtual screening run: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/partition_1-7.zip](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/partition_1-7.zip)
+For this tutorial, please download the dataset by clicking the following link and unzip it on your machine that you are using for the virtual screening run: [https://sebastianraschka.com/datasets/screenlamp/pipeline-tutorial_1/partition_1-7.zip](https://sebastianraschka.com/datasets/screenlamp/pipeline-tutorial_1/partition_1-7.zip)
 
 ### data table for Prefiltering
 
-For this particular tutorial, you'll also need a data table containing general information about these molecules. Although the partitions you downloaded above are only a small, modified subset of [ZINC](http://zinc.docking.org) molecules, we are going to use the full ~18,000,000 molecule Drug-like table available for download at [http://zinc.docking.org/subsets/drug-like](http://zinc.docking.org/subsets/drug-like). To download the tab-separated table, click on the [Properties](http://zinc.docking.org/db/bysubset/3/3_prop.xls) link on the [ZINC Drug-like](http://zinc.docking.org/subsets/drug-like) page. Please note that the size of the data table is about ~1.8 Gb, and thus, the download may take a while depending on your internet connection. Alternatively, a smaller data table containing only ~170,000 molecules, please use the following link: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/small_table_p1-7.txt)
+For this particular tutorial, you'll also need a data table containing general information about these molecules. Although the partitions you downloaded above are only a small, modified subset of [ZINC](http://zinc.docking.org) molecules, we are going to use the full ~18,000,000 molecule Drug-like table available for download at [http://zinc.docking.org/subsets/drug-like](http://zinc.docking.org/subsets/drug-like). To download the tab-separated table, click on the [Properties](http://zinc.docking.org/db/bysubset/3/3_prop.xls) link on the [ZINC Drug-like](http://zinc.docking.org/subsets/drug-like) page. Please note that the size of the data table is about ~1.8 Gb, and thus, the download may take a while depending on your internet connection. Alternatively, a smaller data table containing only ~170,000 molecules, please use the following link: [https://sebastianraschka.com/datasets/screenlamp/pipeline-tutorial_1/small_table_p1-7.txt](https://sebastianraschka.com/datasets/screenlamp/pipeline-tutorial_1/small_table_p1-7.txt)
 
 
 ### Query Molecule
 
-The third data file you'll need for ligand-based virtual screening is the query molecule. For this tutorial, please download the following multi-conformer MOL2 file: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/3kpzs_query.mol2)
+The third data file you'll need for ligand-based virtual screening is the query molecule. For this tutorial, please download the following multi-conformer MOL2 file: [https://sebastianraschka.com/datasets/screenlamp/pipeline-tutorial_1/3kpzs_query.mol2](https://sebastianraschka.com/datasets/screenlamp/pipeline-tutorial_1/3kpzs_query.mol2)
 
 ## Editing the Configuration File
 
@@ -51,7 +51,7 @@ python path/to/screenlamp/tools/pipelines/pipeline-example-1.py --config_file /p
 
 By setting `--incremental true`, you will be prompted to confirm each step by pressing enter, which is recommended for the first time use.
 
-For your reference, a zip archive of all files being generated via the execution of the screenlamp pipeline can be obtained via the following download link: [https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/pipeline-tutorial_1_outputs.zip](https://s3-us-west-2.amazonaws.com/screenlamp-datasets/pipeline-tutorial_1/pipeline-tutorial_1_outputs.zip).
+For your reference, a zip archive of all files being generated via the execution of the screenlamp pipeline can be obtained via the following download link: [https://sebastianraschka.com/datasets/screenlamp/pipeline-tutorial_1/pipeline-tutorial_1_outputs.zip](https://sebastianraschka.com/datasets/screenlamp/pipeline-tutorial_1/pipeline-tutorial_1_outputs.zip).
 
 ## Canceling and Resuming a Screening Run
 
