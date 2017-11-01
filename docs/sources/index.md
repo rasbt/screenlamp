@@ -2,7 +2,7 @@
 <br>
 
 <div style="max-width:50%;">
-<img src="images/logo.png" alt="screenlamp logo">
+<img src="images/logo-transparent-bg.png" alt="screenlamp logo">
 </div>
 
 
@@ -19,7 +19,7 @@ Screenlamp is a Python package for facilitating ligand-based virtual screening w
 
 ## About
 
-The screenlamp toolkit was developed in the [Protein Structure Analysis & Design Laboratory](http://www.kuhnlab.bmb.msu.edu) at Michigan State University. For additional information on the theory behind the screenlamp project, please refer to the accompanying research publication:
+The screenlamp toolkit was developed in the [Protein Structure Analysis & Design Laboratory](http://www.kuhnlab.bmb.msu.edu) at Michigan State University. For additional information about screenlamp, please refer to the accompanying research publication, which is currently under revision:
 
 - Raschka, Sebastian, Anne M. Scott, Nan Liu, Santosh Gunturu, Mar Huertas, Weiming Li, and Leslie A. Kuhn (2017). "Enabling the hypothesis-driven prioritization of ligand candidates in big databases: 
 Screenlamp and its application to GPCR inhibitor discovery for invasive species control"
