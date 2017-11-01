@@ -13,6 +13,8 @@
 
 Screenlamp is a Python package for facilitating ligand-based virtual screening workflows and toolkits with hypothesis-driven filtering steps.
 
+**The official documentation is available at https://psa-lab.github.io/screenlamp.**
+
 
 ## About
 
