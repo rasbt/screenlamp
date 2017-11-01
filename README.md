@@ -23,3 +23,8 @@ Screenlamp and its application to GPCR inhibitor discovery for invasive species 
 
 
 Screenlamp is research software and has been made available to other researchers under a permissive [Apache v2 open source license](license). If you use screenlamp in your scientific projects or any derivative work, the authors of the screenlamp software must be acknowledged and the publication listed above should be cited.
+
+
+# Contact
+
+If you encounter bugs or other technical issues with the screenlamp software package, please send an email to [kuhnlab@msu.edu](mailto:kuhnlab@msu.edu) or use the [Issue Tracker](https://github.com/psa-lab/screenlamp/issues). For questions about the [screenlamp research article](cite/index.html), please contact the publisher or [corresponding author](mailto:kuhnl@msu.edu) directly instead.
