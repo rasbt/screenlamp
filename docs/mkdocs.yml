@@ -3,7 +3,7 @@ site_url: http://rasbt.github.io/screenlamp
 site_author: Sebastian Raschka
 site_description: A toolkit for ligand-based screening
 
-repo_url: https://github.com/rasbt/screenlamp
+repo_url: https://github.com/psa-lab/screenlamp
 
 #include_search: true # not necessary for this theme
 docs_dir: sources
